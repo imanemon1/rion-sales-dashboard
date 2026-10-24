@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>فروش کاتینگ ریون</title>
+<style>
+:root{--bg:#f1f3f8;--ink:#1d2433;--mut:#6b7488;--pri:#2f5bea;--navy:#1f2a44;--ok:#16a34a;--warn:#f59e0b;--bad:#dc2626;--line:#e6e9f2}
+*{box-sizing:border-box}
+body{margin:0;font-family:Vazirmatn,Tahoma,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+header{background:linear-gradient(135deg,#dcebff,#b9d6f7);color:var(--navy);padding:12px 16px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px #0002}
+.logo{background:#fff;border:1px solid #9bb8e0;border-radius:14px;padding:6px 12px;box-shadow:0 2px 6px #0002;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.logo img{height:64px;width:auto;display:block}
+body.locked .ctrl,body.locked #gear,body.locked #nav{display:none}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+h1{margin:0;font-size:17px;letter-spacing:.2px}
+.brand{display:flex;align-items:center;gap:12px}
+.sub{font-size:11px;color:#3d4d72;margin-top:2px}
+.lft{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.lft .ctrl{background:#fff;border-radius:10px;padding:7px 10px;box-shadow:0 2px 6px #0002;color:var(--ink)}
+.lft .ctrl select{background:#eef3fc;color:var(--ink)}
+.ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px}
+.ctrl input,.ctrl select{padding:5px 7px;border-radius:6px;border:0;font-family:inherit}
+.ctrl input[type=number]{width:85px}
+.btn{background:#f2b84b;color:#222;border:0;padding:7px 12px;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:bold}
+.btn.sec{background:#e5e9f5}
+nav{display:flex;gap:4px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+nav button{background:var(--navy);color:#fff;border:1px solid var(--navy);padding:5px 9px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap}
+nav button.on{background:#f2b84b;color:#222;border-color:#f2b84b;font-weight:bold}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.seg button{background:#fff;color:var(--ink);border:1px solid #c9d6ea;padding:8px 14px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:13px}
+.seg button.on{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:bold}
+main{max-width:1200px;margin:auto;padding:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.card,.box{background:#fff;border-radius:12px;box-shadow:0 1px 3px #0001}
+.card{padding:13px;border-top:3px solid var(--pri)}
+.card.g{border-color:var(--ok)}.card.w{border-color:var(--warn)}.card.b{border-color:var(--bad)}
+.card .l{color:var(--mut);font-size:12px}.card .v{font-size:23px;font-weight:bold;margin-top:3px}.card .s{font-size:11px;color:var(--mut)}
+.tap{cursor:pointer;transition:transform .1s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
+.tap:active{transform:scale(.98)}.tap:hover{box-shadow:0 2px 8px #0a7ea426}
+.tap.on{box-shadow:0 0 0 2px #0a7ea4}
+.tap .more{display:block;font-style:normal;color:#0a7ea4;margin-top:5px;font-size:11px}
+.drill{background:#fff;border-radius:12px;box-shadow:0 1px 3px #0001;border-top:3px solid #0a7ea4;padding:14px;margin:0 0 12px}
+.drill .dh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.drill h2{margin:0 0 2px;font-size:15px}.drill .note{margin:0 0 10px}
+.drill .dx{background:none;border:0;font-size:24px;line-height:1;cursor:pointer;color:#0a5f7d;padding:0 4px}
+.drill .sub{font-size:12px;color:var(--mut);margin:12px 0 6px}
+.box{padding:14px;margin-bottom:12px}
+.box h2{margin:0 0 4px;font-size:15px}.note{color:var(--mut);font-size:12px;margin:0 0 10px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+.bar{background:#e8ebf4;border-radius:6px;height:12px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--pri)}.bar.big{height:22px}
+.wrap{overflow:auto;max-height:560px}
+.pb-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.pb-head h2{margin:0}.pb-head b{font-size:13px;color:var(--mut);font-weight:normal}
+.pb-click{cursor:pointer;border-radius:6px;transition:background .2s}
+.pb-click:hover{background:#0a7ea40d}
+.pb-click:focus-visible{outline:2px solid #0a7ea4;outline-offset:4px}
+.gh{font-size:12px;color:#0a7ea4;margin-top:8px}
+.pb-tube{position:relative;height:24px;border-radius:4px;background:#e3f2f7;border:1px solid #8cc9dd;box-shadow:inset 0 2px 4px #0a4d6626;overflow:hidden}
+.pb-fill{position:absolute;top:2px;bottom:2px;right:2px;width:var(--w);min-width:24px;border-radius:2px;overflow:hidden;
+ background:linear-gradient(#7fd6ef 0%,#1aa3cc 42%,#0b7ea6 70%,#095f7f 100%);
+ box-shadow:0 0 6px #0a7ea455;animation:pbgrow 1.8s cubic-bezier(.22,.8,.25,1) both}
+@keyframes pbgrow{from{width:24px}}
+.pb-fill::after{content:"";position:absolute;left:0;right:0;top:0;height:35%;background:linear-gradient(#ffffff40,#fff0)}
+.pb-w{position:absolute;left:0;right:0;bottom:0;height:62%;background-repeat:repeat-x;background-position:0 0;background-size:72px 100%;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 20' preserveAspectRatio='none'%3E%3Cpath d='M0 9Q18 3 36 9T72 9V20H0Z' fill='white' fill-opacity='.38'/%3E%3C/svg%3E");
+ animation:wvA 9s linear infinite}
+.pb-w.p2{height:44%;bottom:0;background-size:110px 100%;opacity:.55;animation:wvB 14s linear infinite;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 110 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10Q27 4 55 10T110 10V20H0Z' fill='%23bff1ff' fill-opacity='.7'/%3E%3C/svg%3E")}
+@keyframes wvA{to{background-position:72px 0}}
+@keyframes wvB{to{background-position:-110px 0}}
+.pb-pct{position:absolute;top:0;bottom:0;left:12px;display:flex;align-items:center;font-weight:bold;font-size:13px;color:#06405a;z-index:5;direction:ltr}
+.pb-ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-top:5px;padding:0 6px}
+/* سهم از فروش: لوله‌ی سبز سه‌بعدی با مایع در حال حرکت */
+.sh-tube{position:relative;height:30px;min-width:200px;border-radius:4px;background:linear-gradient(#dff5e8,#f2fbf5);border:1px solid #6cbf8c;box-shadow:inset 0 3px 5px #0b4f2a33,inset 0 -1px 2px #ffffffaa;overflow:hidden}
+.sh-fill{position:absolute;top:2px;bottom:2px;right:2px;width:var(--w);min-width:0;border-radius:3px;overflow:hidden;
+ background:linear-gradient(#a9f0c0 0%,#2fbf66 42%,#16a34a 70%,#0b6130 100%);box-shadow:0 0 7px #16a34a77;animation:shgrow 1.6s cubic-bezier(.22,.8,.25,1) both}
+@keyframes shgrow{from{width:0}}
+.sh-fill::after{content:"";position:absolute;left:0;right:0;top:0;height:40%;background:linear-gradient(#ffffff55,#fff0)}
+.sh-stripe{position:absolute;inset:0;background:repeating-linear-gradient(-45deg,#ffffff2e 0 6px,#fff0 6px 14px);background-size:28px 28px;animation:shflow 1s linear infinite}
+@keyframes shflow{to{background-position:28px 0}}
+.sh-w{position:absolute;left:0;right:0;bottom:0;height:55%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 20' preserveAspectRatio='none'%3E%3Cpath d='M0 9Q18 3 36 9T72 9V20H0Z' fill='white' fill-opacity='.35'/%3E%3C/svg%3E") repeat-x 0 0/72px 100%;animation:wvA 8s linear infinite}
+.sh-edge{position:absolute;top:0;bottom:0;left:0;width:6px;background:linear-gradient(90deg,#eafff1,#ffffff00);animation:shedge 1.2s ease-in-out infinite}
+@keyframes shedge{50%{opacity:.35}}
+.sh-b{position:absolute;bottom:-4px;width:6px;height:6px;border-radius:50%;background:#ffffffcc;animation:shbub 2.6s ease-in infinite}
+@keyframes shbub{0%{transform:translateY(0);opacity:0}20%{opacity:.9}100%{transform:translateY(-30px);opacity:0}}
+.sh-pct{position:absolute;top:0;bottom:0;left:10px;display:flex;align-items:center;font-weight:bold;font-size:15px;color:#064e2a;z-index:5;direction:ltr}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mut);font-weight:normal;font-size:12px;background:#fafbfe;position:sticky;top:0;cursor:pointer}
+td.n,th.n{text-align:left;direction:ltr}
+td.z{color:#c3c8d6}
+tr:hover td{background:#f7f9ff}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;background:#eef1fb;color:#33416b}
+.tag.old{background:#fee2e2;color:#991b1b}.tag.mid{background:#fef3c7;color:#92400e}.tag.new{background:#dcfce7;color:#166534}.tag.gray{background:#eceef3;color:#555}
+.st{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;color:#fff}
+.st.ok{background:var(--ok)}.st.g1{background:var(--warn)}.st.g2{background:#ea580c}.st.g3{background:var(--bad)}.st.never{background:#6b7280}
+.months{display:flex;align-items:flex-end;gap:6px;height:170px;border-bottom:1px solid #ccd;position:relative;padding-top:14px}
+.mc{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.mc b{width:70%;background:var(--pri);border-radius:4px 4px 0 0}.mc.f b{background:#cbd5e1}.mc.cur b{background:var(--ok)}
+.mc span{font-size:10px;color:#556;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;margin-bottom:3px}
+.mlab{display:flex;gap:6px;height:54px;border-top:0}.mlab div{flex:1;min-width:0;display:flex;justify-content:center;padding-top:4px}.mlab span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;color:var(--mut);white-space:nowrap}
+.tline{position:absolute;left:0;right:0;border-top:2px dashed var(--bad)}.tline em{position:absolute;right:2px;top:-15px;font-size:10px;color:var(--bad);font-style:normal}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.filters input,.filters select{padding:7px;border-radius:8px;border:1px solid #cdd3e3;font-family:inherit}
+.filters input{flex:1;min-width:160px}
+details{border-bottom:1px solid var(--line);padding:6px 0}
+summary{cursor:pointer;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:8px 0}
+.chip{background:#f1f3fa;border-radius:8px;padding:3px 9px;font-size:12px}
+.chip small{color:var(--mut)}
+#empty{padding:50px;text-align:center;color:var(--mut)}
+.setf{display:grid;gap:12px;max-width:420px}
+.setf label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:#445}
+.setf input{padding:9px 10px;border:1px solid #d5dbea;border-radius:8px;font-family:inherit;font-size:15px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.btn.sec{background:#e8ebf4;color:#223}
+.gear{background:#fff;color:var(--navy);border:1px solid #9bb8e0;box-shadow:0 2px 6px #0002;border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.gear.on{background:#f2b84b;color:#222}
+.gear:hover{background:#eef3fc}
+.upl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ok{color:var(--ok);font-size:13px;font-weight:600}
+@media (max-width:600px){
+ .top{padding:10px 12px}
+ .brand{gap:8px}
+ h1{font-size:15px}.sub{font-size:10px}
+ .ctrl{width:100%;gap:6px}.ctrl .btn{width:100%}
+ main{padding:10px}
+ .grid{grid-template-columns:1fr 1fr;gap:8px}
+ .card .v{font-size:20px}
+ .two{grid-template-columns:1fr}
+ .setf{max-width:none}
+}
+.lc{width:100%;height:auto;display:block;overflow:visible}
+.lc .ln{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;pathLength:1;stroke-dasharray:1;stroke-dashoffset:1;animation:lcdraw 1.4s ease forwards}
+.lc .dot{stroke:#fff;stroke-width:2}
+.lc text{font-family:Vazirmatn,sans-serif;font-size:13px;fill:var(--mut)}
+@keyframes lcdraw{to{stroke-dashoffset:0}}
+.lgd{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px}
+.lgd span{display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.lgd i{width:14px;height:14px;border-radius:50%;display:inline-block}
+.gd{position:fixed;inset:0;background:#0a2a3a80;display:none;align-items:flex-end;justify-content:center;z-index:50;padding:12px}
+.gd.on{display:flex;animation:gdin .25s ease}
+@keyframes gdin{from{opacity:0}}
+.gd .pn{position:relative;background:#f4fbfd;width:100%;max-width:560px;max-height:85vh;overflow:auto;border-radius:6px;border:1px solid #8cc9dd;border-top:4px solid #0a7ea4;box-shadow:0 10px 30px #0a3a4d55;padding:14px 16px 18px}
+.gd h3{margin:0 0 4px;color:#0a5f7d}
+.gd .it{background:#fff;border:1px solid #cfe8f1;border-right:4px solid #0a7ea4;border-radius:4px;padding:10px 12px;margin:8px 0}
+.gd .it b{font-size:14px}
+.gd .it p{margin:4px 0 8px;font-size:13px;color:#2b4550;line-height:1.7}
+.gd button.go{background:#0a7ea4;color:#fff;border:0;border-radius:3px;padding:6px 12px;font-family:inherit;font-size:13px;cursor:pointer}
+.gd button.go:hover{background:#095f7f}
+.gd .x{position:absolute;top:6px;left:8px;background:none;border:0;font-size:24px;line-height:1;cursor:pointer;color:#0a5f7d}
+</style>
+</head>
+<body>
+<header>
+ <div class="top">
+  <div class="brand">
+   <div><h1>فروش کاتینگ ریون</h1><div class="sub">پیگیری فروش متراژی حریر و توری</div></div>
+  </div>
+  <div class="logo"><img src="/*__LOGO__*/" alt="لوگو"></div>
+  <div class="lft">
+   <button class="gear" id="gear" title="تنظیمات">⚙</button>
+   <div class="ctrl">
+    <label>ماه جاری <select id="cur"></select></label>
+   </div>
+   <input id="file" type="file" accept=".xlsx,.xls" hidden>
+  </div>
+ </div>
+ <nav id="nav"></nav>
+</header>
+<div id="guide" class="gd"></div>
+<main id="app"><div id="empty">برای شروع، از ⚙ گوشه بالا-چپ فایل اکسل را بارگذاری کنید.</div></main>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const PRELOAD = /*__DATA__*/null;
+const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+const DEF={target:60000,newGoal:80,base:null};
+const getCfg=()=>{try{return {...DEF,...JSON.parse(localStorage.getItem('rionCfg')||'{}')}}catch(e){return {...DEF}}};
+const setCfg=c=>localStorage.setItem('rionCfg',JSON.stringify(c));
+const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها و راسته‌ها'],['reps','نماینده‌ها']];
+const STL={ok:'فعال',g1:'یک ماه بی‌خرید',g2:'دو ماه بی‌خرید',g3:'سه ماه+ بی‌خرید',never:'بدون خرید'};
+const mcell=(v,cls='',attr='')=>`<td class="n ${cls}" ${attr}>${v==null?'':fa(v)}</td>`;
+const fa=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:1});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num=v=>typeof v==='number'?v:(parseFloat(v)||0);
+const $=id=>document.getElementById(id);
+const S={csub:'collect',tab:'over',cur:0,q:'',sheet:'',status:'',year:'',sort:'total',dir:-1};
+let D=null;let LASTMSG='';
+
+function parse(sheets){
+  const shops=[],reps=[];
+  for(const [sheet,rows] of Object.entries(sheets)){
+    const hi=rows.findIndex(r=>r&&r.some(c=>String(c??'').trim()==='نام مغازه'));
+    if(hi<0)continue;
+    const h=rows[hi].map(c=>c==null?'':String(c).trim());
+    const nameC=h.indexOf('نام مغازه'),hangC=h.indexOf('هنگر');
+    const mC=[];for(let m=1;m<=12;m++){const i=h.indexOf(String(m));if(i>=0)mC[m]=i}
+    const bookCs=h.map((x,i)=>x.startsWith('بوک')?i:-1).filter(i=>i>=0);
+    const isRep=bookCs.length>1;
+    for(let r=hi+1;r<rows.length;r++){
+      const row=rows[r];if(!row)continue;
+      const name=String(row[nameC]??'').trim();
+      if(!name||name.startsWith('جمع'))continue;
+      const m=[0];for(let k=1;k<=12;k++){const raw=mC[k]!=null?row[mC[k]]:null;m[k]=(raw==null||String(raw).trim()==='')?null:num(raw)}
+      const total=m.reduce((a,b)=>a+(b||0),0);
+      if(isRep)reps.push({name,sheet,hanger:num(row[hangC]),b:bookCs.map(i=>({label:h[i],n:num(row[i])})),m,total});
+      else{
+        const book=String(row[bookCs[0]]??'').trim();
+        const mt=book.match(/(\d)\s*$/);
+        shops.push({name,sheet,book,year:mt?+mt[1]:0,hanger:!!String(row[hangC]??'').trim(),m,total});
+      }
+    }
+  }
+  return {shops,reps};
+}
+
+function lastMonth(){let l=0;[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)if(s.m[k]>0&&k>l)l=k});return l||1}
+function enrich(){
+  const c=S.cur;
+  D.shops.forEach(s=>{
+    let gap=0;for(let k=c;k>=1&&!(s.m[k]>0);k--)gap++;
+    const upto=s.m.slice(1,c+1).reduce((a,b)=>a+b,0);
+    s.upto=upto;
+    s.gap=gap;
+    s.status=upto===0?'never':gap===0?'ok':gap===1?'g1':gap===2?'g2':'g3';
+    // last purchase month
+    s.lastBuy=0;for(let k=c;k>=1;k--)if(s.m[k]>0){s.lastBuy=k;break}
+  });
+}
+const yl=y=>y?'۱۴۰'+fa(y):'؟';
+const ytag=y=>`<span class="tag ${y>=5?'new':y===4?'mid':y?'old':'gray'}">بوک ${yl(y)}</span>`;
+const stag=s=>`<span class="st ${s}">${STL[s]}</span>`;
+const shopCell=s=>`<td>${esc(s.name)}</td>`;
+
+// تعداد بوک‌های تحویلی به نماینده‌ها، به تفکیک سال بوک (۴ یا ۵)
+function repBooks(){const r={};D.reps.forEach(p=>p.b.forEach(b=>{const mt=b.label.match(/(\d)\s*$/);const y=mt?+mt[1]:0;r[y]=(r[y]||0)+b.n}));return r}
+const DRG={sold:'top',left:'top',need:'top',proj:'top',inact:'top',added:'top',coll:'top',st_active:'st',st_semi:'st',st_inact:'st',st_dead:'st',st_upd:'st',shS:'sh',repS:'sh'};
+function drillTap(k,l,v,s,cl){const on=S.drill===k;return `<div class="card tap ${cl||''} ${on?'on':''}" data-d="${k}" role="button" tabindex="0" aria-expanded="${on}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div><em class="more">${on?'بستن ▴':'جزئیات ▾'}</em></div>`}
+function ovNums(){
+  const cfg=getCfg(),target=cfg.target||60000,c=S.cur;
+  const mon=Array(13).fill(0);[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)mon[k]+=s.m[k]});
+  const sold=mon.slice(1).reduce((a,b)=>a+b,0);
+  const left=Math.max(target-sold,0),rem=12-c,need=rem>0?left/rem:left;
+  const cnt=k=>D.shops.filter(s=>s.status===k).length;
+  const inact=cnt('g1')+cnt('g2')+cnt('g3');
+  const coll=D.shops.filter(s=>s.year>=4&&s.status!=='ok').length;
+  const pace=c?sold/c:0, proj=pace*12;
+  const shopM=D.shops.reduce((a,s)=>a+s.total,0), repM=D.reps.reduce((a,r)=>a+r.total,0);
+  const nShops=D.shops.length, base=cfg.base??nShops, added=Math.max(nShops-base,0), gN=cfg.newGoal||0;
+  return {cfg,target,c,mon,sold,left,rem,need,pace,proj,cnt,inact,coll,shopM,repM,nShops,base,added,gN};
+}
+function statBlock(){
+  const c=S.cur, by=k=>D.shops.filter(s=>s.status===k);
+  const upd=D.shops.filter(s=>s.year===4&&['ok','g1','g2'].includes(s.status));
+  const g={
+    active:{l:'فعال',a:by('ok'),cl:'g',d:'در ماه جاری خرید داشته‌اند'},
+    semi:{l:'نیمه‌فعال',a:[...by('g1'),...by('g2')],cl:'w',d:'۱ یا ۲ ماه است خرید نکرده‌اند'},
+    inact:{l:'غیرفعال',a:by('g3'),cl:'b',d:'۳ ماه یا بیشتر خرید نکرده‌اند ولی امسال خرید داشته‌اند'},
+    dead:{l:'راکد',a:by('never'),cl:'b',d:'از ابتدای سال هیچ خریدی نداشته‌اند'}
+  };
+  const card=(k,l,a,cl,d)=>drillTap(k,l,fa(a.length),d,cl);
+  return `<div class="box"><h2>وضعیت مغازه‌ها تا ${MONTHS[c-1]} (${fa(D.shops.length)} مغازه، بدون نماینده)</h2>
+  <div class="grid">${card('st_active',g.active.l,g.active.a,g.active.cl,g.active.d)}${card('st_semi',g.semi.l,g.semi.a,g.semi.cl,g.semi.d)}${card('st_inact',g.inact.l,g.inact.a,g.inact.cl,g.inact.d)}${card('st_dead',g.dead.l,g.dead.a,g.dead.cl,g.dead.d)}${card('st_upd','قابل به‌روزرسانی به بوک ۱۴۰۵',upd,'g','بوک ۱۴۰۴ دارند و فعال یا نیمه‌فعال هستند')}</div>
+  ${drillPanel('st')}</div>`;
+}
+function shopRows(a){
+  if(!a.length)return '<p class="note">موردی نیست.</p>';
+  return `<div class="wrap"><table><tr><th>مغازه</th><th>بوک</th><th class="n">آخرین خرید</th><th class="n">جمع سال</th><th>وضعیت</th></tr>${a.map(s=>`<tr><td>${esc(s.name)}<br><small>${esc(s.sheet)}</small></td><td>${ytag(s.year)}</td><td class="n">${s.lastBuy?MONTHS[s.lastBuy-1]:'—'}</td><td class="n">${fa(s.total)}</td><td>${stag(s.status)}</td></tr>`).join('')}</table></div>`;
+}
+const byTot=(a,b)=>b.total-a.total;
+const byLast=(a,b)=>(a.lastBuy||99)-(b.lastBuy||99)||b.total-a.total;
+function kvRows(rows){return `<div class="wrap"><table>${rows.map(([l,v])=>`<tr><td>${l}</td><td class="n"><b>${v}</b></td></tr>`).join('')}</table></div>`}
+function drillInfo(k){
+  const o=ovNums(),c=o.c,tot=o.sold||1;
+  const by=st=>D.shops.filter(s=>st.includes(s.status));
+  switch(k){
+    case 'sold':{
+      const rows=[];for(let m=1;m<=c;m++){const buyers=D.shops.filter(s=>s.m[m]>0).length;rows.push(`<tr><td>${MONTHS[m-1]}</td><td class="n">${fa(o.mon[m])}</td><td class="n">${fa(buyers)}</td></tr>`)}
+      return {t:'فروش تا امروز',d:'جمع فروش مغازه‌ها و نماینده‌ها در ماه‌های سال.',
+        h:kvRows([['فروش مغازه‌ها',fa(o.shopM)+' متر'],['فروش نماینده‌ها',fa(o.repM)+' متر'],['جمع',fa(o.sold)+' متر'],['درصد از هدف',fa(o.sold/o.target*100)+'٪']])+
+        `<div class="sub">فروش هر ماه</div><div class="wrap"><table><tr><th>ماه</th><th class="n">متر</th><th class="n">مغازه خریدار</th></tr>${rows.join('')}</table></div>`};}
+    case 'left':
+      return {t:'باقی‌مانده تا هدف',d:'چقدر مانده تا هدف سالانه برسیم.',
+        h:kvRows([['هدف سالانه',fa(o.target)+' متر'],['فروخته‌شده',fa(o.sold)+' متر'],['باقی‌مانده',fa(o.left)+' متر'],['ماه‌های مانده',fa(o.rem)],['لازم در هر ماه',fa(o.need)+' متر']])};
+    case 'need':{
+      const from=Math.max(1,o.c-2),ms=[];for(let m=from;m<=o.c;m++)ms.push(o.mon[m]);const last3=ms.length?ms.reduce((a,b)=>a+b,0)/ms.length:0;
+      return {t:'لازم در هر ماه',d:'برای رسیدن به هدف، این مقدار باید در هر ماه باقی‌مانده فروخته شود.',
+        h:kvRows([['لازم در هر ماه',fa(o.need)+' متر'],['میانگین کل تا امروز',fa(o.pace)+' متر'],['میانگین ۳ ماه اخیر',fa(last3)+' متر'],['اختلاف با میانگین کل',fa(o.need-o.pace)+' متر']])};}
+    case 'proj':
+      return {t:'پیش‌بینی پایان سال',d:'اگر همین میانگین تا پایان سال ادامه پیدا کند.',
+        h:kvRows([['میانگین ماهانه تا امروز',fa(o.pace)+' متر'],['پیش‌بینی جمع سال',fa(o.proj)+' متر'],['هدف',fa(o.target)+' متر'],['اختلاف با هدف',(o.proj>=o.target?'+':'−')+fa(Math.abs(o.proj-o.target))+' متر']])};
+    case 'inact':
+      return {t:'مغازه‌های بی‌خرید',d:'مغازه‌هایی که یک ماه یا بیشتر خرید نکرده‌اند؛ قدیمی‌ترین وقفه اول.',
+        h:shopRows(by(['g1','g2','g3']).sort(byLast))};
+    case 'added':{
+      const nw=D.shops.filter(s=>s.sheet==='جدید');
+      return {t:'مغازه جدید',d:`پایه: ${fa(o.base)} مغازه • الان: ${fa(o.nShops)} مغازه • اضافه‌شده: ${fa(o.added)} از هدف ${fa(o.gN)}. فهرست زیر بر اساس شیت «جدید» است.`,
+        h:shopRows(nw.sort(byTot))};}
+    case 'coll':
+      return {t:'بوک برای جمع‌آوری',d:'بوک ۱۴۰۴ و ۱۴۰۵ که مغازه‌شان این ماه خرید نداشته است.',
+        h:shopRows(D.shops.filter(s=>s.year>=4&&s.status!=='ok').sort((a,b)=>b.year-a.year||byTot(a,b)))};
+    case 'st_active':return {t:'مغازه‌های فعال',d:'در ماه جاری خرید داشته‌اند.',h:shopRows(by(['ok']).sort(byTot))};
+    case 'st_semi':return {t:'مغازه‌های نیمه‌فعال',d:'۱ یا ۲ ماه خرید نکرده‌اند.',h:shopRows(by(['g1','g2']).sort(byLast))};
+    case 'st_inact':return {t:'مغازه‌های غیرفعال',d:'۳ ماه یا بیشتر خرید نکرده‌اند.',h:shopRows(by(['g3']).sort(byLast))};
+    case 'st_dead':return {t:'مغازه‌های راکد',d:'از ابتدای سال هیچ خریدی نداشته‌اند.',h:shopRows(by(['never']).sort((a,b)=>a.name.localeCompare(b.name)))};
+    case 'st_upd':return {t:'قابل به‌روزرسانی به بوک ۱۴۰۵',d:'بوک ۱۴۰۴ دارند و فعال یا نیمه‌فعال هستند؛ برای آلبوم جدید اولویت‌بندی کنید.',h:shopRows(D.shops.filter(s=>s.year===4&&['ok','g1','g2'].includes(s.status)).sort(byTot))};
+    case 'shS':return {t:'فروش مغازه‌ها',d:`${fa(o.nShops)} مغازه، ${fa(o.shopM/tot*100)}٪ از فروش کل. مرتب‌شده بر اساس جمع فروش.`,h:shopRows([...D.shops].sort(byTot))};
+    case 'repS':{
+      const rows=[...D.reps].sort((a,b)=>b.total-a.total).map(r=>`<tr><td>${esc(r.name)}</td><td class="n">${fa(r.total)}</td><td>${shareBar(r.total/tot*100)}</td></tr>`).join('');
+      return {t:'فروش نماینده‌ها',d:'نماینده‌ها در جمع فروش حساب می‌شوند ولی در رتبه‌بندی مغازه‌ها نیستند.',
+        h:`<div class="wrap"><table><tr><th>نماینده</th><th class="n">متر</th><th>سهم از فروش</th></tr>${rows}</table></div>`};}
+  }
+  return null;
+}
+function drillPanel(g){
+  const k=S.drill; if(!k||DRG[k]!==g) return '';
+  const r=drillInfo(k); if(!r) return '';
+  return `<div class="drill" id="drill"><div class="dh"><div><h2>${r.t}</h2><p class="note">${r.d}</p></div><button class="dx" data-dx aria-label="بستن">×</button></div>${r.h}</div>`;
+}
+function viewOver(){
+  const o=ovNums(),{target,c,sold,left,rem,need,pace,proj,inact,coll,shopM,repM,gN,added,cnt}=o;
+  const mT=target/12, maxM=Math.max(...o.mon.slice(1),mT)*1.1||1, tot=sold||1;
+  return `<div class="grid">
+   ${drillTap('sold','فروش تا امروز (متر)',fa(sold),fa(sold/target*100)+'٪ از هدف','')}
+   ${drillTap('left','باقی‌مانده تا هدف',fa(left),fa(rem)+' ماه مانده',left?'w':'g')}
+   ${drillTap('need','لازم در هر ماه',fa(need),'میانگین فعلی '+fa(pace),need>pace*1.2?'b':'g')}
+   ${drillTap('proj','پیش‌بینی پایان سال',fa(proj),'با همین روند',proj>=target?'g':'b')}
+   ${drillTap('inact','مغازه‌های بی‌خرید',fa(inact),`یک ماه ${fa(cnt('g1'))} • دو ماه ${fa(cnt('g2'))} • بیشتر ${fa(cnt('g3'))}`,'w')}
+   ${gN?drillTap('added','مغازه جدید اضافه‌شده',fa(added)+' از '+fa(gN),'هدف: '+fa(Math.min(added/gN*100,100))+'٪','g'):''}
+   ${drillTap('coll','بوک ۱۴۰۵ و ۱۴۰۴ برای جمع‌آوری',fa(coll),'مغازه‌ای که این ماه کار نکرده','b')}
+  </div>
+  ${drillPanel('top')}
+  ${statBlock()}
+  <div class="box pb-click" role="button" tabindex="0"><div class="pb-head"><h2>هدف سالانه: ${fa(target)} متر</h2><b>${fa(sold)} متر فروخته شده • ${fa(left)} متر مانده</b></div>
+  <div class="pb-tube"><div class="pb-fill" style="--w:${Math.max(Math.min(sold/target*100,100),0)}%"><i class="pb-w"></i><i class="pb-w p2"></i></div><div class="pb-pct">${fa(sold/target*100)}٪</div></div>
+  <div class="gh">روی نوار بزنید: راهنمای مسیر و پیشنهادها</div>
+  <div class="pb-ticks"><span>۰</span><span>۲۵٪</span><span>۵۰٪</span><span>۷۵٪</span><span>${fa(target)}</span></div></div>
+  <div class="grid">
+   ${drillTap('shS','فروش مغازه‌ها',fa(shopM),fa(shopM/tot*100)+'٪ از فروش کل • '+fa(D.shops.length)+' مغازه','g')}
+   ${drillTap('repS','فروش نماینده‌ها',fa(repM),fa(repM/tot*100)+'٪ از فروش کل • '+fa(D.reps.length)+' نماینده','b')}
+  </div>
+  ${drillPanel('sh')}
+  ${gN?`<div class="box"><div class="pb-head"><h2>هدف مغازه جدید: ${fa(gN)} مغازه</h2><b>${fa(added)} مغازه اضافه شده</b></div><div class="bar big"><i style="width:${Math.min(added/gN*100,100)}%"></i></div></div>`:''}
+  <div class="box"><h2>فروش ماهانه</h2><p class="note">ستون سبز ماه جاری است. خط قرمز هدف ماهانه (${fa(mT)} متر) است.</p>
+   <div class="months"><div class="tline" style="bottom:${mT/maxM*100}%"><em>هدف ${fa(mT)}</em></div>
+   ${o.mon.slice(1).map((v,i)=>`<div class="mc ${i+1>c?'f':''} ${i+1===c?'cur':''}"><span>${v?fa(v):''}</span><b style="height:${v/maxM*100}%"></b></div>`).join('')}</div>
+   <div class="mlab">${MONTHS.map(m=>`<div><span>${m}</span></div>`).join('')}</div></div>
+  <div class="two"><div class="box"><h2>۱۰ مغازه برتر</h2><div class="wrap"><table>${[...D.shops].sort(byTot).slice(0,10).map((s,i)=>`<tr><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td class="n">${fa(s.total)}</td></tr>`).join('')}</table></div></div>
+  <div class="box"><h2>سهم بوک‌ها از فروش مغازه‌ها</h2>${yearTable()}</div></div>`;
+}
+function yearTable(){
+  const y={};D.shops.forEach(s=>{const o=y[s.year]??={n:0,t:0,h:0};o.n++;o.t+=s.total;if(s.hanger)o.h++});
+  const tot=D.shops.reduce((a,s)=>a+s.total,0)||1;
+  return `<div class="wrap"><table><tr><th>طرح</th><th class="n">مغازه</th><th class="n">متر</th><th>سهم از فروش</th><th class="n">میانگین هر مغازه</th><th class="n">هنگر</th></tr>${Object.keys(y).sort((a,b)=>b-a).map(k=>{const o=y[k];return `<tr><td>${ytag(+k)}</td><td class="n">${fa(o.n)}</td><td class="n">${fa(o.t)}</td><td>${shareBar(o.t/tot*100)}</td><td class="n">${fa(o.t/o.n)}</td><td class="n">${fa(o.h)}</td></tr>`}).join('')}</table></div>`;
+}
+
+/* ---- all shops ---- */
+function filtered(){
+  const q=S.q.trim();
+  let a=D.shops.filter(s=>(!q||s.name.includes(q)||s.book.toLowerCase().includes(q.toLowerCase()))&&(!S.sheet||s.sheet===S.sheet)&&(!S.status||s.status===S.status)&&(!S.year||String(s.year)===S.year));
+  const k=S.sort,d=S.dir;
+  a.sort((x,y)=>{let p=k.startsWith('m')&&k.length<=3?x.m[+k.slice(1)]:x[k],q2=k.startsWith('m')&&k.length<=3?y.m[+k.slice(1)]:y[k];
+    if(typeof p==='string')return d*p.localeCompare(q2,'fa');return d*((+p)-(+q2))});
+  return a;
+}
+function viewShops(){
+  const sheets=[...new Set(D.shops.map(s=>s.sheet))];
+  const years=[...new Set(D.shops.map(s=>s.year))].sort((a,b)=>b-a);
+  return `<div class="box"><h2>همه مغازه‌ها (${fa(D.shops.length)})</h2><p class="note">روی عنوان هر ستون بزن تا مرتب شود. ماه‌های بعد از ماه جاری خاکستری‌اند.</p>
+  <div class="filters">
+   <input id="q" placeholder="جستجوی نام مغازه یا بوک..." value="${esc(S.q)}">
+   <select id="fs"><option value="">همه شیت‌ها</option>${sheets.map(x=>`<option ${S.sheet===x?'selected':''}>${esc(x)}</option>`).join('')}</select>
+   <select id="fst"><option value="">همه وضعیت‌ها</option>${Object.entries(STL).map(([k,v])=>`<option value="${k}" ${S.status===k?'selected':''}>${v}</option>`).join('')}</select>
+   <select id="fy"><option value="">همه بوک‌ها</option>${years.map(y=>`<option value="${y}" ${S.year===String(y)?'selected':''}>بوک ${yl(y)}</option>`).join('')}</select>
+   <button class="btn sec" id="csv">خروجی CSV</button></div>
+  <div class="wrap" id="stbl"></div></div>`;
+}
+function shopsTable(){
+  const a=filtered(),c=S.cur;
+  const th=(k,t,cls='')=>`<th class="${cls}" data-sort="${k}">${t}${S.sort===k?(S.dir>0?' ▲':' ▼'):''}</th>`;
+  const ms=[];for(let k=1;k<=12;k++)ms.push(th('m'+k,MONTHS[k-1].slice(0,4),'n'));
+  const sum=a.reduce((x,s)=>x+s.total,0);
+  $('stbl').innerHTML=`<table><tr><th>#</th>${th('name','مغازه')}${th('sheet','شیت')}${th('book','بوک')}${th('hanger','هنگر')}${ms.join('')}${th('total','جمع','n')}${th('status','وضعیت')}</tr>
+  ${a.map((s,i)=>`<tr><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td>${ytag(s.year)} <small>${esc(s.book)}</small></td><td>${s.hanger?'✔':''}</td>
+  ${s.m.slice(1).map((v,k)=>mcell(v,v===0?'z':'',k+1>c?'style="opacity:.4"':'')).join('')}<td class="n"><b>${fa(s.total)}</b></td><td>${stag(s.status)}</td></tr>`).join('')}
+  <tr><td></td><td><b>جمع (${fa(a.length)} مغازه)</b></td><td></td><td></td><td></td>${Array.from({length:12},(_,k)=>{const has=a.some(s=>s.m[k+1]!=null);return `<td class="n"><b>${has?fa(a.reduce((x,s)=>x+(s.m[k+1]||0),0)):''}</b></td>`}).join('')}<td class="n"><b>${fa(sum)}</b></td><td></td></tr></table>`;
+}
+function bindShops(){
+  shopsTable();
+  $('q').oninput=e=>{S.q=e.target.value;shopsTable()};
+  $('fs').onchange=e=>{S.sheet=e.target.value;shopsTable()};
+  $('fst').onchange=e=>{S.status=e.target.value;shopsTable()};
+  $('fy').onchange=e=>{S.year=e.target.value;shopsTable()};
+  $('stbl').onclick=e=>{const t=e.target.closest('th');if(!t||!t.dataset.sort)return;const k=t.dataset.sort;S.dir=S.sort===k?-S.dir:-1;S.sort=k;shopsTable()};
+  $('csv').onclick=()=>{const a=filtered();const rows=[['مغازه','شیت','بوک','هنگر',...MONTHS,'جمع','وضعیت'],...a.map(s=>[s.name,s.sheet,s.book,s.hanger?'دارد':'',...s.m.slice(1),s.total,STL[s.status]])];
+    const t='\ufeff'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const l=document.createElement('a');l.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));l.download='shops.csv';l.click()};
+}
+
+/* ---- inactive ---- */
+function viewInactive(){
+  const groups=[['g3','سه ماه یا بیشتر خرید نکرده‌اند','b'],['g2','دو ماه است خرید نکرده‌اند','w'],['g1','یک ماه است خرید نکرده‌اند','w'],['never','از ابتدای سال هیچ خریدی نداشته‌اند','b']];
+  const c=S.cur;
+  return `<p class="note">بر اساس ماه جاری: <b>${MONTHS[c-1]}</b>. اگر ماه جاری را از بالای صفحه عوض کنی، فهرست‌ها هم عوض می‌شوند. مغازه‌ای که در ماه جاری خرید داشته فعال حساب می‌شود.</p>
+  <div class="grid">${groups.map(([k,t,cl])=>`<div class="card ${cl}"><div class="l">${t}</div><div class="v">${fa(D.shops.filter(s=>s.status===k).length)}</div></div>`).join('')}</div>
+  ${groups.map(([k,t])=>{const a=D.shops.filter(s=>s.status===k).sort((x,y)=>y.total-x.total);
+   return `<div class="box"><h2>${t} (${fa(a.length)})</h2><div class="wrap"><table><tr><th>مغازه</th><th>شیت</th><th>بوک</th><th class="n">آخرین خرید</th><th class="n">جمع سال</th></tr>
+   ${a.map(s=>`<tr>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td>${ytag(s.year)} <small>${esc(s.book)}</small></td><td class="n">${s.lastBuy?MONTHS[s.lastBuy-1]:'—'}</td><td class="n">${fa(s.total)}</td></tr>`).join('')||'<tr><td>موردی نیست ✔</td></tr>'}</table></div></div>`}).join('')}`;
+}
+
+/* ---- collect books ---- */
+function viewCollect(){
+  if(S.csub==='album')return viewAlbum();
+  return viewCollectMain();
+}
+function viewCollectMain(){
+  const defs=[[5,'بوک ۱۴۰۵ (امسال)','b'],[4,'بوک ۱۴۰۴ (پارسال)','w']];
+  const rb=repBooks();
+  const info=defs.map(([y,title,cl])=>{
+    const all=D.shops.filter(s=>s.year===y);
+    const idle=all.filter(s=>s.status!=='ok').sort((p,q)=>q.gap-p.gap||q.total-p.total);
+    const by={};idle.forEach(s=>(by[s.book]??=[]).push(s));
+    return {y,title,cl,all,idle,by};
+  });
+  const tAll=info.reduce((a,i)=>a+i.all.length,0),tIdle=info.reduce((a,i)=>a+i.idle.length,0);
+  const card=(l,v,s,cl)=>`<div class="card ${cl}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  return segBar()+`<p class="note">مغازه‌ای که بوکش در ماه جاری (<b>${MONTHS[S.cur-1]}</b>) خرید نداشته، برای جمع‌آوری آمده است. بوک‌های قدیمی‌تر از ۱۴۰۴ در این صفحه نیستند.</p>
+  <div class="box"><h2>کل بوک‌ها: مغازه + نماینده</h2><p class="note">هر مغازه یک بوک دارد. نماینده‌ها تعداد بوک گرفته‌اند و در جمع کل حساب شده‌اند.</p><div class="wrap"><table>
+   <tr><th>طرح</th><th class="n">مغازه</th><th class="n">نماینده (تعداد)</th><th class="n">جمع</th></tr>
+   ${[5,4].map(y=>{const sh=D.shops.filter(s=>s.year===y).length,rn=rb[y]||0;return `<tr><td>${ytag(y)}</td><td class="n">${fa(sh)}</td><td class="n">${fa(rn)}</td><td class="n"><b>${fa(sh+rn)}</b></td></tr>`}).join('')}
+  </table></div></div>
+  <div class="grid">
+   ${info.map(i=>card('برای جمع‌آوری: '+i.title,fa(i.idle.length),'از '+fa(i.all.length)+' مغازه',i.cl)).join('')}
+   ${card('جمع برای جمع‌آوری',fa(tIdle),'از '+fa(tAll)+' مغازه با بوک ۱۴۰۵ یا ۱۴۰۴','b')}
+  </div>
+  ${info.map(i=>`<div class="box"><h2>${i.title}: ${fa(i.idle.length)} مغازه کار نکرده‌اند</h2>
+   <p class="note">از ${fa(i.all.length)} مغازه‌ای که این بوک را دارند. بالاتر یعنی مدت بیشتری خرید نکرده‌اند.</p>
+   ${Object.keys(i.by).sort((a,b)=>i.by[b].length-i.by[a].length).map(n=>{const a=i.by[n];return `<details open><summary>${ytag(i.y)} <b>${esc(n)}</b> <span class="tag">${fa(a.length)} مغازه</span></summary>
+   <div class="chips">${a.map(s=>`<span class="chip">${esc(s.name)} <small>${esc(s.sheet)} • ${s.lastBuy?'آخرین خرید '+MONTHS[s.lastBuy-1]:'بدون خرید'}</small> ${stag(s.status)}</span>`).join('')}</div></details>`}).join('')||'<p>همه کار کرده‌اند ✔</p>'}</div>`).join('')}`;
+}
+
+function segBar(){
+  return `<div class="seg"><button data-csub="collect" class="${S.csub==='collect'?'on':''}">جمع‌آوری بوک</button><button data-csub="album" class="${S.csub==='album'?'on':''}">پیشنهاد به‌روزرسانی آلبوم</button></div>`;
+}
+/* ---- album suggestions: book-1404 shops that keep buying ---- */
+function viewAlbum(){
+  const cur=S.cur,ms=[];for(let k=cur;k>=1&&ms.length<3;k--)ms.push(k);
+  const need=ms.length;
+  const rows=D.shops.filter(s=>s.year===4).map(s=>{const n=ms.filter(k=>(s.m[k]||0)>0).length;return {s,n,avg:ms.reduce((a,k)=>a+(s.m[k]||0),0)/need}}).filter(r=>r.n>=2)
+    .sort((a,b)=>b.n-a.n||b.s.total-a.s.total);
+  const top=rows.filter(r=>r.n===need),mid=rows.filter(r=>r.n<need);
+  const sum=rows.reduce((a,r)=>a+r.s.total,0);
+  const card=(l,v,s,cl)=>`<div class="card ${cl}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  const tb=(list)=>list.length?`<div class="wrap"><table><tr><th>مغازه</th><th>شیت</th><th class="n">ماه‌های خرید (از ${fa(need)})</th><th class="n">میانگین ماهانه</th><th class="n">جمع</th><th>آخرین خرید</th></tr>
+   ${list.map(r=>`<tr><td>${esc(r.s.name)}</td><td>${esc(r.s.sheet)}</td><td class="n">${fa(r.n)}</td><td class="n">${fa(+r.avg.toFixed(1))}</td><td class="n">${fa(r.s.total)}</td><td>${r.s.lastBuy?MONTHS[r.s.lastBuy-1]:'—'}</td></tr>`).join('')}</table></div>`:'<p>موردی نیست.</p>';
+  return segBar()+`<p class="note">مشتری‌هایی که <b>بوک ۱۴۰۴</b> دارند و در <b>${fa(need)} ماه اخیر</b> (تا <b>${MONTHS[cur-1]}</b>) حداقل ۲ بار خرید کرده‌اند. برای پیشنهاد آلبوم جدید اول فهرست «خیلی فعال» را ببینید.</p>
+  <div class="grid">${card('خیلی فعال (همه ماه‌ها)',fa(top.length),'خرید در همه ماه‌های اخیر','g')}${card('فعال (۲ ماه)',fa(mid.length),'خرید در ۲ ماه از اخیر','w')}${card('جمع متراژ این گروه',fa(sum),'از بوک ۱۴۰۴','')}</div>
+  <div class="box"><h2>خیلی فعال‌ها: پیشنهاد اولویت آلبوم</h2>${tb(top)}</div>
+  <div class="box"><h2>فعال‌ها (۲ ماه از ${fa(need)})</h2>${tb(mid)}</div>`;
+}
+
+/* ---- sheets ---- */
+function shareBar(p){const w=Math.max(Math.min(p,100),0);return `<div class="sh-tube"><div class="sh-fill" style="--w:${w}%"><i class="sh-stripe"></i><i class="sh-w"></i><i class="sh-edge"></i><i class="sh-b" style="left:25%;animation-delay:0s"></i><i class="sh-b" style="left:55%;animation-delay:1.1s"></i><i class="sh-b" style="left:80%;animation-delay:.5s"></i></div><span class="sh-pct">${fa(p)}٪</span></div>`}
+function viewSheets(){
+  const c={};[...D.shops,...D.reps].forEach(s=>{const o=c[s.sheet]??={n:0,t:0,m:Array(13).fill(0),h:Array(13).fill(false),ina:0};o.n++;o.t+=s.total;for(let k=1;k<=12;k++){o.m[k]+=(s.m[k]||0);if(s.m[k]!=null)o.h[k]=true}if(s.status&&s.status!=='ok')o.ina++});
+  const rows=Object.entries(c).sort((a,b)=>b[1].t-a[1].t),tot=rows.reduce((a,[,o])=>a+o.t,0)||1,mx=rows[0]?rows[0][1].t:1;
+  return `<div class="box"><h2>فروش هر شهر و راسته</h2><div class="wrap"><table><tr><th>شیت</th><th class="n">مغازه</th><th class="n">بی‌خرید</th>${MONTHS.map(m=>`<th class="n">${m.slice(0,4)}</th>`).join('')}<th class="n">جمع</th><th>سهم از فروش</th></tr>
+  ${rows.map(([k,o])=>`<tr><td><b>${esc(k)}</b></td><td class="n">${fa(o.n)}</td><td class="n">${fa(o.ina)}</td>${o.m.slice(1).map((v,k)=>mcell(o.h[k+1]?v:null,v===0&&o.h[k+1]?'z':'')).join('')}<td class="n"><b>${fa(o.t)}</b></td><td>${shareBar(o.t/tot*100)}</td></tr>`).join('')}</table></div></div>`;
+}
+
+/* ---- reps ---- */
+const SET_PASS='3594';
+const unlocked=()=>sessionStorage.getItem('rionOK')==='1';
+function viewSettings(){
+  if(!unlocked())return `<div class="box"><h2>ورود به تنظیمات</h2><p class="note">برای ورود به تنظیمات، رمز را وارد کنید.</p>
+  <div class="upl"><input id="s_pw" type="password" inputmode="numeric" placeholder="رمز" autocomplete="off" style="padding:9px 12px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;width:160px"><button class="btn" id="s_login">ورود</button></div>
+  <div id="s_err" style="color:var(--bad);font-size:13px;margin-top:8px"></div></div>`;
+  const c=getCfg(),n=D?D.shops.length:0;
+  return `<div class="box"><h2>بارگذاری اکسل ماهانه</h2>
+  <p class="note">فایل فقط در همین مرورگر خوانده می‌شود و جایی ذخیره یا ارسال نمی‌شود.</p>
+  <div class="upl"><button class="btn" onclick="$('file').click()">بارگذاری اکسل جدید</button>${LASTMSG?`<span class="ok">${LASTMSG}</span>`:''}</div></div>
+  <div class="box"><h2>تنظیمات</h2><p class="note">این مقادیر فقط در همین مرورگر ذخیره می‌شوند.</p>
+  <div class="setf">
+   <label>هدف فروش سالانه (متر)<input id="s_t" type="number" min="0" value="${c.target}"></label>
+   <label>تعداد مغازه جدیدی که می‌خواهیم اضافه کنیم<input id="s_g" type="number" min="0" value="${c.newGoal||0}"></label>
+   <label>تعداد مغازه‌ها در شروع این هدف<input id="s_b" type="number" min="0" value="${c.base??n}"></label>
+   <div class="actions"><button class="btn" id="s_save">ذخیره</button><button class="btn sec" id="s_reset">شروع دوباره از همین حالا</button></div>
+  </div></div>`;
+}
+function bindSettings(){
+  if(!unlocked()){
+    const go=()=>{if($('s_pw').value.trim()===SET_PASS){sessionStorage.setItem('rionOK','1');draw()}else{$('s_err').textContent='رمز اشتباه است';$('s_pw').value='';$('s_pw').focus()}};
+    $('s_login').onclick=go;
+    $('s_pw').onkeydown=e=>{if(e.key==='Enter')go()};
+    return;
+  }
+  const n=D?D.shops.length:0;
+  const save=c=>{setCfg(c);draw()};
+  $('s_save').onclick=()=>{const c=getCfg();c.target=+$('s_t').value||60000;c.newGoal=+$('s_g').value||0;c.base=$('s_b').value===''?n:+$('s_b').value;save(c)};
+  $('s_reset').onclick=()=>{const c=getCfg();c.base=n;save(c)};
+}
+const LCOL=['#2f5bea','#16a34a','#f59e0b','#dc2626','#7c3aed','#0891b2'];
+// نمودار خطی: هر سری = یک نماینده، محور افقی ماه‌ها تا ماه جاری
+function lineChart(series){
+  const W=720,H=300,pl=48,pr=16,pt=16,pb=36,c=S.cur;
+  const top=Math.max(1,...series.flatMap(s=>s.vals.slice(1,c+1)));
+  const max=top*1.15;
+  const xs=k=>pl+(k-1)*(W-pl-pr)/11, ys=v=>H-pb-(v/max)*(H-pt-pb);
+  let g='';
+  for(let i=0;i<=4;i++){const v=top*i/4,y=ys(v);g+=`<line x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}" stroke="#e6e9f2"/><text x="${pl-8}" y="${y+4}" text-anchor="end">${fa(Math.round(v))}</text>`}
+  let lines='',dots='';
+  series.forEach((s,i)=>{
+    const segs=[];let cur=null;
+    for(let k=1;k<=c;k++){const v=s.vals[k];if(v==null){cur=null;continue}
+      if(!cur){cur=[];segs.push(cur)}cur.push([xs(k),ys(v),k])}
+    if(!segs.length)return;
+    const d=segs.map(sg=>sg.map((p,j)=>(j?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')).join(' ');
+    lines+=`<path class="ln" pathLength="1" d="${d}" stroke="${s.color}" ${s.dash?'stroke-dasharray="6 5"':''}/>`;
+    if(!s.dash)segs.flat().forEach(p=>{dots+=`<circle class="dot" cx="${p[0]}" cy="${p[1]}" r="4.5" fill="${s.color}"><title>${esc(s.name)} - ${MONTHS[p[2]-1]}: ${fa(s.vals[p[2]])}</title></circle>`});
+  });
+  const lab=MONTHS.map((m,i)=>`<text x="${xs(i+1)}" y="${H-10}" text-anchor="middle">${m.slice(0,4)}</text>`).join('');
+  return `<svg class="lc" viewBox="0 0 ${W} ${H}" role="img" aria-label="نمودار خطی فروش نماینده‌ها">${g}${lab}${lines}${dots}</svg>`;
+}
+function viewReps(){
+  if(!D.reps.length)return '<div class="box">نماینده‌ای در فایل نیست.</div>';
+  const series=D.reps.map((r,i)=>({name:r.name,color:LCOL[i%LCOL.length],vals:r.m}));
+  const tot=Array(13).fill(0);D.reps.forEach(r=>{for(let k=1;k<=12;k++)tot[k]+=r.m[k]});
+  series.push({name:'جمع نماینده‌ها',color:'#1f2a44',vals:tot,dash:true});
+  const lgd=series.map(s=>`<span><i style="background:${s.color}"></i>${esc(s.name)}</span>`).join('');
+  const chart=`<div class="box"><h2>روند فروش نماینده‌ها (متر به ماه)</h2><p class="note">خط تیره جمع همه نماینده‌هاست. ماه‌های بعد از ${MONTHS[S.cur-1]} نمایش داده نمی‌شوند.</p>${lineChart(series)}<div class="lgd">${lgd}</div></div>`;
+  return chart+`<div class="box"><h2>نماینده‌ها</h2><p class="note">اعداد بوک و هنگر تعداد تحویل‌شده است. نماینده‌ها در رتبه‌بندی مغازه‌ها نیامده‌اند ولی فروششان در هدف حساب می‌شود.</p><div class="wrap"><table>
+  <tr><th>نام</th><th class="n">هنگر</th>${D.reps[0].b.map(b=>`<th class="n">${esc(b.label)}</th>`).join('')}${MONTHS.map(m=>`<th class="n">${m.slice(0,4)}</th>`).join('')}<th class="n">جمع متر</th><th class="n">متر هر بوک</th></tr>
+  ${D.reps.map(r=>{const nb=r.b.reduce((a,b)=>a+b.n,0);return `<tr><td><b>${esc(r.name)}</b></td><td class="n">${fa(r.hanger)}</td>${r.b.map(b=>`<td class="n">${fa(b.n)}</td>`).join('')}${r.m.slice(1).map(v=>mcell(v,v===0?'z':'')).join('')}<td class="n"><b>${fa(r.total)}</b></td><td class="n">${nb?fa(r.total/nb):'—'}</td></tr>`}).join('')}</table></div></div>`;
+}
+
+const PRC={1:'#dc2626',2:'#f59e0b',3:'#16a34a'};
+function guideItems(){
+  const cfg=getCfg(),target=cfg.target||60000,c=S.cur;
+  const mon=Array(13).fill(0);[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)mon[k]+=s.m[k]});
+  const sold=mon.slice(1).reduce((a,b)=>a+b,0);
+  const left=Math.max(target-sold,0),rem=12-c,need=rem>0?left/rem:left,pace=c?sold/c:0;
+  const it=[];
+  if(left<=0)it.push({pr:3,t:'هدف سالانه محقق شد',d:`جمع فروش ${fa(sold)} متر از هدف ${fa(target)} متر بیشتر است.`,tab:'over'});
+  else if(need>pace*1.2)it.push({pr:1,t:'روند فعلی کمتر از نیاز است',d:`برای رسیدن به هدف باید ماهانه حدود ${fa(need)} متر بفروشید، اما میانگین فعلی ${fa(pace)} متر است. روی مغازه‌های فعال و نماینده‌ها تمرکز کنید.`,tab:'over'});
+  else it.push({pr:3,t:'روند فعلی برای هدف کافی است',d:`میانگین ${fa(pace)} متر در ماه از نیاز ${fa(need)} متر بیشتر است. همین ریتم را نگه دارید.`,tab:'over'});
+  if(c>=2){
+    const a=mon[c],b=mon[c-1];
+    if(b>0&&a<b*.8)it.push({pr:2,t:'فروش ماه جاری از ماه قبل کمتر است',d:`${fa(a)} متر در برابر ${fa(b)} متر ماه قبل. دلیل افت را با مغازه‌های بی‌خرید بررسی کنید.`,tab:'over'});
+    else if(a>b*1.2&&b>0)it.push({pr:3,t:'فروش ماه جاری رشد داشته',d:`${fa(a)} متر در برابر ${fa(b)} متر ماه قبل.`,tab:'over'});
+    const drop=D.reps.filter(r=>r.m[c-1]>0&&r.m[c]<r.m[c-1]*.7).map(r=>r.name);
+    if(drop.length)it.push({pr:2,t:'افت فروش نماینده‌ها',d:`فروش این ماه کمتر از ماه قبل: ${drop.join('، ')}.`,tab:'reps'});
+  }
+  const inactive=D.shops.filter(s=>['g1','g2','g3'].includes(s.status));
+  if(inactive.length){
+    const top=[...inactive].sort((a,b)=>b.total-a.total).slice(0,3).map(s=>s.name);
+    it.push({pr:1,t:`${fa(inactive.length)} مغازه خرید نکرده‌اند`,d:`بیشترین فروش گذشته: ${top.join('، ')}. با این مغازه‌ها تماس بگیرید.`,tab:'inactive'});
+  }
+  const coll=D.shops.filter(s=>s.year>=4&&s.status!=='ok');
+  if(coll.length)it.push({pr:2,t:'بوک‌های ۱۴۰۵ و ۱۴۰۴ برای جمع‌آوری',d:`${fa(coll.length)} مغازه این ماه کار نکرده‌اند. فهرست جمع‌آوری را ببینید.`,tab:'collect'});
+  const sh={};D.shops.forEach(s=>{const o=sh[s.sheet]??={n:0,t:0};o.n++;o.t+=s.total});
+  const arr=Object.entries(sh).filter(([,o])=>o.n>=3).map(([k,o])=>[k,o.t/o.n]).sort((x,y)=>x[1]-y[1]);
+  if(arr.length>1)it.push({pr:2,t:`میانگین پایین‌تر در «${arr[0][0]}»`,d:`هر مغازه در «${arr[0][0]}» به‌طور میانگین ${fa(arr[0][1])} متر فروخته؛ بالاترین «${arr[arr.length-1][0]}» با ${fa(arr[arr.length-1][1])} متر است.`,tab:'sheets'});
+  const gN=cfg.newGoal||0,added=Math.max(D.shops.length-(cfg.base??D.shops.length),0);
+  if(gN&&added<gN)it.push({pr:2,t:'هدف مغازه جدید هنوز کامل نیست',d:`${fa(added)} از ${fa(gN)} مغازه جدید اضافه شده؛ ${fa(gN-added)} مغازه مانده.`,tab:'shops'});
+  return it.sort((x,y)=>x.pr-y.pr);
+}
+function openGuide(){
+  const items=guideItems();
+  $('guide').innerHTML=`<div class="pn"><button class="x" data-x aria-label="بستن">×</button><h3>راهنمای مسیر به هدف</h3><p class="note">پیشنهادها از داده‌ی ماه جاری ساخته می‌شوند. هر کارت شما را به صفحه‌ی مربوطه می‌برد.</p>${items.map(i=>`<div class="it" style="border-right-color:${PRC[i.pr]}"><b>${esc(i.t)}</b><p>${esc(i.d)}</p><button class="go" data-go="${i.tab}">باز کردن: ${TABS.find(t=>t[0]===i.tab)[1]}</button></div>`).join('')}</div>`;
+  $('guide').classList.add('on');
+}
+function closeGuide(){$('guide').classList.remove('on')}
+$('guide').onclick=e=>{
+  if(e.target.id==='guide'||e.target.closest('[data-x]')){closeGuide();return}
+  const b=e.target.closest('[data-go]');
+  if(b){S.tab=b.dataset.go;closeGuide();draw();scrollTo(0,0)}
+};
+function tapDrill(k){S.drill=S.drill===k?null:k;draw();if(S.drill){const el=$('drill');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}}
+$('app').addEventListener('click',e=>{const dx=e.target.closest&&e.target.closest('[data-dx]');if(dx){S.drill=null;draw();return}const td=e.target.closest&&e.target.closest('[data-d]');if(td){tapDrill(td.dataset.d);return}const c=e.target.closest&&e.target.closest('[data-csub]');if(c){S.csub=c.dataset.csub;draw();return}if(e.target.closest&&e.target.closest('.pb-click'))openGuide()});
+$('app').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('.pb-click')){e.preventDefault();openGuide();return}if((e.key==='Enter'||e.key===' ')&&e.target.closest&&e.target.closest('[data-d]')){e.preventDefault();tapDrill(e.target.closest('[data-d]').dataset.d)}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeGuide()});
+function lockView(){
+  return `<div class="box" style="max-width:340px;margin:40px auto;text-align:center"><h2>ورود به داشبورد</h2>
+  <p class="note">برای مشاهده اطلاعات فروش، رمز ورود را وارد کنید.</p>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><input id="l_pw" type="password" inputmode="numeric" placeholder="رمز ورود" autocomplete="off" style="padding:10px 12px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;width:220px;text-align:center"><button class="btn" id="l_go" style="width:220px">ورود</button></div>
+  <div id="l_err" style="color:var(--bad);font-size:13px;margin-top:8px"></div></div>`;
+}
+function draw(){
+  document.body.classList.toggle('locked',!unlocked());
+  if(!unlocked()){
+    $('nav').innerHTML='';$('app').innerHTML=lockView();
+    const go=()=>{if($('l_pw').value.trim()===SET_PASS){sessionStorage.setItem('rionOK','1');draw()}else{$('l_err').textContent='رمز اشتباه است';$('l_pw').value='';$('l_pw').focus()}};
+    $('l_go').onclick=go;
+    $('l_pw').onkeydown=e=>{if(e.key==='Enter')go()};
+    $('l_pw').focus();
+    return;
+  }
+  $('gear').classList.toggle('on',S.tab==='settings');
+  if(!D){$('nav').innerHTML='';$('app').innerHTML=S.tab==='settings'?viewSettings():'<div id="empty">برای شروع، از ⚙ گوشه بالا-چپ فایل اکسل را بارگذاری کنید.</div>';if(S.tab==='settings')bindSettings();return}
+  $('nav').innerHTML=TABS.map(([k,t])=>`<button class="${S.tab===k?'on':''}" data-t="${k}">${t}</button>`).join('');
+  const v={over:viewOver,shops:viewShops,inactive:viewInactive,collect:viewCollect,sheets:viewSheets,reps:viewReps,settings:viewSettings}[S.tab];
+  $('app').innerHTML=v();
+  if(S.tab==='shops')bindShops();
+  if(S.tab==='settings')bindSettings();
+}
+$('gear').onclick=()=>{S.tab='settings';draw();scrollTo(0,0)};
+$('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.tab=b.dataset.t;S.drill=null;draw();scrollTo(0,0)};
+$('cur').onchange=e=>{S.cur=+e.target.value;enrich();draw()};
+function load(sheets){
+  D=parse(sheets);
+  if(!D.shops.length&&!D.reps.length){$('app').innerHTML='<div id="empty">در این فایل شیتی با ستون «نام مغازه» پیدا نشد.</div>';return}
+  LASTMSG='✔ فایل بارگذاری شد: '+fa(D.shops.length)+' مغازه';
+  S.cur=lastMonth();
+  $('cur').innerHTML=MONTHS.map((m,i)=>`<option value="${i+1}" ${i+1===S.cur?'selected':''}>${m}</option>`).join('');
+  enrich();draw();
+}
+$('file').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
+  const s={};wb.SheetNames.forEach(n=>s[n]=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:null}));
+  load(s);
+};
+document.addEventListener('DOMContentLoaded',()=>{});
+
+if(PRELOAD)load(PRELOAD);else{draw()}
+</script>
+</body>
+</html>
