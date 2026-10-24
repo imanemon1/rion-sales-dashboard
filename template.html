@@ -176,7 +176,7 @@ summary{cursor:pointer;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 <script>
 const PRELOAD = /*__DATA__*/null;
 const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
-const DEF={target:60000,newGoal:80,base:null};
+const DEF={target:40000,newGoal:80,base:null};
 const getCfg=()=>{try{return {...DEF,...JSON.parse(localStorage.getItem('rionCfg')||'{}')}}catch(e){return {...DEF}}};
 const setCfg=c=>localStorage.setItem('rionCfg',JSON.stringify(c));
 const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها و راسته‌ها'],['reps','نماینده‌ها']];
@@ -239,7 +239,7 @@ function repBooks(){const r={};D.reps.forEach(p=>p.b.forEach(b=>{const mt=b.labe
 const DRG={sold:'top',left:'top',need:'top',proj:'top',inact:'top',added:'top',coll:'top',st_active:'st',st_semi:'st',st_inact:'st',st_dead:'st',st_upd:'st',shS:'sh',repS:'sh'};
 function drillTap(k,l,v,s,cl){const on=S.drill===k;return `<div class="card tap ${cl||''} ${on?'on':''}" data-d="${k}" role="button" tabindex="0" aria-expanded="${on}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div><em class="more">${on?'بستن ▴':'جزئیات ▾'}</em></div>`}
 function ovNums(){
-  const cfg=getCfg(),target=cfg.target||60000,c=S.cur;
+  const cfg=getCfg(),target=cfg.target||40000,c=S.cur;
   const mon=Array(13).fill(0);[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)mon[k]+=s.m[k]});
   const sold=mon.slice(1).reduce((a,b)=>a+b,0);
   const left=Math.max(target-sold,0),rem=12-c,need=rem>0?left/rem:left;
@@ -498,7 +498,7 @@ function bindSettings(){
   }
   const n=D?D.shops.length:0;
   const save=c=>{setCfg(c);draw()};
-  $('s_save').onclick=()=>{const c=getCfg();c.target=+$('s_t').value||60000;c.newGoal=+$('s_g').value||0;c.base=$('s_b').value===''?n:+$('s_b').value;save(c)};
+  $('s_save').onclick=()=>{const c=getCfg();c.target=+$('s_t').value||40000;c.newGoal=+$('s_g').value||0;c.base=$('s_b').value===''?n:+$('s_b').value;save(c)};
   $('s_reset').onclick=()=>{const c=getCfg();c.base=n;save(c)};
 }
 const LCOL=['#2f5bea','#16a34a','#f59e0b','#dc2626','#7c3aed','#0891b2'];
@@ -537,7 +537,7 @@ function viewReps(){
 
 const PRC={1:'#dc2626',2:'#f59e0b',3:'#16a34a'};
 function guideItems(){
-  const cfg=getCfg(),target=cfg.target||60000,c=S.cur;
+  const cfg=getCfg(),target=cfg.target||40000,c=S.cur;
   const mon=Array(13).fill(0);[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)mon[k]+=s.m[k]});
   const sold=mon.slice(1).reduce((a,b)=>a+b,0);
   const left=Math.max(target-sold,0),rem=12-c,need=rem>0?left/rem:left,pace=c?sold/c:0;
