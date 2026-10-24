@@ -620,11 +620,13 @@ $('file').onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
   const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});
   const s={};wb.SheetNames.forEach(n=>s[n]=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:null}));
+  try{localStorage.setItem('rionData',JSON.stringify(s))}catch(err){}
   load(s);
 };
 document.addEventListener('DOMContentLoaded',()=>{});
 
-if(PRELOAD)load(PRELOAD);else{draw()}
+const SAVED=(()=>{try{return JSON.parse(localStorage.getItem('rionData')||'null')}catch(e){return null}})();
+if(PRELOAD)load(PRELOAD);else if(SAVED)load(SAVED);else{draw()}
 </script>
 </body>
 </html>
