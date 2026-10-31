@@ -2,7 +2,7 @@
 const nz=s=>String(s==null?'':s).replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/ة/g,'ه').replace(/\u200c/g,' ').replace(/[()\-.،]/g,' ').replace(/\s+/g,' ').trim();
 const NOISE=new Set(['آقای','اقای','خانم','نمایندگی','تهران','زرتشت','ولیعصر','کرج','مشهد','شیراز','عبدل','اباد','آباد'].map(w=>w.replace(/آ/g,'ا')));
 const core=x=>x.replace(/آ/g,'ا').split(' ').filter(w=>w&&!NOISE.has(w)).join(' ');
-const ACC_MAN={'میلاد قادریان تهران':'قادریان','پرده خانه ابریشم زرتشت':'خانه پرده ابریشم','کوکون مورکسی ارومیه':'کوکون مورکسی','فرشته پارک وی تهران':'فرشته پارک وی داوودپور','آقای دشتی رشت':'علی دشتی','رضایی شریعتی تهران':'آرمانی شریعتی','شانل ساری':'اشکان ساری'};
+const ACC_MAN={'میلاد قادریان تهران':'قادریان','پرده خانه ابریشم زرتشت':'خانه پرده ابریشم','کوکون مورکسی ارومیه':'کوکون مورکسی','فرشته پارک وی تهران':'فرشته پارک وی داوودپور','آقای دشتی رشت':'علی دشتی'};
 const ACC_NO=new Set([]);
 function lev(a,b){const m=a.length,n=b.length;if(!m||!n)return 0;let p=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return 1-p[n]/Math.max(m,n)}
 function hintOf(a){
