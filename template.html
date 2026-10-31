@@ -653,6 +653,8 @@ function applyAcc(){
 }
 function buildAcc(rows){
   if(!rows||!rows.length||!D){ACC=null;return}
+  const CMAP={'D-1023/R02':'20020/03','D-1023/R01':'20020/02'};
+  rows.forEach(r=>{const t=CMAP[r[2]];if(t){r[2]=t;r[3]='DELVAN RION'}});
   const cust={},code={};let maxM=0;
   rows.forEach(([c,d,k,g,q,a,m])=>{
     if(m>maxM)maxM=m;
