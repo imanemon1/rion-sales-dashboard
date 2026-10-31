@@ -648,7 +648,7 @@ function buildAcc(rows){
     u.tot+=q;u.amt+=a;u.n++;u.mo[m]+=q;if(isAct(g))u.act+=q;
     const uc=u.codes[k]||(u.codes[k]={q:0,g,mo:Array(13).fill(0)});uc.q+=q;uc.mo[m]+=q;
     const o=code[k]||(code[k]={code:k,g,act:isAct(g),q:0,amt:0,mo:Array(13).fill(0),cu:{}});
-    o.q+=q;o.amt+=a;o.mo[m]+=q;o.cu[c]=(o.cu[c]||0)+q;
+    o.q+=q;o.amt+=a;o.mo[m]+=q;o.cu[c]=(o.cu[c]||0)+q;(o.ev=o.ev||[]).push([c,d,q,a]);
   });
   const unm=[],fz=[];
   Object.values(cust).forEach(u=>{
@@ -664,27 +664,35 @@ function buildAcc(rows){
   ACC={rows,cust,code,maxM,unm,fz,total:Object.values(cust).reduce((a,u)=>a+u.tot,0)};
 }
 const fm=v=>fa(Math.round(v*10)/10);
+function dsn(k){const s=String(k),n=s.match(/\d+/g)||[];let d=n[0]||'',c='';const m=s.match(/[A-Za-z]-?\s?(\d+)/g);
+  if(/^P-?\d+\//i.test(s)){const x=s.split('/');const dd=x.find((y,i)=>i>0&&/^[A-Za-z]-?\d/.test(y.trim()));c=dd?(dd.match(/\d+/)||[''])[0]:(x[x.length-1].match(/\d+/)||[''])[0]}
+  else if(/^\d+[-\/]/.test(s)){const x=s.split('/');c=x.length>1?(x[x.length-1].match(/\d+/)||[''])[0]:(n[1]||'')}
+  return [d,c]}
 const spark=(mo,mx)=>{const M=Math.max(...mo.slice(1,mx+1),1);return `<span class="spk">${mo.slice(1,mx+1).map(v=>`<i style="height:${Math.max(v>0?10:0,Math.round(Math.max(v,0)/M*100))}%" title="${fm(v)}"></i>`).join('')}</span>`};
 const grpTag=g=>`<span class="tag ${isAct(g)?'new':'gray'}">${isAct(g)?(/DELVAN/i.test(g)?'دلوان':'پایا'):esc(g||'؟')}</span>`;
 function codeTable(list,tot,mx){
-  return `<div class="wrap"><table><tr><th>#</th><th>کد</th><th>گروه</th><th class="n">متر</th><th>سهم</th><th class="n">مشتری</th><th>روند ماهانه</th><th class="n">آخرین ماه</th></tr>
-  ${list.map((o,i)=>`<tr class="clk" data-code="${esc(o.code)}"><td>${fa(i+1)}</td><td dir="ltr" style="text-align:right">${esc(o.code)}</td><td>${grpTag(o.g)}</td><td class="n"><b>${fm(o.q)}</b></td><td style="min-width:90px"><div class="bar"><i style="width:${Math.min(100,tot?o.q/tot*100*4:0)}%"></i></div></td><td class="n">${fa(o.nc)}</td><td>${spark(o.mo,mx)}</td><td class="n">${o.last?MONTHS[o.last-1]:'-'}</td></tr>`).join('')}</table></div>`;
+  return `<div class="wrap"><table><tr><th>#</th><th>کد</th><th>طرح</th><th>رنگ</th><th>گروه</th><th class="n">متر</th><th>سهم</th><th class="n">مشتری</th><th>روند ماهانه</th><th class="n">آخرین ماه</th></tr>
+  ${list.map((o,i)=>`<tr class="clk" data-code="${esc(o.code)}"><td>${fa(i+1)}</td><td dir="ltr" style="text-align:right">${esc(o.code)}</td><td>${dsn(o.code)[0]}</td><td>${dsn(o.code)[1]}</td><td>${grpTag(o.g)}</td><td class="n"><b>${fm(o.q)}</b></td><td style="min-width:90px"><div class="bar"><i style="width:${Math.min(100,tot?o.q/tot*100*4:0)}%"></i></div></td><td class="n">${fa(o.nc)}</td><td>${spark(o.mo,mx)}</td><td class="n">${o.last?MONTHS[o.last-1]:'-'}</td></tr>`).join('')}</table></div>`;
 }
 function viewCodes(){
   if(!ACC)return `<div class="box"><h2>کدها</h2><p class="note">برای دیدن آمار کدها، از ⚙ تنظیمات «اکسل حسابداری» را بارگذاری کنید.</p></div>`;
-  const all=Object.values(ACC.code),mx=ACC.maxM,sub=S.ksub||'new';
+  const all=Object.values(ACC.code),mx=ACC.maxM,sub=S.ksub||'all';
   const act=all.filter(o=>o.act&&o.q>0).sort((a,b)=>b.q-a.q),out=all.filter(o=>!o.act&&o.q>0).sort((a,b)=>b.q-a.q);
   const ta=act.reduce((x,o)=>x+o.q,0),to=out.reduce((x,o)=>x+o.q,0);
-  const seg=`<div class="seg">${[['new',`کدهای بوک جدید (${fa(act.length)})`],['out',`کدهای خارج‌شده (${fa(out.length)})`],['low','کم‌فروش‌ها / نامزد خروج']].map(([k,t])=>`<button class="${sub===k?'on':''}" data-ksub="${k}">${t}</button>`).join('')}</div>`;
+  const seg=`<div class="seg">${[['all',`همه کدها (${fa(all.filter(o=>o.q!==0).length)})`],['new',`کدهای بوک جدید (${fa(act.length)})`],['out',`کدهای خارج‌شده (${fa(out.length)})`],['low','کم‌فروش‌ها / نامزد خروج']].map(([k,t])=>`<button class="${sub===k?'on':''}" data-ksub="${k}">${t}</button>`).join('')}</div>`;
   const cards=`<div class="cards"><div class="card g"><div class="l">فروش بوک جدید</div><div class="v">${fm(ta)}</div><div class="s">متر · ${fa(ta+to?ta/(ta+to)*100:0)}٪ کل</div></div><div class="card w"><div class="l">فروش کدهای خارج‌شده</div><div class="v">${fm(to)}</div><div class="s">متر · ته‌مانده فروش</div></div><div class="card"><div class="l">جمع حسابداری</div><div class="v">${fm(ta+to)}</div><div class="s">متر · تا ${MONTHS[mx-1]}</div></div></div>`;
   let body='';
-  if(sub==='new')body=`<div class="box"><h2>کدهای بوک جدید — چطور می‌فروشند</h2><p class="note">گروه فروش RION. روی هر کد بزن تا لیست مشتری‌هایش باز شود.</p>${codeTable(act,ta,mx)}</div>`;
+  if(sub==='all'){
+    const q=(S.kq||'').trim().toLowerCase();
+    body=`<div class="box"><h2>همه کدها</h2><p class="note">هر کد = طرح و رنگ. مثلاً <b>P-1407/D-1219F</b> یعنی طرح ۱۴۰۷ رنگ ۱۲۱۹، و <b>2708-2254/201</b> یعنی طرح ۲۷۰۸ رنگ ۲۰۱. بخشی از کد، طرح یا رنگ را جست‌وجو کن. روی هر کد بزن تا مغازه‌ها، متراژ و تاریخ سفارش‌ها را ببینی.</p><input id="kq" placeholder="جستجو: 1407 یا 1219 یا 2708..." value="${esc(S.kq||'')}" dir="ltr" style="width:100%;margin:6px 0"><div id="kt"></div></div>`;
+  }else if(sub==='new')body=`<div class="box"><h2>کدهای بوک جدید — چطور می‌فروشند</h2><p class="note">گروه فروش RION. روی هر کد بزن تا لیست مشتری‌هایش باز شود.</p>${codeTable(act,ta,mx)}</div>`;
   else if(sub==='out')body=`<div class="box"><h2>کدهای خارج‌شده</h2><p class="note">کدهایی که گروه فروششان RION نیست (خارج، امید جیناک، هنگل و ...). فروش آن‌ها از موجودی باقی‌مانده است.</p>${codeTable(out,to,mx)}</div>`;
   else{
     const med=[...act].map(o=>o.q).sort((a,b)=>a-b)[Math.floor(act.length/2)]||0;
     const low=[...act].filter(o=>o.q<med*0.5||o.nc<=5).sort((a,b)=>a.q-b.q);
     body=`<div class="box"><h2>کم‌فروش‌های بوک جدید</h2><p class="note">کدی کم‌فروش حساب می‌شود که فروشش کمتر از نصف میانه‌ی کدهای جدید (${fm(med)} متر) باشد یا فقط ${fa(5)} مشتری یا کمتر داشته باشد. تصمیم نهایی خروج، بعد از اضافه شدن موجودی انبار گرفته می‌شود (نسبت موجودی به فروش ماهانه).</p>${low.length?codeTable(low,ta,mx):'<p class="note">موردی نیست.</p>'}</div>`;
   }
+  setTimeout(()=>{const i=$('kq');if(!i)return;const go=()=>{const q=i.value.trim().toLowerCase().split(/\s+/).filter(Boolean);S.kq=i.value;const l=all.filter(o=>o.q!==0&&q.every(w=>{const[d,c]=dsn(o.code);return o.code.toLowerCase().includes(w)||d===w||c===w})).sort((a,b)=>b.q-a.q);$('kt').innerHTML=l.length?codeTable(l,l.reduce((x,o)=>x+o.q,0)||1,mx):'<p class="note">کدی پیدا نشد.</p>'};i.oninput=go;go()},0);
   return cards+seg+body;
 }
 function modal(h){$('guide').innerHTML=`<div class="pn"><button class="x" data-x aria-label="بستن">×</button>${h}</div>`;$('guide').classList.add('on')}
@@ -693,7 +701,8 @@ function codeProfile(k){
   const cu=Object.entries(o.cu).filter(([,v])=>v!==0).sort((a,b)=>b[1]-a[1]),top=cu[0]?cu[0][1]:1;
   modal(`<h3 dir="ltr" style="text-align:right">${esc(k)}</h3><p class="note">${grpTag(o.g)} · ${fm(o.q)} متر · ${fa(o.nc)} مشتری</p>
   <div class="wrap"><table><tr>${MONTHS.slice(0,mx).map(m=>`<th class="n">${m.slice(0,4)}</th>`).join('')}</tr><tr>${o.mo.slice(1,mx+1).map(v=>mcell(v,v===0?'z':'')).join('')}</tr></table></div>
-  <h4>مشتری‌ها</h4><div class="wrap"><table>${cu.map(([c,v])=>`<tr class="clk" ${ACC.cust[c]&&ACC.cust[c].shop?`data-shop="${ACC.cust[c].shop.id}"`:`data-cust="${esc(c)}"`}><td>${esc(c)}</td><td class="n"><b>${fm(v)}</b></td><td style="min-width:80px"><div class="bar"><i style="width:${Math.max(0,v/top*100)}%"></i></div></td></tr>`).join('')}</table></div>`);
+  <h4>سفارش‌ها (تاریخ، مغازه، متر)</h4><div class="wrap"><table><tr><th>تاریخ</th><th>مشتری</th><th>شیت/شهر</th><th class="n">متر</th></tr>${[...(o.ev||[])].sort((a,b)=>String(b[1]).localeCompare(String(a[1]))).map(([c,d,q])=>{const u=ACC.cust[c],sh=u&&u.shop;return `<tr class="clk" ${sh?`data-shop="${sh.id}"`:`data-cust="${esc(c)}"`}><td>${esc(d)}</td><td>${esc(c)}</td><td>${sh?esc(sh.sheet):'بدون کالیته'}</td><td class="n">${fm(q)}</td></tr>`}).join('')}</table></div>
+  <h4>جمع به تفکیک مشتری</h4><div class="wrap"><table>${cu.map(([c,v])=>`<tr class="clk" ${ACC.cust[c]&&ACC.cust[c].shop?`data-shop="${ACC.cust[c].shop.id}"`:`data-cust="${esc(c)}"`}><td>${esc(c)}</td><td class="n"><b>${fm(v)}</b></td><td style="min-width:80px"><div class="bar"><i style="width:${Math.max(0,v/top*100)}%"></i></div></td></tr>`).join('')}</table></div>`);
 }
 function codeBlock(codes,mx,title){
   const l=Object.entries(codes).filter(([,v])=>v.q!==0).sort((a,b)=>b[1].q-a[1].q);
