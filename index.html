@@ -338,9 +338,10 @@ function ovNums(){
   const coll=D.shops.filter(s=>s.year>=4&&s.status!=='ok').length;
   const pace=c?mon.slice(1,c+1).reduce((a,b)=>a+b,0)/c:0, proj=pace*12;
   const shopM=D.shops.reduce((a,s)=>a+s.total,0), repM=D.reps.reduce((a,r)=>a+r.total,0);
-  const nShops=D.shops.length, base=cfg.base??nShops, added=Math.max(nShops-base,0), gN=cfg.newGoal||0;
+  const nShops=D.shops.length, base=cfg.base??nShops, added=NEWSH().length, gN=cfg.newGoal||0;
   return {cfg,target,c,mon,sold,left,rem,need,pace,proj,cnt,inact,coll,shopM,repM,nShops,base,added,gN};
 }
+const NEWSH=()=>(CAL||[]).filter(s=>s.sheet==='جدید');
 function statBlock(){
   const c=S.cur, by=k=>D.shops.filter(s=>s.status===k);
   const upd=D.shops.filter(s=>s.year===4&&['ok','g1','g2'].includes(s.status));
@@ -385,9 +386,9 @@ function drillInfo(k){
       return {t:'مغازه‌های بی‌خرید',d:'مغازه‌هایی که یک ماه یا بیشتر خرید نکرده‌اند؛ قدیمی‌ترین وقفه اول.',
         h:shopRows(by(['g1','g2','g3']).sort(byLast))};
     case 'added':{
-      const nw=D.shops.filter(s=>s.sheet==='جدید');
+      const nw=NEWSH();
       return {t:'مغازه جدید',d:`پایه: ${fa(o.base)} مغازه • الان: ${fa(o.nShops)} مغازه • اضافه‌شده: ${fa(o.added)} از هدف ${fa(o.gN)}. فهرست زیر بر اساس شیت «جدید» است.`,
-        h:shopRows(nw.sort(byTot))};}
+        h:`<div class="wrap"><table><tr><th>#</th><th>مغازه</th><th>بوک</th></tr>${nw.map((s,i)=>`<tr><td>${fa(i+1)}</td><td>${esc(s.name)}</td><td>${esc(s.book)}</td></tr>`).join('')}</table></div>`};}
     case 'coll':
       return {t:'بوک برای جمع‌آوری',d:'بوک ۱۴۰۴ و ۱۴۰۵ که مغازه‌شان این ماه خرید نداشته است.',
         h:shopRows(D.shops.filter(s=>s.year>=4&&s.status!=='ok').sort((a,b)=>b.year-a.year||byTot(a,b)))};
@@ -815,7 +816,7 @@ function guideItems(){
   const sh={};D.shops.forEach(s=>{const o=sh[s.sheet]??={n:0,t:0};o.n++;o.t+=s.total});
   const arr=Object.entries(sh).filter(([,o])=>o.n>=3).map(([k,o])=>[k,o.t/o.n]).sort((x,y)=>x[1]-y[1]);
   if(arr.length>1)it.push({pr:2,t:`میانگین پایین‌تر در «${arr[0][0]}»`,d:`هر مغازه در «${arr[0][0]}» به‌طور میانگین ${fa(arr[0][1])} متر فروخته؛ بالاترین «${arr[arr.length-1][0]}» با ${fa(arr[arr.length-1][1])} متر است.`,tab:'sheets'});
-  const gN=cfg.newGoal||0,added=Math.max(D.shops.length-(cfg.base??D.shops.length),0);
+  const gN=cfg.newGoal||0,added=NEWSH().length;
   if(gN&&added<gN)it.push({pr:2,t:'هدف مغازه جدید هنوز کامل نیست',d:`${fa(added)} از ${fa(gN)} مغازه جدید اضافه شده؛ ${fa(gN-added)} مغازه مانده.`,tab:'shops'});
   return it.sort((x,y)=>x.pr-y.pr);
 }
