@@ -1,132 +1,131 @@
 <!doctype html><html lang="fa" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>فتح ایران</title>
 <style>
-:root{--gold:#e9bb62;--line:rgba(233,187,98,.38);--card:rgba(8,22,40,.82)}
+:root{--gold:#b7791f;--line:#e2e8f0;--card:#ffffff;--ink:#1e293b;--mute:#64748b}
 *{box-sizing:border-box}
-body{margin:0;padding:14px 16px 26px;color:#fff;font-family:Tahoma,sans-serif;min-height:100vh;background:radial-gradient(900px 520px at 50% 18%,#1d4375 0%,#0b2140 42%,#050c17 100%);overflow-x:hidden}
+body{margin:0;padding:14px 16px 26px;color:var(--ink);font-family:Tahoma,sans-serif;min-height:100vh;background:#ffffff;overflow-x:hidden}
 .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:relative}
-.logo{background:#fff;border-radius:14px;padding:6px 12px;border:1px solid var(--gold);box-shadow:0 0 18px #e9bb6055}
+.logo{background:#fff;border-radius:14px;padding:6px 12px;border:1px solid var(--line)}
 .logo img{height:54px;display:block}
-.cap{font-size:12px;letter-spacing:4px;color:var(--gold)}
-h1{margin:2px 0 0;font-size:24px;font-weight:800;text-shadow:0 2px 12px #000}
-.sub{font-size:12px;color:#b9c9de;margin-top:3px}
+.cap{font-size:12px;letter-spacing:4px;color:var(--gold);font-weight:700}
+h1{margin:2px 0 0;font-size:24px;font-weight:800;color:var(--ink)}
+.sub{font-size:12px;color:var(--mute);margin-top:3px}
 .stats{margin-inline-start:auto;display:flex;gap:10px;flex-wrap:wrap}
-.st{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 14px;min-width:118px;text-align:center;box-shadow:0 8px 20px #0008}
-.st b{display:block;font-size:22px}.st span{font-size:11px;color:#9fb3cc}
+.st{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 14px;min-width:118px;text-align:center}
+.st b{display:block;font-size:22px;color:var(--ink)}.st span{font-size:11px;color:var(--mute)}
 .st.g b{color:var(--gold)}
-.ctl{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;font-size:12px;color:#c7d5e8;align-items:center}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;font-size:12px;color:var(--ink);align-items:center}
 .ctl label,.ctl #s{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;display:flex;gap:6px;align-items:center}
-.ctl input[type=number]{width:70px;background:#0a1a2e;color:#fff;border:1px solid #2b4a70;border-radius:6px;padding:3px 5px}
+.ctl input[type=number]{width:70px;background:#fff;color:var(--ink);border:1px solid #cbd5e1;border-radius:6px;padding:3px 5px}
 .ctl b{color:var(--gold)}
 .row{display:grid;grid-template-columns:240px 1fr 240px;gap:14px;align-items:start}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 10px 26px #0009}
-.lgr{display:flex;align-items:center;gap:8px;font-size:12px;margin:9px 0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.lgr{display:flex;align-items:center;gap:8px;font-size:12px;margin:9px 0;color:var(--ink)}
 .lgr i{width:14px;height:14px;border-radius:50%;display:inline-block}
 .lgr em{margin-inline-start:auto;font-style:normal;color:var(--gold);font-weight:700}
 .big{font-size:26px;font-weight:800;color:var(--gold);margin:4px 0}
-.bar{height:12px;border-radius:8px;background:#0b1d33;border:1px solid #274a74;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8a6420,#f3cf7a,#e9bb62);transition:width .6s}
-.mini{font-size:11px;color:#9fb3cc}
-.stage{perspective:1600px;padding:6px 0 0}
-.map3d{transform:rotateX(24deg) scale(.96);transform-origin:50% 40%;transition:transform .5s}
-.map3d:hover{transform:rotateX(14deg) scale(.98)}
-.map3d svg{width:100%;height:auto;display:block;overflow:visible;filter:drop-shadow(0 22px 26px #000c) drop-shadow(0 0 22px #3b82f655)}
-.pv{stroke:#0a1422;stroke-width:.9;stroke-linejoin:round;cursor:pointer;transition:filter .15s}
-.pv:hover{filter:brightness(1.3)}
-.s0{fill:#3f4a5a}.s1{fill:#f2a51f}.s2{fill:#18a35d}.s3{fill:#2b7fff}
-.pl{font-size:9.5px;fill:#fff;text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:#000c;stroke-width:2.4px;font-weight:700}
-.bd rect{fill:#071426;stroke:var(--gold);stroke-width:1.4}
-.bd text{font-size:11.5px;font-weight:800;fill:#fff;text-anchor:middle;dominant-baseline:central}
-.fl line{stroke:#fff;stroke-width:1.2}.fl path{fill:#ff3b3b;stroke:#6b0f0f;stroke-width:.6}
-.fl.big path{fill:#ff7a1a}
-.lgnd{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:11.5px;color:#dbe6f5;margin-top:10px}
+.bar{height:12px;border-radius:8px;background:#edf2f7;border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#d69e2e,#ecc94b);transition:width .6s}
+.mini{font-size:11px;color:var(--mute)}
+.stage{padding:6px 0 0}
+.map2d{width:100%}
+.map2d svg{width:100%;height:auto;display:block}
+.pv{stroke:#ffffff;stroke-width:.9;stroke-linejoin:round;cursor:pointer;transition:filter .15s}
+.pv:hover{filter:brightness(.92)}
+.s0{fill:#cbd5e0}.s1{fill:#f6ad55}.s2{fill:#38a169}.s3{fill:#3182ce}
+.pl{font-size:9.5px;fill:#1e293b;text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:#fff;stroke-width:2.4px;font-weight:700}
+.bd rect{fill:#fff;stroke:var(--gold);stroke-width:1.4}
+.bd text{font-size:11.5px;font-weight:800;fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+.fl line{stroke:#1e293b;stroke-width:1.2}.fl path{fill:#e53e3e;stroke:#742a2a;stroke-width:.6}
+.fl.big path{fill:#dd6b20}
+.lgnd{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:11.5px;color:var(--ink);margin-top:10px}
 .lgnd i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-left:5px;vertical-align:-1px}
-#tip{position:fixed;pointer-events:none;background:#fff;color:#14233a;border-radius:10px;padding:9px 11px;font-size:12px;box-shadow:0 6px 18px #000a;display:none;min-width:170px;line-height:1.75;z-index:9}
+#tip{position:fixed;pointer-events:none;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12px;box-shadow:0 6px 18px #0002;display:none;min-width:170px;line-height:1.75;z-index:9}
 .tag{border-radius:10px;padding:1px 8px;font-size:11px;color:#fff}
-.t0{background:#5b6677}.t1{background:#d88e0c}.t2{background:#138a4e}.t3{background:#1f6fe0}
-.band{position:relative;margin-top:18px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(#0a1c33ee,#050c17ee);overflow:hidden;padding:14px 16px;min-height:150px}
+.t0{background:#718096}.t1{background:#dd6b20}.t2{background:#2f855a}.t3{background:#2b6cb0}
+.band{position:relative;margin-top:18px;border-radius:18px;border:1px solid var(--line);background:#fbf8f1;overflow:hidden;padding:14px 16px;min-height:150px}
 .band>svg.bg{position:absolute;left:0;top:0;width:100%;height:100%}
 .tl{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.node{text-align:center;min-width:170px;background:#071426cc;border:1px solid var(--line);border-radius:14px;padding:8px 12px}
-.node b{display:block;font-size:20px;color:var(--gold)}.node span{font-size:11.5px;color:#c9d7ea}
+.node{text-align:center;min-width:170px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px 12px}
+.node b{display:block;font-size:20px;color:var(--gold)}.node span{font-size:11.5px;color:var(--mute)}
 .tb{margin-top:10px}
-h3{color:var(--gold);margin:18px 0 6px;font-size:15px}
-table{border-collapse:collapse;width:100%;background:var(--card)}
-th,td{padding:6px 8px;border-bottom:1px solid #1d3352;text-align:right;font-size:12.5px;color:#dbe6f5;vertical-align:top}
-th{background:#10284a;color:var(--gold);position:sticky;top:0}
-tr.z td{background:#0f3a2a66}
+h3{color:var(--ink);margin:18px 0 6px;font-size:15px}
+table{border-collapse:collapse;width:100%;background:#fff}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:12.5px;color:var(--ink);vertical-align:top}
+th{background:#f7fafc;color:var(--gold);position:sticky;top:0}
+tr.z td{background:#fffaf0}
 @media(max-width:900px){.row{grid-template-columns:1fr}}
 </style>
-
+<body>
 <div class=top>
- <div class=logo><img id=lg alt="Rion"></div>
- <div><div class=cap>CONQUER IRAN</div><h1>ایران در انتظار فتح است!</h1><div class=sub>با فروش بیشتر، قلمرو برند ریون را گسترش دهید.</div></div>
- <div class=stats>
-  <div class=st><b id=k1>۰</b><span>مغازه‌های ما</span></div>
-  <div class="st g"><b id=k2>۰٪</b><span>پیشرفت به سوی هدف سال</span></div>
-  <div class=st><b id=k3>۰</b><span>استان‌های با حضور ما</span></div>
-  <div class=st><b id=k4>۰</b><span>شهرهای قابل فتح</span></div>
- </div>
+  <div class=logo><img id=lg alt="Rion"></div>
+  <div><div class=cap>CONQUER IRAN</div><h1>ایران در انتظار فتح است!</h1><div class=sub>با فروش بیشتر، قلمرو برند ریون را گسترش دهید.</div></div>
+  <div class=stats>
+   <div class=st><b id=k1>۰</b><span>مغازه‌های ما</span></div>
+   <div class="st g"><b id=k2>۰٪</b><span>پیشرفت به سوی هدف سال</span></div>
+   <div class=st><b id=k3>۰</b><span>استان‌های با حضور ما</span></div>
+   <div class=st><b id=k4>۰</b><span>شهرهای قابل فتح</span></div>
+  </div>
 </div>
 
 <div class=ctl>
- <label>هدف سهم از پرده‌فروشی‌ها %<input id=t type=number value=30></label>
- <label>متراژ سالانه هر مغازه جدید<input id=a type=number value=150></label>
- <label>حداقل رقبا<input id=m type=number value=20></label>
- <label><input id=o type=checkbox checked> فقط شهرهای بدون مغازه ما</label>
- <div id=s></div>
+  <label>هدف سهم از پرده‌فروشی‌ها %<input id=t type=number value=30></label>
+  <label>متراژ سالانه هر مغازه جدید<input id=a type=number value=150></label>
+  <label>حداقل رقبا<input id=m type=number value=20></label>
+  <label><input id=o type=checkbox checked> فقط شهرهای بدون مغازه ما</label>
+  <div id=s></div>
 </div>
 
 <div class=row>
- <aside class=panel>
-  <div class=cap>وضعیت استان‌ها</div>
-  <div class=lgr><i style="background:#2b7fff;box-shadow:0 0 8px #2b7fff"></i>پایگاه ما (۱۰+ مغازه)<em id=c3>۰</em></div>
-  <div class=lgr><i style="background:#18a35d;box-shadow:0 0 8px #18a35d"></i>در حال فتح (۳–۹)<em id=c2>۰</em></div>
-  <div class=lgr><i style="background:#f2a51f;box-shadow:0 0 8px #f2a51f"></i>هدف ما (۱–۲ یا شهر قابل فتح)<em id=c1>۰</em></div>
-  <div class=lgr><i style="background:#3f4a5a"></i>بدون فعالیت<em id=c0>۰</em></div>
-  <hr style="border:0;border-top:1px solid #1d3352;margin:12px 0">
-  <div class=cap>گل فروش ما (تجمیعی سال)</div>
-  <div class=big id=m2>۰</div>
-  <div class=mini>طبق فایل حسابداری</div>
- </aside>
+  <aside class=panel>
+   <div class=cap>وضعیت استان‌ها</div>
+   <div class=lgr><i style="background:#3182ce"></i>پایگاه ما (۱۰+ مغازه)<em id=c3>۰</em></div>
+   <div class=lgr><i style="background:#38a169"></i>در حال فتح (۳–۹)<em id=c2>۰</em></div>
+   <div class=lgr><i style="background:#f6ad55"></i>هدف ما (۱–۲ یا شهر قابل فتح)<em id=c1>۰</em></div>
+   <div class=lgr><i style="background:#cbd5e0"></i>بدون فعالیت<em id=c0>۰</em></div>
+   <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">
+   <div class=cap>گل فروش ما (تجمیعی سال)</div>
+   <div class=big id=m2>۰</div>
+   <div class=mini>طبق فایل حسابداری</div>
+  </aside>
 
- <section class=stage>
-  <div class=map3d><svg id=mp role="img" aria-label="نقشه فتح ایران" viewBox="0 0 /*W*/0 /*H*/0"></svg></div>
-  <div class=lgnd>
-   <span><i style="background:#2b7fff"></i>پایگاه ما</span>
-   <span><i style="background:#18a35d"></i>در حال فتح</span>
-   <span><i style="background:#f2a51f"></i>هدف ما</span>
-   <span><i style="background:#3f4a5a"></i>بدون فعالیت</span>
-   <span><i style="background:#ff3b3b;border-radius:0"></i>پرچم = شهر قابل فتح (نارنجی = کمبود ≥ ۱۵)</span>
-   <span>عدد روی نقشه = تعداد مغازه ما در استان</span>
-  </div>
- </section>
+  <section class=stage>
+   <div class=map2d><svg id=mp role="img" aria-label="نقشه فتح ایران" viewBox="0 0 /*W*/0 /*H*/0"></svg></div>
+   <div class=lgnd>
+    <span><i style="background:#3182ce"></i>پایگاه ما</span>
+    <span><i style="background:#38a169"></i>در حال فتح</span>
+    <span><i style="background:#f6ad55"></i>هدف ما</span>
+    <span><i style="background:#cbd5e0"></i>بدون فعالیت</span>
+    <span><i style="background:#e53e3e;border-radius:0"></i>پرچم = شهر قابل فتح (نارنجی = کمبود ≥ ۱۵)</span>
+    <span>عدد روی نقشه = تعداد مغازه ما در استان</span>
+   </div>
+  </section>
 
- <aside class=panel>
-  <svg viewBox="0 0 160 70" width="160" style="display:block;margin:0 auto 6px">
-   <g fill="#e9bb62"><path d="M80,35 C58,8 30,6 4,24 C26,22 46,30 62,42 Z"/><path d="M80,35 C102,8 130,6 156,24 C134,22 114,30 98,42 Z"/><path d="M80,32 C70,36 70,44 80,48 C90,44 90,36 80,32Z" fill="#fff3c4"/></g>
-   <circle cx="80" cy="36" r="9" fill="#f3cf7a" stroke="#8a6420" stroke-width="1.5"/>
-  </svg>
-  <div class=cap>ماموریت اصلی</div>
-  <div style="font-size:19px;font-weight:800;margin:4px 0 8px">فتح ایران</div>
-  <div class=bar><i id=pbar></i></div>
-  <div class=mini style="margin-top:6px">پیشرفت فروش نسبت به هدف سال: <b id=pt></b></div>
-  <div class=mini style="margin-top:14px">هدف بعدی (بیشترین کمبود)</div>
-  <div id=nx style="margin-top:4px;font-weight:700;color:var(--gold);font-size:13px">—</div>
- </aside>
+  <aside class=panel>
+   <svg viewBox="0 0 160 70" width="160" style="display:block;margin:0 auto 6px">
+    <g fill="#b7791f"><path d="M80,35 C58,8 30,6 4,24 C26,22 46,30 62,42 Z"/><path d="M80,35 C102,8 130,6 156,24 C134,22 114,30 98,42 Z"/><path d="M80,32 C70,36 70,44 80,48 C90,44 90,36 80,32Z" fill="#faf089"/></g>
+    <circle cx="80" cy="36" r="9" fill="#ecc94b" stroke="#975a16" stroke-width="1.5"/>
+   </svg>
+   <div class=cap>ماموریت اصلی</div>
+   <div style="font-size:19px;font-weight:800;margin:4px 0 8px">فتح ایران</div>
+   <div class=bar><i id=pbar></i></div>
+   <div class=mini style="margin-top:6px">پیشرفت فروش نسبت به هدف سال: <b id=pt></b></div>
+   <div class=mini style="margin-top:14px">هدف بعدی (بیشترین کمبود)</div>
+   <div id=nx style="margin-top:4px;font-weight:700;color:var(--gold);font-size:13px">—</div>
+  </aside>
 </div>
 
 <div class=band>
- <svg class=bg id=bgs viewBox="0 0 1000 150" preserveAspectRatio="xMidYMax slice"></svg>
- <div class=tl>
-  <svg viewBox="0 0 150 120" width="130" style="filter:drop-shadow(0 8px 10px #000a)">
-   <rect x="4" y="0" width="4" height="118" fill="#e9bb62"/>
-   <path d="M8,8 C40,-2 70,18 104,6 C122,0 136,4 146,10 L146,72 C128,66 114,80 96,76 C66,70 40,90 8,80 Z" fill="#0d2a5c" stroke="#e9bb62" stroke-width="3"/>
-   <image id=fi x="30" y="22" width="96" height="44" preserveAspectRatio="xMidYMid meet"/>
-  </svg>
-  <div class=node><b id=n1>۰</b><span>مغازه فعال</span></div>
-  <div class=node><b id=n2>۰</b><span>استان با حضور ما</span></div>
-  <div class=node><b id=n3>۰</b><span>شهر قابل فتح</span></div>
- </div>
+  <svg class=bg id=bgs viewBox="0 0 1000 150" preserveAspectRatio="xMidYMax slice"></svg>
+  <div class=tl>
+   <svg viewBox="0 0 150 120" width="130">
+    <rect x="4" y="0" width="4" height="118" fill="#b7791f"/>
+    <path d="M8,8 C40,-2 70,18 104,6 C122,0 136,4 146,10 L146,72 C128,66 114,80 96,76 C66,70 40,90 8,80 Z" fill="#fff" stroke="#b7791f" stroke-width="3"/>
+    <image id=fi x="30" y="22" width="96" height="44" preserveAspectRatio="xMidYMid meet"/>
+   </svg>
+   <div class=node><b id=n1>۰</b><span>مغازه فعال</span></div>
+   <div class=node><b id=n2>۰</b><span>استان با حضور ما</span></div>
+   <div class=node><b id=n3>۰</b><span>شهر قابل فتح</span></div>
+  </div>
 </div>
 
 <p class="mini tb" id=un>مرز استان‌ها: GADM 4.1. شهر «قابل فتح» = شهری که رقیب پرده‌فروشی دارد (بلد)، مغازه ما ندارد و به حداقل رقبای بالا رسیده است.</p>
@@ -148,12 +147,12 @@ const SN=['بدون فعالیت','هدف ما','در حال فتح','پایگا
 function mk(n,at,par,tx){const e=document.createElementNS(NS,n);for(const k in at)e.setAttribute(k,at[k]);if(tx!=null)e.textContent=tx;if(par)par.appendChild(e);return e}
 
 function bg(){
-  let h='<defs><linearGradient id=gr x1=0 y1=0 x2=0 y2=1><stop offset=0 stop-color="#d7a64e" stop-opacity=".55"/><stop offset=1 stop-color="#d7a64e" stop-opacity=".08"/></linearGradient></defs>';
-  h+='<path d="M0,150 L0,122 Q250,108 500,118 T1000,112 L1000,150Z" fill="#06101d"/>';
+  let h='<defs><linearGradient id=gr x1=0 y1=0 x2=0 y2=1><stop offset=0 stop-color="#d69e2e" stop-opacity=".35"/><stop offset=1 stop-color="#d69e2e" stop-opacity=".05"/></linearGradient></defs>';
+  h+='<path d="M0,150 L0,122 Q250,108 500,118 T1000,112 L1000,150Z" fill="#f1e7d0"/>';
   for(let i=0;i<9;i++){const x=50+i*110;
     h+=`<g fill="url(#gr)"><rect x="${x-4}" y="58" width="8" height="62"/><rect x="${x-9}" y="52" width="18" height="7"/><rect x="${x-13}" y="28" width="26" height="6"/><rect x="${x-10}" y="120" width="20" height="5"/></g>`;
   }
-  h+='<path d="M0,150 L0,128 H1000 V150Z" fill="#06101d" opacity=".6"/>';
+  h+='<path d="M0,150 L0,128 H1000 V150Z" fill="#e9dcc0" opacity=".6"/>';
   $('bgs').innerHTML=h;
 }
 
@@ -175,7 +174,6 @@ function go(){
    <td>${p.own.map(c=>c.c+' ('+fa(c.mine)+')').join('، ')||'—'}<td><b>${fa(p.mine)}</b><td>${fa(p.comp)}<td>${fa(p.tg)}<td>${fa(p.g)}
    <td class=mini>${p.op.slice(0,6).map(c=>c.c+' '+fa(c.g)).join('، ')||'—'}<td><b>${fa(p.mt)}</b> <span class=mini>متر</span>`).join('');
 
-  // آمار بالا و پنل‌ها
   const shops=C.reduce((x,c)=>x+c.mine,0),actP=PV.filter(p=>p.mine>0).length,openC=C.filter(c=>c.open);
   const pct=TGT?Math.min(100,Math.round(M2/TGT*100)):0;
   const cnt=[0,0,0,0];PV.forEach(p=>cnt[p.st]++);
@@ -187,11 +185,8 @@ function go(){
   $('nx').textContent=nx?nx.c+'، '+nx.p+' — کمبود '+fa(nx.g)+' مغازه':'همه شهرهای هدف فتح شده‌اند';
   $('n1').textContent=fa(shops);$('n2').textContent=fa(actP)+' از '+fa(P.length);$('n3').textContent=fa(openC.length);
 
-  // نقشه سه‌بعدی: لایه‌های ضخامت + استان‌ها
+  // نقشه از بالا (دوبعدی)
   const svg=$('mp');svg.innerHTML='';
-  const defs=mk('defs',{},svg);
-  mk('path',{d:P.map(p=>p.d).join(''),id:'U'},defs);
-  for(let k=10;k>=1;k--) mk('use',{href:'#U',transform:'translate(0,'+(k*1.2)+')',fill:k%2?'#08182c':'#0d2742',stroke:'#7d5b1d','stroke-width':.5},svg);
   const tip=$('tip');
   PV.forEach(p=>{const e=mk('path',{d:p.d,class:'pv s'+p.st},svg);
     const show=ev=>{tip.innerHTML=`<b>${p.n}</b> <span class="tag t${p.st}">${SN[p.st]}</span><br>مغازه ما: <b>${fa(p.mine)}</b><br>پرده‌فروشی (بلد): ${fa(p.comp)}<br>کمبود تا هدف: ${fa(p.g)}<br>پیش‌بینی: <b>${fa(p.mt)}</b> متر${p.op.length?'<br>🚩 '+p.op.slice(0,4).map(c=>c.c).join('، '):''}`;
@@ -210,4 +205,4 @@ try{const src=parent.document.querySelector('.logo img').src;$('lg').src=src;$('
 bg();
 ['t','a','m','o'].forEach(i=>$(i).onchange=go);go();
 </script>
-</html>
+</body></html>
