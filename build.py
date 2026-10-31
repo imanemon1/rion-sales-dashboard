@@ -10,4 +10,5 @@ cw = openpyxl.load_workbook('data/caliti.xlsx', data_only=True)
 cal = {ws.title: [list(r) for r in ws.iter_rows(values_only=True)] for ws in cw}
 t = t.replace('/*__CAL__*/null', json.dumps(cal, ensure_ascii=False))
 t = t.replace('/*__DATA__*/null', json.dumps(data, ensure_ascii=False)).replace('/*__ACC__*/null', acc)
+t = t.replace("/*__PLAN__*/''", json.dumps(open('pakhsh_plan.html',encoding='utf-8').read(), ensure_ascii=False).replace('</','<\\/'))
 open('index.html','w',encoding='utf-8').write(t)

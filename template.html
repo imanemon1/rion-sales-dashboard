@@ -267,7 +267,7 @@ const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرد�
 const DEF={target:40000,newGoal:80,base:null};
 const getCfg=()=>{try{return {...DEF,...JSON.parse(localStorage.getItem('rionCfg')||'{}')}}catch(e){return {...DEF}}};
 const setCfg=c=>localStorage.setItem('rionCfg',JSON.stringify(c));
-const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها و راسته‌ها'],['reps','نماینده‌ها'],['acc','لیست حسابداری'],['codes','کدها']];
+const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها و راسته‌ها'],['reps','نماینده‌ها'],['acc','لیست حسابداری'],['codes','کدها'],['plan','پخش کشور']];
 const STL={ok:'فعال',g1:'یک ماه بی‌خرید',g2:'دو ماه بی‌خرید',g3:'سه ماه+ بی‌خرید',never:'بدون خرید'};
 const mcell=(v,cls='',attr='')=>`<td class="n ${cls}" ${attr}>${v==null?'':fa(v)}</td>`;
 const fa=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:1});
@@ -328,13 +328,14 @@ const DRG={sold:'top',left:'top',need:'top',proj:'top',inact:'top',added:'top',c
 function drillTap(k,l,v,s,cl){const on=S.drill===k;return `<div class="card tap ${cl||''} ${on?'on':''}" data-d="${k}" role="button" tabindex="0" aria-expanded="${on}"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div><em class="more">${on?'بستن ▴':'جزئیات ▾'}</em></div>`}
 function ovNums(){
   const cfg=getCfg(),target=cfg.target||40000,c=S.cur;
-  const mon=Array(13).fill(0);[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)mon[k]+=s.m[k]});
+  const mon=Array(13).fill(0);
+  if(ACC){ACC.rows.forEach(r=>{mon[r[6]]+=r[4]})}else[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)mon[k]+=s.m[k]});
   const sold=mon.slice(1).reduce((a,b)=>a+b,0);
   const left=Math.max(target-sold,0),rem=12-c,need=rem>0?left/rem:left;
   const cnt=k=>D.shops.filter(s=>s.status===k).length;
   const inact=cnt('g1')+cnt('g2')+cnt('g3');
   const coll=D.shops.filter(s=>s.year>=4&&s.status!=='ok').length;
-  const pace=c?sold/c:0, proj=pace*12;
+  const pace=c?mon.slice(1,c+1).reduce((a,b)=>a+b,0)/c:0, proj=pace*12;
   const shopM=D.shops.reduce((a,s)=>a+s.total,0), repM=D.reps.reduce((a,r)=>a+r.total,0);
   const nShops=D.shops.length, base=cfg.base??nShops, added=Math.max(nShops-base,0), gN=cfg.newGoal||0;
   return {cfg,target,c,mon,sold,left,rem,need,pace,proj,cnt,inact,coll,shopM,repM,nShops,base,added,gN};
@@ -674,6 +675,8 @@ function codeTable(list,tot,mx){
   return `<div class="wrap"><table><tr><th>#</th><th>کد</th><th>طرح</th><th>رنگ</th><th>گروه</th><th class="n">متر</th><th>سهم</th><th class="n">مشتری</th><th>روند ماهانه</th><th class="n">آخرین ماه</th></tr>
   ${list.map((o,i)=>`<tr class="clk" data-code="${esc(o.code)}"><td>${fa(i+1)}</td><td dir="ltr" style="text-align:right">${esc(o.code)}</td><td>${dsn(o.code)[0]}</td><td>${dsn(o.code)[1]}</td><td>${grpTag(o.g)}</td><td class="n"><b>${fm(o.q)}</b></td><td style="min-width:90px"><div class="bar"><i style="width:${Math.min(100,tot?o.q/tot*100*4:0)}%"></i></div></td><td class="n">${fa(o.nc)}</td><td>${spark(o.mo,mx)}</td><td class="n">${o.last?MONTHS[o.last-1]:'-'}</td></tr>`).join('')}</table></div>`;
 }
+const PLAN=/*__PLAN__*/'';
+function viewPlan(){return `<iframe srcdoc="${PLAN.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" style="width:100%;height:85vh;border:0;background:#fff"></iframe>`}
 function viewCodes(){
   if(!ACC)return `<div class="box"><h2>کدها</h2><p class="note">برای دیدن آمار کدها، از ⚙ تنظیمات «اکسل حسابداری» را بارگذاری کنید.</p></div>`;
   const all=Object.values(ACC.code),mx=ACC.maxM,sub=S.ksub||'all';
@@ -849,7 +852,7 @@ function draw(){
   $('gear').classList.toggle('on',S.tab==='settings');
   if(!D){$('nav').innerHTML='';$('app').innerHTML=S.tab==='settings'?viewSettings():'<div id="empty">برای شروع، از ⚙ گوشه بالا-چپ فایل اکسل را بارگذاری کنید.</div>';if(S.tab==='settings')bindSettings();return}
   $('nav').innerHTML=TABS.map(([k,t])=>`<button class="${S.tab===k?'on':''}" data-t="${k}">${t}</button>`).join('');
-  const v={over:viewOver,shops:viewShops,inactive:viewInactive,collect:viewCollect,sheets:viewSheets,reps:viewReps,acc:viewAcc,codes:viewCodes,settings:viewSettings}[S.tab];
+  const v={over:viewOver,shops:viewShops,inactive:viewInactive,collect:viewCollect,sheets:viewSheets,reps:viewReps,acc:viewAcc,codes:viewCodes,plan:viewPlan,settings:viewSettings}[S.tab];
   $('app').innerHTML=v();
   if(S.tab==='shops')bindShops();
   if(S.tab==='settings')bindSettings();
