@@ -238,6 +238,8 @@ input,select,textarea{font-size:16px}
 }
 .clk{cursor:pointer}.clk:hover td{background:#f4f7ff}.spk{display:inline-flex;align-items:flex-end;gap:2px;height:22px}.spk i{display:block;width:5px;background:#2f5bea;border-radius:1px}
 .cl_in.bad{border:2px solid #c0392b!important;background:#fdecea}
+.bk5{background:#cfe3ff!important}.bk4{background:#d4f5dc!important}.bkS{background:#ffe3c2!important}
+.cl_t{width:auto}.cl_t td,.cl_t th{padding:4px 6px}.cl_t .cl_in{width:130px;box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -762,30 +764,49 @@ function clValHTML(){
   <div style="max-height:260px;overflow:auto;margin-top:6px"><table class="t"><tbody>${is.map((x,j)=>`<tr><td style="color:${x.lv==='e'?'#c0392b':'#b9770e'}">${x.lv==='e'?'خطا':'هشدار'}</td><td>${esc(x.sn)}</td><td><b>${esc(x.nm)}</b></td><td>${lab[x.k]}: ${esc(x.m)}</td><td style="white-space:nowrap"><button class="btn sec cl_go" data-s="${esc(x.sn)}" data-r="${x.i}" data-c="${x.c}">برو به سلول</button>${x.fix?` <button class="btn cl_fix" data-s="${esc(x.sn)}" data-r="${x.i}" data-c="${x.c}" data-v="${esc(x.fix)}">اصلاح به ${esc(x.fix)}</button>`:''}${x.del?` <button class="btn sec cl_rm" data-s="${esc(x.sn)}" data-r="${x.i}">حذف این ردیف</button>`:''}</td></tr>`).join('')}</tbody></table></div>
   <p class="note">قبل از ذخیره، موارد قرمز را اصلاح کنید.</p></div>`}
 function keepDraw(){const y=window.scrollY,p=document.querySelector('#cl_val>div>div'),pt=p?p.scrollTop:0;draw();scrollTo(0,y);const q=document.querySelector('#cl_val>div>div');if(q)q.scrollTop=pt}
+function bkCls(v){v=String(v??'');if(/-5$/.test(v))return 'bk5';if(/-4$/.test(v))return 'bk4';if(/سند/.test(v))return 'bkS';return ''}
 function viewCList(){
   if(!CLW)CLW=JSON.parse(JSON.stringify(getCL()));
   const names=Object.keys(CLW);if(!S.lsheet||!CLW[S.lsheet])S.lsheet=names[0];
+  const cntOf=n=>{const rr=CLW[n],hh=hdrIdx(rr);if(hh<0)return 0;const nn=hdrOf(rr[hh]).indexOf('نام مغازه');return rr.slice(hh+1).filter(r=>isDataRow(r,nn)).length};
+  const tot=names.reduce((a,n)=>a+cntOf(n),0);
+  const legend=`<div class="note" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center"><span><i class="bk5" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۵ (۵-)</span><span><i class="bk4" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۴ (۴-)</span><span><i class="bkS" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> سند</span></div>`;
+  if(S.clm!=='edit'){
+    return `<div class="box"><h2>لیست پخش کالیته</h2>
+    <p class="note">برای ویرایش هر شیت، دکمه «ویرایش» را بزنید. مجموع: <b>${fa(tot)}</b> مغازه.</p>
+    <div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
+     <button class="btn" id="cl_save">💾 ذخیره و اعمال</button>
+     <button class="btn sec" id="cl_dl">⬇ دانلود اکسل</button>
+    </div>
+    <div id="cl_msg" class="note"></div>
+    <div id="cl_val">${clValHTML()}</div>
+    <table class="t"><thead><tr><th>شیت</th><th>تعداد مغازه</th><th></th></tr></thead><tbody>
+    ${names.map(n=>`<tr><td><b>${esc(n)}</b></td><td>${fa(cntOf(n))}</td><td><button class="btn sec cl_ed" data-n="${esc(n)}">✏️ ویرایش</button></td></tr>`).join('')}
+    </tbody></table>
+    <div style="margin:8px 0"><button class="btn sec cl_ns" title="شیت جدید">＋ شیت جدید</button></div></div>`}
   const rows=CLW[S.lsheet],hi=hdrIdx(rows),h=hdrOf(rows[hi]),nc=h.indexOf('نام مغازه');
   const cols=h.map((x,i)=>EDC.includes(x)?i:-1).filter(i=>i>=0);
   const ISS=clIssues(),BAD=new Set(ISS.map(x=>x.sn+'|'+x.i+'|'+x.c));
   const MULTI=h.filter(x=>x.startsWith('بوک')).length>1,TG=names.filter(n=>n!==S.lsheet&&hdrOf(CLW[n][hdrIdx(CLW[n])]).filter(x=>x.startsWith('بوک')).length<2);
   let cnt=0;const body=[];
   for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!isDataRow(r,nc))continue;cnt++;
-    body.push(`<tr><td class="n">${fa(cnt)}</td>${cols.map(c=>`<td><input class="cl_in${BAD.has(S.lsheet+'|'+i+'|'+c)?' bad':''}" list="${h[c]==='شهر'?'cl_cities':''}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`).join('')}<td>${MULTI?'':`<select class="cl_mv" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-r="${i}">🗑 حذف</button></td></tr>`)}
+    body.push(`<tr><td class="n">${fa(cnt)}</td>${cols.map(c=>{const isBk=h[c].startsWith('بوک');return `<td><input class="cl_in${isBk?' '+bkCls(r[c]):''}${BAD.has(S.lsheet+'|'+i+'|'+c)?' bad':''}" list="${h[c]==='شهر'?'cl_cities':''}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`}).join('')}<td>${MULTI?'':`<select class="cl_mv" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-r="${i}">🗑 حذف</button></td></tr>`)}
   const cities=new Set(Object.values(CITYMAP));try{JSON.parse(PLAN.match(/const R=(\[.*?\]),P=/s)[1]).forEach(x=>cities.add(x.c))}catch(e){}
-  const tot=names.reduce((a,n)=>{const rr=CLW[n],hh=hdrIdx(rr),nn=hdrOf(rr[hh]).indexOf('نام مغازه');return a+rr.slice(hh+1).filter(r=>isDataRow(r,nn)).length},0);
-  return `<div class="box"><h2>لیست پخش کالیته</h2>
-  <p class="note">هر شیت را ویرایش کنید، مغازه اضافه یا حذف کنید و بعد «ذخیره و اعمال» بزنید. بعد از ذخیره، همه تب‌ها (مغازه‌ها، بی‌خرید، نقشه پخش کشور و...) با این لیست به‌روز می‌شوند. ستون «شهر» برای نقشه لازم است. مجموع: <b>${fa(tot)}</b> ردیف.</p>
-  <div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
+  return `<div class="box"><h2>ویرایش شیت «${esc(S.lsheet)}»</h2>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
+   <button class="btn sec" id="cl_back">→ بازگشت به لیست شیت‌ها</button>
    <button class="btn" id="cl_save">💾 ذخیره و اعمال</button>
    <button class="btn sec" id="cl_dl">⬇ دانلود اکسل</button>
-</div>
+  </div>
   <div id="cl_msg" class="note"></div>
   <div id="cl_val">${clValHTML()}</div>
-  <div style="margin:8px 0"><button class="btn" id="cl_add">➕ مغازه جدید در شیت «${esc(S.lsheet)}»</button></div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${names.map(n=>`<button class="btn ${n===S.lsheet?'':'sec'} cl_sh" data-n="${esc(n)}">${esc(n)} (${fa(Object.keys(CLW[n]).length&&CLW[n].slice(hdrIdx(CLW[n])+1).filter(r=>isDataRow(r,hdrOf(CLW[n][hdrIdx(CLW[n])]).indexOf('نام مغازه'))).length)})</button>`).join('')}<button class="btn cl_ns" title="شیت جدید">＋</button>${cnt===0&&names.length>1?'<button class="btn sec cl_ds">حذف این شیت خالی</button>':''}</div>
+  ${legend}
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
+   <button class="btn" id="cl_add">➕ مغازه جدید</button>
+   ${cnt===0&&names.length>1?'<button class="btn sec cl_ds">حذف این شیت خالی</button>':''}
+  </div>
   <datalist id="cl_cities">${[...cities].map(c=>`<option value="${esc(c)}">`).join('')}</datalist>
-  <div style="overflow:auto"><table class="t"><thead><tr><th>#</th>${cols.map(c=>`<th>${esc(h[c])}</th>`).join('')}<th>جابجایی</th><th></th></tr></thead><tbody>${body.join('')}</tbody></table></div></div>`}
+  <div style="overflow:auto"><table class="t cl_t"><thead><tr><th>#</th>${cols.map(c=>`<th>${esc(h[c])}</th>`).join('')}${MULTI?'':'<th>جابجایی</th>'}<th></th></tr></thead><tbody>${body.join('')}</tbody></table></div></div>`}
 const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json'};
 let ACCR=null;
 const GHK='rionGhTok';
@@ -839,6 +860,8 @@ if(e.target.closest('.cl_in')){const v=$('cl_val');if(v)v.innerHTML=clValHTML();
       CLW[n]=[['ردیف','نام مغازه','هنگر','بوک','شهر']];S.lsheet=n;draw();return}
     if(t.classList.contains('cl_ds')){if(confirm('شیت «'+S.lsheet+'» حذف شود؟')){delete CLW[S.lsheet];S.lsheet=Object.keys(CLW)[0];draw()}return}
     if(t.classList.contains('cl_sh')){S.lsheet=t.dataset.n;draw();return}
+    if(t.classList.contains('cl_ed')){S.lsheet=t.dataset.n;S.clm='edit';draw();return}
+    if(t.id==='cl_back'){S.clm=null;draw();return}
     if(t.classList.contains('cl_del')){const rows=CLW[S.lsheet],r=rows[+t.dataset.r];
       if(confirm('حذف «'+(r[hdrOf(rows[hdrIdx(rows)]).indexOf('نام مغازه')]||'')+'»؟')){rows.splice(+t.dataset.r,1);keepDraw()}return}
     if(t.id==='cl_add'){const rows=CLW[S.lsheet],hi=hdrIdx(rows),nc=hdrOf(rows[hi]).indexOf('نام مغازه');
