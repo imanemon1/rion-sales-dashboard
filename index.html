@@ -777,6 +777,19 @@ function clValHTML(){
   <p class="note">قبل از ذخیره، موارد قرمز را اصلاح کنید.</p></div>`}
 function keepDraw(){const y=window.scrollY,p=document.querySelector('#cl_val>div>div'),pt=p?p.scrollTop:0;draw();scrollTo(0,y);const q=document.querySelector('#cl_val>div>div');if(q)q.scrollTop=pt}
 function bkCls(v){v=String(v??'');if(/-5$/.test(v))return 'bk5';if(/-4$/.test(v))return 'bk4';if(/سند/.test(v))return 'bkS';return ''}
+let IGN=null;
+function getIgn(){if(!IGN){try{IGN=JSON.parse(localStorage.getItem('rionIgn')||'null')}catch(e){}if(!Array.isArray(IGN))IGN=[]}return IGN}
+async function ignSave(){localStorage.setItem('rionIgn',JSON.stringify(getIgn()));try{return await ghPush(getIgn(),GH.ignPath,'ignored')==='ok'}catch(e){return false}}
+function clUnmHTML(){
+  if(!ACC||!ACC.unm)return '';
+  const ign=new Set(getIgn());
+  const list=ACC.unm.filter(u=>!ign.has(nrm(u.name))).sort((a,b)=>b.tot-a.tot);
+  if(!list.length)return `<div class="box" style="background:#eaf7ee;border:1px solid #9fd5ae;margin:8px 0"><b>✔ همه مشتریان حسابداری در لیست یا در «حذف» هستند.</b></div>`;
+  const rows=list.map(u=>{
+    const cn=core(nz(u.name));
+    const sug=CAL.map(s=>({s,r:lev(cn,core(nz(s.name)))})).filter(x=>x.r>=0.5).sort((a,b)=>b.r-a.r).slice(0,3).map(x=>esc(x.s.name)).join('، ')||'—';
+    return `<tr><td><b>${esc(u.name)}</b></td><td class="n">${fa(Math.round(u.tot))}</td><td>ندارد</td><td>${sug}</td><td style="white-space:nowrap"><button class="btn sec cl_udef" data-n="${esc(u.name)}">تعریف در لیست</button> <button class="btn sec cl_udel" data-n="${esc(u.name)}">حذف</button></td></tr>`}).join('');
+  return `<div class="box" style="margin:8px 0"><h2>مغازه‌های بدون کالیته (${fa(list.length)})</h2><p class="note">مشتریانی که در فایل فروش هستند ولی در لیست مغازه‌ها نیستند. «حذف» یعنی مشتری واقعی نیست و برای همیشه از این فهرست کنار گذاشته می‌شود.</p><div style="max-height:320px;overflow:auto"><table class="t"><tr><th>مشتری</th><th class="n">متر</th><th>کالیته</th><th>شبیه به</th><th></th></tr>${rows}</table></div></div>`}
 function clCols(rows){const hi=hdrIdx(rows),h=hdrOf(rows[hi]);return h.map((x,i)=>i).filter(i=>h[i]!==''&&h[i]!=='ردیف')}
 function viewCList(){
   if(!CLW)CLW=JSON.parse(JSON.stringify(getCL()));
@@ -823,8 +836,9 @@ function viewCList(){
   ${legend}
   <datalist id="cl_cities">${[...cities].map(c=>`<option value="${esc(c)}">`).join('')}</datalist>
   <div id="cl_row" style="display:flex;gap:10px;overflow-x:auto;align-items:flex-start;padding:6px 2px 12px;direction:rtl">${secs}</div>
-  <div id="cl_val">${clValHTML()}</div></div>`}
-const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json'};
+  <div id="cl_val">${clValHTML()}${clUnmHTML()}</div></div>`}
+const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json',ignPath:'kalite/ignored.json'};
+async function fetchIgn(){try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.ignPath}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch(e){return null}}
 let ACCR=null;
 const GHK='rionGhTok';
 const b64=s=>btoa(unescape(encodeURIComponent(s)));
@@ -873,6 +887,14 @@ function bindCList(){
     const hd=e.target.closest('.cl_hd');if(hd&&!e.target.closest('button')){const n=hd.dataset.tg;S.clclosed[n]=!S.clclosed[n];draw();return}
     const t=e.target.closest('button');if(!t)return;
     if(t.classList.contains('cl_go')){const q=document.querySelector(`.cl_in[data-s="${CSS.escape(t.dataset.s)}"][data-r="${t.dataset.r}"][data-c="${t.dataset.c}"]`);if(S.clclosed[t.dataset.s]){S.clclosed[t.dataset.s]=false}S.clm='edit';draw();const q2=document.querySelector(`.cl_in[data-s="${CSS.escape(t.dataset.s)}"][data-r="${t.dataset.r}"][data-c="${t.dataset.c}"]`);if(q2){q2.scrollIntoView({block:'center'});q2.focus();q2.select()}return}
+    if(t.classList.contains('cl_udef')){const n=t.dataset.n;const sn=prompt('شیت (شهر یا راسته) برای «'+n+'»؟\n'+Object.keys(CLW).join('، '));if(!sn)return;
+      if(!CLW[sn]){alert('این شیت پیدا نشد');return}
+      const city=prompt('شهر این مغازه؟','')||'';const rows=CLW[sn],hi=hdrIdx(rows),h=hdrOf(rows[hi]),nc=h.indexOf('نام مغازه'),rc=h.indexOf('ردیف');
+      const nr=h.map(x=>x==='نام مغازه'?n:x==='شهر'?city:null);let last=hi;rows.forEach((q,i)=>{if(i>hi&&isDataRow(q,nc))last=i});rows.splice(last+1,0,nr);
+      if(rc>=0){let k=0;rows.forEach((q,i)=>{if(i>hi&&isDataRow(q,nc))q[rc]=++k})}
+      keepDraw();msg('«'+n+'» به شیت «'+sn+'» اضافه شد. برای ثبت نهایی ذخیره کنید.');return}
+    if(t.classList.contains('cl_udel')){const n=nrm(t.dataset.n);if(!confirm('«'+n+'» برای همیشه از فهرست بدون کالیته حذف شود؟'))return;
+      getIgn().push(n);keepDraw();ignSave().then(ok=>msg(ok?'✔ حذف شد و در گیت‌هاب ثبت شد':'✔ حذف شد (فقط روی این مرورگر؛ توکن گیت‌هاب ثبت نشده)'));return}
     if(t.classList.contains('cl_fix')){CLW[t.dataset.s][+t.dataset.r][+t.dataset.c]=t.dataset.v;keepDraw();return}
     if(t.classList.contains('cl_rm')){const rr=CLW[t.dataset.s];if(confirm('این ردیف حذف شود؟')){rr.splice(+t.dataset.r,1);keepDraw()}return}
     if(t.classList.contains('cl_ns')){const n=(prompt('نام شیت (شهر یا راسته) جدید؟')||'').trim();if(!n)return;if(CLW[n]){alert('این نام وجود دارد');return}
@@ -1185,6 +1207,7 @@ $('guide').addEventListener('click',e=>{
 
 const SAVED=(()=>{try{return JSON.parse(localStorage.getItem('rionData')||'null')}catch(e){return null}})();
 (async()=>{const ra=await fetchRemoteAcc();if(ra&&ra.length){ACCR=ra;localStorage.setItem('rionAcc',JSON.stringify(ra))}
+const ri=await fetchIgn();if(Array.isArray(ri)){IGN=ri;localStorage.setItem('rionIgn',JSON.stringify(ri))}
 const rm=await fetchRemote();if(rm){localStorage.setItem(CLK,JSON.stringify(rm));CLW=null}
 if(PRELOAD)load(getCL());else if(SAVED)load(SAVED);else{draw()}})();
 </script>
