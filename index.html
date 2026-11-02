@@ -742,10 +742,10 @@ function clIssues(){
     if(byName[x.nm].length>1){const o=byName[x.nm].filter(y=>y!==x).map(y=>y.sn).join('، ');out.push({...P,c:x.nc,k:'dup',lv:'e',m:'تکراری؛ در شیت دیگر هم هست: '+o,del:1})}
     const raw=x.raw[x.bc];
     if(!x.bk){}
+    else if(x.bk==='1403'){}
     else if(/^\d+$/.test(x.bk))out.push({...P,c:x.bc,k:'book',lv:'e',m:'به‌جای کد بوک عدد ('+x.bk+') نوشته شده'});
     else if(BKFIX[x.bk])out.push({...P,c:x.bc,k:'book',lv:'w',m:'املای مشکوک: '+x.bk,fix:BKFIX[x.bk]});
     else if(!/^[A-Z]+-[345]$/.test(x.bk))out.push({...P,c:x.bc,k:'book',lv:'e',m:'قالب کد بوک غلط است: '+x.bk});
-    else if(cnt[x.bk]===1)out.push({...P,c:x.bc,k:'book',lv:'w',m:'این کد فقط یک بار آمده: '+x.bk+' (مطمئنید؟)'});
     if(x.cc>=0&&!x.city)out.push({...P,c:x.cc,k:'city',lv:'e',m:'شهر مشخص نیست (روی نقشه نمی‌آید)'});
   }
   return out}
