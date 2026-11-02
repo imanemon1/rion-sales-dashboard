@@ -572,9 +572,8 @@ function viewSettings(){
   <div class="upl"><input id="s_pw" type="password" inputmode="numeric" placeholder="رمز" autocomplete="off" style="padding:9px 12px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;width:160px"><button class="btn" id="s_login">ورود</button></div>
   <div id="s_err" style="color:var(--bad);font-size:13px;margin-top:8px"></div></div>`;
   const c=getCfg(),n=D?D.shops.length:0;
-  return `<div class="box"><h2>بارگذاری اکسل ماهانه</h2>
-  <p class="note">فایل فقط در همین مرورگر خوانده می‌شود و جایی ذخیره یا ارسال نمی‌شود.</p>
-  <div class="upl"><button class="btn" onclick="$('file').click()">بارگذاری اکسل جدید</button>${LASTMSG?`<span class="ok">${LASTMSG}</span>`:''}</div></div>
+  return `<div class="box"><h2>توکن گیت‌هاب</h2><p class="note">برای ذخیره‌ی لیست پخش کالیته در گیت‌هاب لازم است. فقط روی همین مرورگر ذخیره می‌شود.</p>
+  <div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="s_tok" type="password" placeholder="توکن گیت‌هاب" autocomplete="off" style="padding:8px 10px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;flex:1;min-width:240px;direction:ltr"><button class="btn sec" id="s_tokbtn">ثبت توکن</button><span class="note">${localStorage.getItem(GHK)?'توکن ثبت است':'توکن ثبت نشده'}</span></div></div>
   <div class="box"><h2>بارگذاری اکسل حسابداری</h2><p class="note">فایل فروش حسابداری (xls). فقط در همین مرورگر خوانده می‌شود.</p>
   <div class="upl"><button class="btn" onclick="$('afile').click()">بارگذاری اکسل حسابداری</button>${ACC?`<span class="ok">✔ ${fa(ACC.rows.length)} ردیف، ${fa(Math.round(ACC.total))} متر</span>`:''}</div></div>
   <div class="box"><h2>تنظیمات</h2><p class="note">این مقادیر فقط در همین مرورگر ذخیره می‌شوند.</p>
@@ -594,6 +593,7 @@ function bindSettings(){
   }
   const n=D?D.shops.length:0;
   const save=c=>{setCfg(c);draw()};
+  $('s_tokbtn').onclick=()=>{const v=(($('s_tok')||{}).value||'').trim();if(!v){alert('توکن خالی است');return}localStorage.setItem(GHK,v);draw()};
   $('s_save').onclick=()=>{const c=getCfg();c.target=+$('s_t').value||40000;c.newGoal=+$('s_g').value||0;c.base=$('s_b').value===''?n:+$('s_b').value;save(c)};
   $('s_reset').onclick=()=>{const c=getCfg();c.base=n;save(c)};
 }
@@ -740,7 +740,7 @@ function clIssues(){
     if(x.nm==='مغازه جدید')out.push({...P,c:x.nc,k:'name',lv:'e',m:'نام مغازه هنوز تغییر نکرده'});
     if(byName[x.nm].length>1){const o=byName[x.nm].filter(y=>y!==x).map(y=>y.sn).join('، ');out.push({...P,c:x.nc,k:'dup',lv:'e',m:'تکراری؛ در شیت دیگر هم هست: '+o,del:1})}
     const raw=x.raw[x.bc];
-    if(!x.bk)out.push({...P,c:x.bc,k:'book',lv:'w',m:'بوک خالی'});
+    if(!x.bk){}
     else if(/^\d+$/.test(x.bk))out.push({...P,c:x.bc,k:'book',lv:'e',m:'به‌جای کد بوک عدد ('+x.bk+') نوشته شده'});
     else if(BKFIX[x.bk])out.push({...P,c:x.bc,k:'book',lv:'w',m:'املای مشکوک: '+x.bk,fix:BKFIX[x.bk]});
     else if(!/^[A-Z]+-[345]$/.test(x.bk))out.push({...P,c:x.bc,k:'book',lv:'e',m:'قالب کد بوک غلط است: '+x.bk});
@@ -754,45 +754,49 @@ function clValHTML(){
   const lab={dup:'تکراری',book:'بوک',city:'شهر',name:'نام'};
   return `<div class="box" style="border:1px solid #e0b4b4;margin:8px 0"><b>بررسی لیست:</b> <span style="color:#c0392b">${fa(e)} خطا</span> · <span style="color:#b9770e">${fa(w)} هشدار</span>
   <div style="max-height:260px;overflow:auto;margin-top:6px"><table class="t"><tbody>${is.map((x,j)=>`<tr><td style="color:${x.lv==='e'?'#c0392b':'#b9770e'}">${x.lv==='e'?'خطا':'هشدار'}</td><td>${esc(x.sn)}</td><td><b>${esc(x.nm)}</b></td><td>${lab[x.k]}: ${esc(x.m)}</td><td style="white-space:nowrap"><button class="btn sec cl_go" data-s="${esc(x.sn)}" data-r="${x.i}" data-c="${x.c}">برو به سلول</button>${x.fix?` <button class="btn cl_fix" data-s="${esc(x.sn)}" data-r="${x.i}" data-c="${x.c}" data-v="${esc(x.fix)}">اصلاح به ${esc(x.fix)}</button>`:''}${x.del?` <button class="btn sec cl_rm" data-s="${esc(x.sn)}" data-r="${x.i}">حذف این ردیف</button>`:''}</td></tr>`).join('')}</tbody></table></div>
-  <p class="note">قبل از ذخیره، موارد قرمز را اصلاح کنید. شماره ردیف‌ها هنگام ذخیره خودکار مرتب می‌شود. ردیف‌های ۱۱ تا ۲۰ خالی شیت «جدید» هم هنگام ذخیره حذف می‌شود.</p></div>`}
+  <p class="note">قبل از ذخیره، موارد قرمز را اصلاح کنید.</p></div>`}
+function keepDraw(){const y=window.scrollY,p=document.querySelector('#cl_val>div>div'),pt=p?p.scrollTop:0;draw();scrollTo(0,y);const q=document.querySelector('#cl_val>div>div');if(q)q.scrollTop=pt}
 function viewCList(){
   if(!CLW)CLW=JSON.parse(JSON.stringify(getCL()));
   const names=Object.keys(CLW);if(!S.lsheet||!CLW[S.lsheet])S.lsheet=names[0];
   const rows=CLW[S.lsheet],hi=hdrIdx(rows),h=hdrOf(rows[hi]),nc=h.indexOf('نام مغازه');
   const cols=h.map((x,i)=>EDC.includes(x)?i:-1).filter(i=>i>=0);
   const ISS=clIssues(),BAD=new Set(ISS.map(x=>x.sn+'|'+x.i+'|'+x.c));
+  const MULTI=h.filter(x=>x.startsWith('بوک')).length>1,TG=names.filter(n=>n!==S.lsheet&&hdrOf(CLW[n][hdrIdx(CLW[n])]).filter(x=>x.startsWith('بوک')).length<2);
   let cnt=0;const body=[];
   for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!isDataRow(r,nc))continue;cnt++;
-    body.push(`<tr><td class="n">${fa(cnt)}</td>${cols.map(c=>`<td><input class="cl_in${BAD.has(S.lsheet+'|'+i+'|'+c)?' bad':''}" list="${h[c]==='شهر'?'cl_cities':''}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`).join('')}<td><button class="btn sec cl_del" data-r="${i}">🗑 حذف</button></td></tr>`)}
+    body.push(`<tr><td class="n">${fa(cnt)}</td>${cols.map(c=>`<td><input class="cl_in${BAD.has(S.lsheet+'|'+i+'|'+c)?' bad':''}" list="${h[c]==='شهر'?'cl_cities':''}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`).join('')}<td>${MULTI?'':`<select class="cl_mv" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-r="${i}">🗑 حذف</button></td></tr>`)}
   const cities=new Set(Object.values(CITYMAP));try{JSON.parse(PLAN.match(/const R=(\[.*?\]),P=/s)[1]).forEach(x=>cities.add(x.c))}catch(e){}
   const tot=names.reduce((a,n)=>{const rr=CLW[n],hh=hdrIdx(rr),nn=hdrOf(rr[hh]).indexOf('نام مغازه');return a+rr.slice(hh+1).filter(r=>isDataRow(r,nn)).length},0);
   return `<div class="box"><h2>لیست پخش کالیته</h2>
   <p class="note">هر شیت را ویرایش کنید، مغازه اضافه یا حذف کنید و بعد «ذخیره و اعمال» بزنید. بعد از ذخیره، همه تب‌ها (مغازه‌ها، بی‌خرید، نقشه پخش کشور و...) با این لیست به‌روز می‌شوند. ستون «شهر» برای نقشه لازم است. مجموع: <b>${fa(tot)}</b> ردیف.</p>
   <div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
    <button class="btn" id="cl_save">💾 ذخیره و اعمال</button>
-   <button class="btn sec" id="cl_add">➕ مغازه جدید</button>
    <button class="btn sec" id="cl_dl">⬇ دانلود اکسل</button>
-   <label class="btn sec" style="cursor:pointer">⬆ بارگذاری لیست جدید<input id="cl_up" type="file" accept=".xlsx,.xls" hidden></label>
-   <button class="btn sec" id="cl_reset">↺ برگشت به لیست اولیه</button></div>
-  ${unlocked()?`<div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center"><input id="cl_tok" type="password" placeholder="توکن گیت‌هاب (فقط روی این مرورگر ذخیره می‌شود)" autocomplete="off" style="padding:8px 10px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;flex:1;min-width:240px;direction:ltr"><button class="btn sec" id="cl_tokbtn">ثبت توکن</button><span class="note">${localStorage.getItem(GHK)?'توکن ثبت است':'توکن ثبت نشده'}</span></div>`:''}
+</div>
   <div id="cl_msg" class="note"></div>
   <div id="cl_val">${clValHTML()}</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${names.map(n=>`<button class="btn ${n===S.lsheet?'':'sec'} cl_sh" data-n="${esc(n)}">${esc(n)} (${fa(Object.keys(CLW[n]).length&&CLW[n].slice(hdrIdx(CLW[n])+1).filter(r=>isDataRow(r,hdrOf(CLW[n][hdrIdx(CLW[n])]).indexOf('نام مغازه'))).length)})</button>`).join('')}</div>
+  <div style="margin:8px 0"><button class="btn" id="cl_add">➕ مغازه جدید در شیت «${esc(S.lsheet)}»</button></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${names.map(n=>`<button class="btn ${n===S.lsheet?'':'sec'} cl_sh" data-n="${esc(n)}">${esc(n)} (${fa(Object.keys(CLW[n]).length&&CLW[n].slice(hdrIdx(CLW[n])+1).filter(r=>isDataRow(r,hdrOf(CLW[n][hdrIdx(CLW[n])]).indexOf('نام مغازه'))).length)})</button>`).join('')}<button class="btn cl_ns" title="شیت جدید">＋</button>${cnt===0&&names.length>1?'<button class="btn sec cl_ds">حذف این شیت خالی</button>':''}</div>
   <datalist id="cl_cities">${[...cities].map(c=>`<option value="${esc(c)}">`).join('')}</datalist>
-  <div style="overflow:auto"><table class="t"><thead><tr><th>#</th>${cols.map(c=>`<th>${esc(h[c])}</th>`).join('')}<th></th></tr></thead><tbody>${body.join('')}</tbody></table></div></div>`}
-const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json'};
+  <div style="overflow:auto"><table class="t"><thead><tr><th>#</th>${cols.map(c=>`<th>${esc(h[c])}</th>`).join('')}<th>جابجایی</th><th></th></tr></thead><tbody>${body.join('')}</tbody></table></div></div>`}
+const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json'};
+let ACCR=null;
 const GHK='rionGhTok';
 const b64=s=>btoa(unescape(encodeURIComponent(s)));
 async function fetchRemote(){
   try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.path}?t=${Date.now()}`,{cache:'no-store'});
     if(!r.ok)return null;return await r.json()}catch(e){return null}}
-async function ghPush(obj){
+async function fetchRemoteAcc(){
+  try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.accPath}?t=${Date.now()}`,{cache:'no-store'});
+    if(!r.ok)return null;return await r.json()}catch(e){return null}}
+async function ghPush(obj,path=GH.path,what='calist'){
   const tok=localStorage.getItem(GHK);if(!tok)return 'nolocal';
-  const api=`https://api.github.com/repos/${GH.repo}/contents/${GH.path}`;
+  const api=`https://api.github.com/repos/${GH.repo}/contents/${path}`;
   const H={Authorization:'Bearer '+tok,Accept:'application/vnd.github+json','Content-Type':'application/json'};
   let sha;const g=await fetch(api+'?ref='+GH.branch,{headers:H,cache:'no-store'});
   if(g.ok)sha=(await g.json()).sha;else if(g.status!==404)throw new Error('GET '+g.status);
-  const body={message:'update calist '+new Date().toISOString().slice(0,16),content:b64(JSON.stringify(obj)),branch:GH.branch};
+  const body={message:'update '+what+' '+new Date().toISOString().slice(0,16),content:b64(JSON.stringify(obj)),branch:GH.branch};
   if(sha)body.sha=sha;
   const p=await fetch(api,{method:'PUT',headers:H,body:JSON.stringify(body)});
   if(!p.ok)throw new Error('PUT '+p.status);return 'ok'}
@@ -813,28 +817,31 @@ function bindCList(){
     const rows=CLW[S.lsheet],h=hdrOf(rows[hdrIdx(rows)]),c=+i.dataset.c;let v=i.value;
     if(h[c].startsWith('بوک-')||(h[c]==='هنگر'&&h.filter(x=>x.startsWith('بوک')).length>1))v=v===''?null:num(v);
     rows[+i.dataset.r][c]=v===''?null:v};
-  app.onchange=e=>{if(e.target.closest('.cl_in')){const v=$('cl_val');if(v)v.innerHTML=clValHTML();e.target.classList.remove('bad')}};
+  app.onchange=e=>{const mv=e.target.closest('.cl_mv');
+    if(mv&&mv.value){const src=CLW[S.lsheet],dst=CLW[mv.value],r=src[+mv.dataset.r],sh=hdrOf(src[hdrIdx(src)]),dh=hdrOf(dst[hdrIdx(dst)]);
+      const nr=dh.map(x=>{const k=sh.indexOf(x);return x==='ردیف'||k<0?null:r[k]});
+      const nc=dh.indexOf('نام مغازه');let last=hdrIdx(dst);dst.forEach((q,i)=>{if(i>hdrIdx(dst)&&isDataRow(q,nc))last=i});dst.splice(last+1,0,nr);
+      src.splice(+mv.dataset.r,1);[src,dst].forEach(rw=>{const hh=hdrIdx(rw),n0=hdrOf(rw[hh]),rc=n0.indexOf('ردیف'),nn=n0.indexOf('نام مغازه');let k=0;if(rc>=0)rw.forEach((q,i)=>{if(i>hh&&isDataRow(q,nn))q[rc]=++k})});
+      keepDraw();return}
+if(e.target.closest('.cl_in')){const v=$('cl_val');if(v)v.innerHTML=clValHTML();e.target.classList.remove('bad')}};
   app.onclick=e=>{
     const t=e.target.closest('button');if(!t)return;
     if(t.classList.contains('cl_go')){S.lsheet=t.dataset.s;draw();const q=document.querySelector(`.cl_in[data-r="${t.dataset.r}"][data-c="${t.dataset.c}"]`);if(q){q.scrollIntoView({block:'center'});q.focus();q.select()}return}
-    if(t.classList.contains('cl_fix')){CLW[t.dataset.s][+t.dataset.r][+t.dataset.c]=t.dataset.v;draw();return}
-    if(t.classList.contains('cl_rm')){const rr=CLW[t.dataset.s];if(confirm('این ردیف حذف شود؟')){rr.splice(+t.dataset.r,1);draw()}return}
+    if(t.classList.contains('cl_fix')){CLW[t.dataset.s][+t.dataset.r][+t.dataset.c]=t.dataset.v;keepDraw();return}
+    if(t.classList.contains('cl_rm')){const rr=CLW[t.dataset.s];if(confirm('این ردیف حذف شود؟')){rr.splice(+t.dataset.r,1);keepDraw()}return}
+    if(t.classList.contains('cl_ns')){const n=(prompt('نام شیت (شهر یا راسته) جدید؟')||'').trim();if(!n)return;if(CLW[n]){alert('این نام وجود دارد');return}
+      CLW[n]=[['ردیف','نام مغازه','هنگر','بوک','شهر']];S.lsheet=n;draw();return}
+    if(t.classList.contains('cl_ds')){if(confirm('شیت «'+S.lsheet+'» حذف شود؟')){delete CLW[S.lsheet];S.lsheet=Object.keys(CLW)[0];draw()}return}
     if(t.classList.contains('cl_sh')){S.lsheet=t.dataset.n;draw();return}
     if(t.classList.contains('cl_del')){const rows=CLW[S.lsheet],r=rows[+t.dataset.r];
-      if(confirm('حذف «'+(r[hdrOf(rows[hdrIdx(rows)]).indexOf('نام مغازه')]||'')+'»؟')){rows.splice(+t.dataset.r,1);draw()}return}
+      if(confirm('حذف «'+(r[hdrOf(rows[hdrIdx(rows)]).indexOf('نام مغازه')]||'')+'»؟')){rows.splice(+t.dataset.r,1);keepDraw()}return}
     if(t.id==='cl_add'){const rows=CLW[S.lsheet],hi=hdrIdx(rows),nc=hdrOf(rows[hi]).indexOf('نام مغازه');
       let last=hi;rows.forEach((r,i)=>{if(i>hi&&isDataRow(r,nc))last=i});
       const nr=Array(rows[hi].length).fill(null);nr[nc]='مغازه جدید';rows.splice(last+1,0,nr);draw();
       const ins=document.querySelector(`.cl_in[data-r="${last+1}"][data-c="${nc}"]`);if(ins){ins.focus();ins.select()}return}
     if(t.id==='cl_save'){clSave().then(st=>{S.tab='clist';draw();msg(st)});return}
-    if(t.id==='cl_tokbtn'){const v=(($('cl_tok')||{}).value||'').trim();if(!v){msg('توکن خالی است');return}localStorage.setItem(GHK,v);draw();msg('✔ توکن ذخیره شد');return}
     if(t.id==='cl_dl'){const wb=XLSX.utils.book_new();for(const [n,r] of Object.entries(CLW))XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(r),n.slice(0,31));XLSX.writeFile(wb,'لیست پخش کالیته.xlsx');return}
-    if(t.id==='cl_reset'){if(confirm('همه ویرایش‌ها پاک شود و لیست اولیه برگردد؟')){localStorage.removeItem(CLK);CLW=null;load(getCL());S.tab='clist';draw()}return}
   };
-  const up=$('cl_up');if(up)up.onchange=async ev=>{const f=ev.target.files[0];if(!f)return;
-    const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});const s={};
-    wb.SheetNames.forEach(n=>s[n]=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:null}));
-    CLW=initCL(s);clSave().then(st=>{S.tab='clist';draw();msg(st)})};
 }
 function viewPlan(){const m2=ACC?Math.round(ACC.total):0;const doc=PLAN.replace('const M2=/*M2*/0','const M2='+m2).replace('const MINE=/*MINE*/null','const MINE='+JSON.stringify(mineByCity()));return `<iframe srcdoc="${doc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" style="width:100%;height:85vh;border:0;background:#fff"></iframe>`}
 function viewCodes(){
@@ -1036,7 +1043,7 @@ function load(sheets){
   $('cur').innerHTML=MONTHS.map((m,i)=>`<option value="${i+1}" ${i+1===S.cur?'selected':''}>${m}</option>`).join('');
   D.shops.forEach((s,i)=>s.id=i);
   enrich();
-  try{buildCal(getCL());const x=PRELOAD_ACC||JSON.parse(localStorage.getItem('rionAcc')||'null');if(x){buildAcc(x);applyAcc()}}catch(e){console.error(e)}
+  try{buildCal(getCL());const x=ACCR||PRELOAD_ACC||JSON.parse(localStorage.getItem('rionAcc')||'null');if(x){buildAcc(x);applyAcc()}}catch(e){console.error(e)}
   draw();
 }
 $('file').onchange=async e=>{
@@ -1051,7 +1058,11 @@ $('afile').onchange=async e=>{
   const rows=parseAcc(await f.text());
   if(!rows.length){alert('ردیفی در این فایل پیدا نشد');return}
   try{localStorage.setItem('rionAcc',JSON.stringify(rows))}catch(err){}
-  buildAcc(rows);applyAcc();draw();
+  ACCR=rows;buildAcc(rows);applyAcc();draw();
+  let st='✔ اکسل حسابداری فقط روی این مرورگر ذخیره شد';
+  if(localStorage.getItem(GHK)){try{const r=await ghPush(rows,GH.accPath,'accounting');st=r==='ok'?'✔ اکسل حسابداری ذخیره شد و روی همه دستگاه‌ها به‌روز می‌شود':st}catch(e){st='⚠ روی این مرورگر ذخیره شد ولی در گیت‌هاب ثبت نشد ('+e.message+')'}}
+  else st='⚠ توکن گیت‌هاب ثبت نشده؛ فقط روی این مرورگر ذخیره شد';
+  alert(st);
 };
 $('app').addEventListener('click',e=>{
   const c=e.target.closest('[data-code]'),s=e.target.closest('[data-shop]'),u=e.target.closest('[data-cust]'),k=e.target.closest('[data-ksub]');
@@ -1064,7 +1075,8 @@ $('guide').addEventListener('click',e=>{
 });
 
 const SAVED=(()=>{try{return JSON.parse(localStorage.getItem('rionData')||'null')}catch(e){return null}})();
-(async()=>{const rm=await fetchRemote();if(rm){localStorage.setItem(CLK,JSON.stringify(rm));CLW=null}
+(async()=>{const ra=await fetchRemoteAcc();if(ra&&ra.length){ACCR=ra;localStorage.setItem('rionAcc',JSON.stringify(ra))}
+const rm=await fetchRemote();if(rm){localStorage.setItem(CLK,JSON.stringify(rm));CLW=null}
 if(PRELOAD)load(getCL());else if(SAVED)load(SAVED);else{draw()}})();
 </script>
 </body>
