@@ -239,7 +239,7 @@ input,select,textarea{font-size:16px}
 .clk{cursor:pointer}.clk:hover td{background:#f4f7ff}.spk{display:inline-flex;align-items:flex-end;gap:2px;height:22px}.spk i{display:block;width:5px;background:#2f5bea;border-radius:1px}
 .cl_in.bad{border:2px solid #c0392b!important;background:#fdecea}
 .bk5{background:#cfe3ff!important}.bk4{background:#d4f5dc!important}.bkS{background:#ffe3c2!important}
-.cl_t{width:auto}.cl_t td,.cl_t th{padding:4px 6px}.cl_t .cl_in{width:130px;box-sizing:border-box}
+.cl_t{width:auto}.cl_t td,.cl_t th{padding:4px 6px;vertical-align:middle}.cl_t td.nm{min-width:260px;white-space:normal;line-height:1.6}.cl_t .cl_in{width:120px;box-sizing:border-box}.cl_t td.nm .cl_in{width:260px}.cl_t td.n{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -765,48 +765,53 @@ function clValHTML(){
   <p class="note">قبل از ذخیره، موارد قرمز را اصلاح کنید.</p></div>`}
 function keepDraw(){const y=window.scrollY,p=document.querySelector('#cl_val>div>div'),pt=p?p.scrollTop:0;draw();scrollTo(0,y);const q=document.querySelector('#cl_val>div>div');if(q)q.scrollTop=pt}
 function bkCls(v){v=String(v??'');if(/-5$/.test(v))return 'bk5';if(/-4$/.test(v))return 'bk4';if(/سند/.test(v))return 'bkS';return ''}
+function clCols(rows){const hi=hdrIdx(rows),h=hdrOf(rows[hi]);return h.map((x,i)=>i).filter(i=>h[i]!==''&&h[i]!=='ردیف')}
 function viewCList(){
   if(!CLW)CLW=JSON.parse(JSON.stringify(getCL()));
-  const names=Object.keys(CLW);if(!S.lsheet||!CLW[S.lsheet])S.lsheet=names[0];
+  const names=Object.keys(CLW);if(!S.clclosed){S.clclosed={};names.forEach((n,i)=>{S.clclosed[n]=i>0})}
+  const edit=S.clm==='edit';
   const cntOf=n=>{const rr=CLW[n],hh=hdrIdx(rr);if(hh<0)return 0;const nn=hdrOf(rr[hh]).indexOf('نام مغازه');return rr.slice(hh+1).filter(r=>isDataRow(r,nn)).length};
   const tot=names.reduce((a,n)=>a+cntOf(n),0);
   const legend=`<div class="note" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center"><span><i class="bk5" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۵ (۵-)</span><span><i class="bk4" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۴ (۴-)</span><span><i class="bkS" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> سند</span></div>`;
-  if(S.clm!=='edit'){
-    return `<div class="box"><h2>لیست پخش کالیته</h2>
-    <p class="note">برای ویرایش هر شیت، دکمه «ویرایش» را بزنید. مجموع: <b>${fa(tot)}</b> مغازه.</p>
-    <div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
-     <button class="btn" id="cl_save">💾 ذخیره و اعمال</button>
-     <button class="btn sec" id="cl_dl">⬇ دانلود اکسل</button>
-    </div>
-    <div id="cl_msg" class="note"></div>
-    <div id="cl_val">${clValHTML()}</div>
-    <table class="t"><thead><tr><th>شیت</th><th>تعداد مغازه</th><th></th></tr></thead><tbody>
-    ${names.map(n=>`<tr><td><b>${esc(n)}</b></td><td>${fa(cntOf(n))}</td><td><button class="btn sec cl_ed" data-n="${esc(n)}">✏️ ویرایش</button></td></tr>`).join('')}
-    </tbody></table>
-    <div style="margin:8px 0"><button class="btn sec cl_ns" title="شیت جدید">＋ شیت جدید</button></div></div>`}
-  const rows=CLW[S.lsheet],hi=hdrIdx(rows),h=hdrOf(rows[hi]),nc=h.indexOf('نام مغازه');
-  const cols=h.map((x,i)=>EDC.includes(x)?i:-1).filter(i=>i>=0);
-  const ISS=clIssues(),BAD=new Set(ISS.map(x=>x.sn+'|'+x.i+'|'+x.c));
-  const MULTI=h.filter(x=>x.startsWith('بوک')).length>1,TG=names.filter(n=>n!==S.lsheet&&hdrOf(CLW[n][hdrIdx(CLW[n])]).filter(x=>x.startsWith('بوک')).length<2);
-  let cnt=0;const body=[];
-  for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!isDataRow(r,nc))continue;cnt++;
-    body.push(`<tr><td class="n">${fa(cnt)}</td>${cols.map(c=>{const isBk=h[c].startsWith('بوک');return `<td><input class="cl_in${isBk?' '+bkCls(r[c]):''}${BAD.has(S.lsheet+'|'+i+'|'+c)?' bad':''}" list="${h[c]==='شهر'?'cl_cities':''}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`}).join('')}<td>${MULTI?'':`<select class="cl_mv" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-r="${i}">🗑 حذف</button></td></tr>`)}
   const cities=new Set(Object.values(CITYMAP));try{JSON.parse(PLAN.match(/const R=(\[.*?\]),P=/s)[1]).forEach(x=>cities.add(x.c))}catch(e){}
-  return `<div class="box"><h2>ویرایش شیت «${esc(S.lsheet)}»</h2>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
-   <button class="btn sec" id="cl_back">→ بازگشت به لیست شیت‌ها</button>
+  const secs=names.map(sn=>{
+    const rows=CLW[sn],hi=hdrIdx(rows),h=hdrOf(rows[hi]),nc=h.indexOf('نام مغازه');
+    const cols=clCols(rows),MULTI=h.filter(x=>x.startsWith('بوک')).length>1;
+    const closed=!!S.clclosed[sn];const cnt=cntOf(sn);
+    const TG=names.filter(n=>n!==sn&&hdrOf(CLW[n][hdrIdx(CLW[n])]).filter(x=>x.startsWith('بوک')).length<2);
+    const ISS=clIssues(),BAD=new Set(ISS.map(x=>x.sn+'|'+x.i+'|'+x.c));
+    let k=0;const body=[];
+    for(let i=hi+1;i<rows.length;i++){const r=rows[i];if(!isDataRow(r,nc))continue;k++;
+      const cells=cols.map(c=>{const cls=c===nc?' nm':'';
+        if(!edit)return `<td class="${cls.trim()}">${esc(r[c]??'')}</td>`;
+        const isBk=h[c].startsWith('بوک');
+        return `<td class="${cls.trim()}"><input class="cl_in${isBk?' '+bkCls(r[c]):''}${BAD.has(sn+'|'+i+'|'+c)?' bad':''}" ${h[c]==='شهر'?'list="cl_cities"':''} data-s="${esc(sn)}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`}).join('');
+      const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
+      body.push(`<tr><td class="n">${fa(k)}</td>${cells}${tail}</tr>`)}
+    const hd=cols.map(c=>`<th>${esc(h[c])}</th>`).join('');
+    return `<div class="box cl_sec" style="flex:0 0 ${closed?'170px':'440px'};max-width:88vw;margin:0;padding:0;overflow:hidden;direction:rtl">
+     <div class="cl_hd" data-tg="${esc(sn)}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;cursor:pointer;background:#faf6ec;border-bottom:1px solid #eadfc4">
+       <b>${closed?'▸':'▾'} ${esc(sn)} <span class="note">(${fa(cnt)} مغازه)</span></b>
+       ${edit?`<span style="display:flex;gap:6px;flex-wrap:wrap">
+         <button class="btn cl_add" data-s="${esc(sn)}">➕ مغازه جدید</button>
+         <button class="btn sec cl_addcol" data-s="${esc(sn)}">＋ ستون جدید</button>
+         ${cnt===0&&names.length>1?`<button class="btn sec cl_ds" data-s="${esc(sn)}">حذف شیت خالی</button>`:''}</span>`:''}
+     </div>
+     ${closed?'':`<div style="overflow:auto;max-height:65vh;padding:8px"><table class="t cl_t"><thead><tr><th>#</th>${hd}${edit?(MULTI?'':'<th>جابجایی</th>')+'<th></th>':''}</tr></thead><tbody>${body.join('')||'<tr><td colspan="9" class="note">مغازه‌ای نیست</td></tr>'}</tbody></table></div>`}
+    </div>`}).join('');
+  return `<div class="box"><h2>لیست پخش کالیته</h2>
+  <p class="note">مجموع: <b>${fa(tot)}</b> مغازه. روی نام هر شیت بزنید تا باز و بسته شود. برای تغییر، دکمه «✏️ ویرایش» را بزنید.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center">
+   ${edit?'<button class="btn sec" id="cl_back">✔ پایان ویرایش</button>':'<button class="btn" id="cl_edit">✏️ ویرایش</button>'}
    <button class="btn" id="cl_save">💾 ذخیره و اعمال</button>
    <button class="btn sec" id="cl_dl">⬇ دانلود اکسل</button>
+   ${edit?'<button class="btn sec cl_ns" title="شیت جدید">＋ شیت جدید</button>':''}
   </div>
   <div id="cl_msg" class="note"></div>
-  <div id="cl_val">${clValHTML()}</div>
   ${legend}
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
-   <button class="btn" id="cl_add">➕ مغازه جدید</button>
-   ${cnt===0&&names.length>1?'<button class="btn sec cl_ds">حذف این شیت خالی</button>':''}
-  </div>
   <datalist id="cl_cities">${[...cities].map(c=>`<option value="${esc(c)}">`).join('')}</datalist>
-  <div style="overflow:auto"><table class="t cl_t"><thead><tr><th>#</th>${cols.map(c=>`<th>${esc(h[c])}</th>`).join('')}${MULTI?'':'<th>جابجایی</th>'}<th></th></tr></thead><tbody>${body.join('')}</tbody></table></div></div>`}
+  <div id="cl_row" style="display:flex;gap:10px;overflow-x:auto;align-items:flex-start;padding:6px 2px 12px;direction:rtl">${secs}</div>
+  <div id="cl_val">${clValHTML()}</div></div>`}
 const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json'};
 let ACCR=null;
 const GHK='rionGhTok';
@@ -841,33 +846,37 @@ async function clSave(){
 function bindCList(){
   const app=$('app'),msg=t=>{const m=$('cl_msg');if(m)m.textContent=t};
   app.oninput=e=>{const i=e.target.closest('.cl_in');if(!i)return;
-    const rows=CLW[S.lsheet],h=hdrOf(rows[hdrIdx(rows)]),c=+i.dataset.c;let v=i.value;
-    if(h[c].startsWith('بوک-')||(h[c]==='هنگر'&&h.filter(x=>x.startsWith('بوک')).length>1))v=v===''?null:num(v);
+    const rows=CLW[i.dataset.s],h=hdrOf(rows[hdrIdx(rows)]),c=+i.dataset.c;let v=i.value;
+    if(h[c].startsWith('بوک-')||/^\d+$/.test(h[c])||(h[c]==='هنگر'&&h.filter(x=>x.startsWith('بوک')).length>1))v=v===''?null:num(v);
     rows[+i.dataset.r][c]=v===''?null:v};
-  app.onchange=e=>{const mv=e.target.closest('.cl_mv');
-    if(mv&&mv.value){const src=CLW[S.lsheet],dst=CLW[mv.value],r=src[+mv.dataset.r],sh=hdrOf(src[hdrIdx(src)]),dh=hdrOf(dst[hdrIdx(dst)]);
+  app.onchange=e=>{
+    const mv=e.target.closest('.cl_mv');
+    if(mv&&mv.value){const sn=mv.dataset.s,src=CLW[sn],dst=CLW[mv.value],r=src[+mv.dataset.r],sh=hdrOf(src[hdrIdx(src)]),dh=hdrOf(dst[hdrIdx(dst)]);
       const nr=dh.map(x=>{const k=sh.indexOf(x);return x==='ردیف'||k<0?null:r[k]});
       const nc=dh.indexOf('نام مغازه');let last=hdrIdx(dst);dst.forEach((q,i)=>{if(i>hdrIdx(dst)&&isDataRow(q,nc))last=i});dst.splice(last+1,0,nr);
       src.splice(+mv.dataset.r,1);[src,dst].forEach(rw=>{const hh=hdrIdx(rw),n0=hdrOf(rw[hh]),rc=n0.indexOf('ردیف'),nn=n0.indexOf('نام مغازه');let k=0;if(rc>=0)rw.forEach((q,i)=>{if(i>hh&&isDataRow(q,nn))q[rc]=++k})});
       keepDraw();return}
-if(e.target.closest('.cl_in')){const v=$('cl_val');if(v)v.innerHTML=clValHTML();e.target.classList.remove('bad')}};
+    if(e.target.closest('.cl_in')){const v=$('cl_val');if(v)v.innerHTML=clValHTML();e.target.classList.remove('bad')}};
   app.onclick=e=>{
+    const hd=e.target.closest('.cl_hd');if(hd&&!e.target.closest('button')){const n=hd.dataset.tg;S.clclosed[n]=!S.clclosed[n];draw();return}
     const t=e.target.closest('button');if(!t)return;
-    if(t.classList.contains('cl_go')){S.lsheet=t.dataset.s;draw();const q=document.querySelector(`.cl_in[data-r="${t.dataset.r}"][data-c="${t.dataset.c}"]`);if(q){q.scrollIntoView({block:'center'});q.focus();q.select()}return}
+    if(t.classList.contains('cl_go')){const q=document.querySelector(`.cl_in[data-s="${CSS.escape(t.dataset.s)}"][data-r="${t.dataset.r}"][data-c="${t.dataset.c}"]`);if(S.clclosed[t.dataset.s]){S.clclosed[t.dataset.s]=false}S.clm='edit';draw();const q2=document.querySelector(`.cl_in[data-s="${CSS.escape(t.dataset.s)}"][data-r="${t.dataset.r}"][data-c="${t.dataset.c}"]`);if(q2){q2.scrollIntoView({block:'center'});q2.focus();q2.select()}return}
     if(t.classList.contains('cl_fix')){CLW[t.dataset.s][+t.dataset.r][+t.dataset.c]=t.dataset.v;keepDraw();return}
     if(t.classList.contains('cl_rm')){const rr=CLW[t.dataset.s];if(confirm('این ردیف حذف شود؟')){rr.splice(+t.dataset.r,1);keepDraw()}return}
     if(t.classList.contains('cl_ns')){const n=(prompt('نام شیت (شهر یا راسته) جدید؟')||'').trim();if(!n)return;if(CLW[n]){alert('این نام وجود دارد');return}
-      CLW[n]=[['ردیف','نام مغازه','هنگر','بوک','شهر']];S.lsheet=n;draw();return}
-    if(t.classList.contains('cl_ds')){if(confirm('شیت «'+S.lsheet+'» حذف شود؟')){delete CLW[S.lsheet];S.lsheet=Object.keys(CLW)[0];draw()}return}
-    if(t.classList.contains('cl_sh')){S.lsheet=t.dataset.n;draw();return}
-    if(t.classList.contains('cl_ed')){S.lsheet=t.dataset.n;S.clm='edit';draw();return}
-    if(t.id==='cl_back'){S.clm=null;draw();return}
-    if(t.classList.contains('cl_del')){const rows=CLW[S.lsheet],r=rows[+t.dataset.r];
+      CLW[n]=[['ردیف','نام مغازه','هنگر','بوک','شهر']];S.clm='edit';draw();return}
+    if(t.classList.contains('cl_ds')){const sn=t.dataset.s;if(confirm('شیت «'+sn+'» حذف شود؟')){delete CLW[sn];draw()}return}
+    if(t.classList.contains('cl_del')){const rows=CLW[t.dataset.s],r=rows[+t.dataset.r];
       if(confirm('حذف «'+(r[hdrOf(rows[hdrIdx(rows)]).indexOf('نام مغازه')]||'')+'»؟')){rows.splice(+t.dataset.r,1);keepDraw()}return}
-    if(t.id==='cl_add'){const rows=CLW[S.lsheet],hi=hdrIdx(rows),nc=hdrOf(rows[hi]).indexOf('نام مغازه');
+    if(t.classList.contains('cl_addcol')){const sn=t.dataset.s,rows=CLW[sn],hi=hdrIdx(rows);
+      const n=(prompt('نام ستون جدید؟')||'').trim();if(!n)return;if(hdrOf(rows[hi]).includes(n)){alert('این ستون وجود دارد');return}
+      rows[hi].push(n);for(let i=hi+1;i<rows.length;i++)rows[i][rows[hi].length-1]=null;keepDraw();return}
+    if(t.classList.contains('cl_add')){const sn=t.dataset.s,rows=CLW[sn],hi=hdrIdx(rows),nc=hdrOf(rows[hi]).indexOf('نام مغازه');
       let last=hi;rows.forEach((r,i)=>{if(i>hi&&isDataRow(r,nc))last=i});
-      const nr=Array(rows[hi].length).fill(null);nr[nc]='مغازه جدید';rows.splice(last+1,0,nr);draw();
-      const ins=document.querySelector(`.cl_in[data-r="${last+1}"][data-c="${nc}"]`);if(ins){ins.focus();ins.select()}return}
+      const nr=Array(rows[hi].length).fill(null);nr[nc]='مغازه جدید';rows.splice(last+1,0,nr);S.clclosed[sn]=false;draw();
+      const ins=document.querySelector(`.cl_in[data-s="${CSS.escape(sn)}"][data-r="${last+1}"][data-c="${nc}"]`);if(ins){ins.focus();ins.select()}return}
+    if(t.id==='cl_edit'){S.clm='edit';draw();return}
+    if(t.id==='cl_back'){S.clm=null;draw();return}
     if(t.id==='cl_save'){clSave().then(st=>{S.tab='clist';draw();msg(st)});return}
     if(t.id==='cl_dl'){const wb=XLSX.utils.book_new();for(const [n,r] of Object.entries(CLW))XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(r),n.slice(0,31));XLSX.writeFile(wb,'لیست پخش کالیته.xlsx');return}
   };
