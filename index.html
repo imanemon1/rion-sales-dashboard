@@ -1075,7 +1075,13 @@ function lockView(){
   <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><input id="l_pw" type="password" inputmode="numeric" placeholder="رمز ورود" autocomplete="off" style="padding:10px 12px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;width:220px;text-align:center"><button class="btn" id="l_go" style="width:220px">ورود</button></div>
   <div id="l_err" style="color:var(--bad);font-size:13px;margin-top:8px"></div></div>`;
 }
-function draw(){
+function draw(keep=true){
+  const snap=keep?[...$('app').querySelectorAll('*')].map((el,i)=>[i,el.scrollTop,el.scrollLeft]).filter(a=>a[1]||a[2]):[];
+  const wx=scrollX,wy=scrollY;
+  _draw();
+  if(keep){const els=$('app').querySelectorAll('*');snap.forEach(([i,t,l])=>{const el=els[i];if(el){el.scrollTop=t;el.scrollLeft=l}});scrollTo(wx,wy)}
+}
+function _draw(){
   document.body.classList.toggle('locked',!unlocked());
   if(!unlocked()){
     $('nav').innerHTML='';$('app').innerHTML=lockView();
@@ -1094,8 +1100,8 @@ function draw(){
   if(S.tab==='clist')bindCList();
   if(S.tab==='settings')bindSettings();
 }
-$('gear').onclick=()=>{S.tab='settings';draw();scrollTo(0,0)};
-$('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.tab=b.dataset.t;S.drill=null;draw();scrollTo(0,0)};
+$('gear').onclick=()=>{S.tab='settings';draw(false);scrollTo(0,0)};
+$('nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.tab=b.dataset.t;S.drill=null;draw(false);scrollTo(0,0)};
 $('cur').onchange=e=>{S.cur=+e.target.value;enrich();draw()};
 function load(sheets){
   D=parse(sheets);
