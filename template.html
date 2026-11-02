@@ -575,7 +575,7 @@ function viewSettings(){
   return `<div class="box"><h2>توکن گیت‌هاب</h2><p class="note">برای ذخیره‌ی لیست پخش کالیته در گیت‌هاب لازم است. فقط روی همین مرورگر ذخیره می‌شود.</p>
   <div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="s_tok" type="password" placeholder="توکن گیت‌هاب" autocomplete="off" style="padding:8px 10px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;flex:1;min-width:240px;direction:ltr"><button class="btn sec" id="s_tokbtn">ثبت توکن</button><span class="note">${localStorage.getItem(GHK)?'توکن ثبت است':'توکن ثبت نشده'}</span></div></div>
   <div class="box"><h2>بارگذاری اکسل حسابداری</h2><p class="note">فایل فروش حسابداری (xls). فقط در همین مرورگر خوانده می‌شود.</p>
-  <div class="upl"><button class="btn" onclick="$('afile').click()">بارگذاری اکسل حسابداری</button>${ACC?`<span class="ok">✔ ${fa(ACC.rows.length)} ردیف، ${fa(Math.round(ACC.total))} متر</span>`:''}</div></div>
+  <div class="upl"><button class="btn" onclick="$('afile').click()">بارگذاری اکسل حسابداری</button>${ACC?`<span class="ok">✔ ${fa(ACC.rows.length)} ردیف، ${fa(Math.round(ACC.total))} متر</span>`:''}</div>${accPrevHTML()}</div>
   <div class="box"><h2>تنظیمات</h2><p class="note">این مقادیر فقط در همین مرورگر ذخیره می‌شوند.</p>
   <div class="setf">
    <label>هدف فروش سالانه (متر)<input id="s_t" type="number" min="0" value="${c.target}"></label>
@@ -625,14 +625,19 @@ function matchShop(a,shops){
   for(const P of pools){for(const x of P){const r=lev(ca,core(nz(x.name)));if(r>=0.85&&(!best||r>best.r))best={s:x,r,how:'fuzzy'}}if(best)return best}
   return null;
 }
-function parseAcc(t){
+const ACC_COLS=['مشتری','تاریخ','کد کالا/خدمت','گروه فروش','مقدار-اصلی','خالص','مبلغ فروش','تخفیف','ماه'];
+const ACC_RX=[/مشتر/,/تاریخ|تاريخ/,/کد|كد/,/گروه/,/مقدار/,/خالص/,/مبلغ/,/تخفیف|تخفيف/,/ماه/];
+function parseAcc(t,S){S=S||{};S.rows=0;S.skip=0;S.hdr=null;
   const un=s=>s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;|&#39;/g,"'").replace(/&amp;/g,'&');
   const out=[];
   for(const r of (t.match(/<Row\b[\s\S]*?<\/Row>/g)||[])){
     const c=[...r.matchAll(/<Cell\b[^>]*?(?:\/>|>([\s\S]*?)<\/Cell>)/g)].map(m=>{const d=(m[1]||'').match(/<Data[^>]*>([\s\S]*?)<\/Data>/);return d?un(d[1]).trim():''});
-    if(c.length!==9)continue;
+    if(!c.some(x=>x))continue;
+    if(S.hdr===null){S.hdr=c;continue}
+    S.rows++;
+    if(c.length!==9){S.skip++;continue}
     const q=parseFloat(c[4]),m=parseInt(c[8]);
-    if(!c[0]||isNaN(q)||isNaN(m))continue;
+    if(!c[0]||isNaN(q)||isNaN(m)){S.skip++;continue}
     out.push([nz(c[0]),c[1],c[2],nz(c[3]),q,parseFloat(c[5])||0,m]);
   }
   return out;
@@ -844,18 +849,42 @@ if(e.target.closest('.cl_in')){const v=$('cl_val');if(v)v.innerHTML=clValHTML();
   };
 }
 function viewPlan(){const m2=ACC?Math.round(ACC.total):0;const doc=PLAN.replace('const M2=/*M2*/0','const M2='+m2).replace('const MINE=/*MINE*/null','const MINE='+JSON.stringify(mineByCity()));return `<iframe srcdoc="${doc.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" style="width:100%;height:85vh;border:0;background:#fff"></iframe>`}
+function facHTML(all,mx){
+  const F=[['paya','پایا','#2f7d4f',o=>o.act&&!/DELVAN/i.test(o.g)],['delvan','دلوان','#2b6cb0',o=>/DELVAN/i.test(o.g)],['out','خارج از بوک','#c0762b',o=>!o.act]];
+  const T=F.map(([k,n,c,f])=>{const l=all.filter(o=>o.q>0&&f(o));const mo=Array(13).fill(0);let q=0,a=0;const cu=new Set();
+    l.forEach(o=>{q+=o.q;a+=o.amt;o.mo.forEach((v,i)=>mo[i]+=v);for(const u in o.cu)if(o.cu[u]>0)cu.add(u)});
+    return {k,n,c,l,q,a,mo,nc:l.length,cu:cu.size}});
+  const tot=T.reduce((x,t)=>x+t.q,0)||1;
+  const pc=v=>fa(Math.round(v/tot*1000)/10);
+  const bar='<div style="display:flex;height:34px;border-radius:8px;overflow:hidden;margin:10px 0">'+T.map(t=>`<div title="${t.n}" style="width:${t.q/tot*100}%;background:${t.c};color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;white-space:nowrap">${t.q/tot>0.06?t.n+' '+pc(t.q)+'٪':''}</div>`).join('')+'</div>';
+  const leg='<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:13px">'+T.map(t=>`<span><i style="display:inline-block;width:11px;height:11px;border-radius:3px;background:${t.c};margin-left:5px"></i>${t.n}</span>`).join('')+'</div>';
+  const mxv=Math.max(...Array.from({length:mx},(_,i)=>T.reduce((x,t)=>x+t.mo[i+1],0)),1);
+  const cols=Array.from({length:mx},(_,i)=>{const m=i+1;const tm=T.reduce((x,t)=>x+t.mo[m],0);
+    return `<div style="flex:1;min-width:34px;text-align:center"><div style="height:150px;display:flex;flex-direction:column-reverse;align-items:center"><div style="width:70%;display:flex;flex-direction:column-reverse;height:${tm/mxv*100}%">${T.map(t=>`<div title="${t.n}: ${fm(t.mo[m])}" style="background:${t.c};height:${tm?t.mo[m]/tm*100:0}%"></div>`).join('')}</div></div><div style="font-size:11px">${MONTHS[i].slice(0,4)}</div><div style="font-size:10px;color:#667">${fm(tm)}</div></div>`}).join('');
+  const rows=T.map(t=>{const last=t.mo[mx],prev=mx>1?t.mo[mx-1]:0;const ch=prev?Math.round((last-prev)/prev*100):null;
+    return `<tr><td><b style="color:${t.c}">${t.n}</b></td><td class="n">${fm(t.q)}</td><td class="n">${pc(t.q)}٪</td><td class="n">${fa(t.nc)}</td><td class="n">${fm(t.nc?t.q/t.nc:0)}</td><td class="n">${fa(t.cu)}</td><td class="n">${fm(t.q/mx)}</td><td class="n">${ch===null?'—':fa(ch)+'٪'}</td></tr>`}).join('');
+  const sub={};T[2].l.forEach(o=>{const g=o.g||'بدون گروه';sub[g]=(sub[g]||0)+o.q});
+  const subH=Object.entries(sub).sort((a,b)=>b[1]-a[1]).map(([g,v])=>`<tr><td>${esc(g)}</td><td class="n">${fm(v)}</td><td class="n">${fa(Math.round(v/(T[2].q||1)*1000)/10)}٪ از خارج‌شده</td><td class="n">${pc(v)}٪ از کل</td></tr>`).join('');
+  const best=[...T].filter(t=>t.nc).sort((a,b)=>b.q/b.nc-a.q/a.nc)[0];
+  return `<div class="box"><h2>سهم هر کارخانه از کل فروش</h2><p class="note">کل فروش حسابداری: ${fm(tot)} متر. RION نام شرکت است؛ پایا و دلوان دو کارخانه‌اند که کدهایشان در بوک فعال است (گروه فروش دارای RION). «خارج از بوک» = کدهایی که RION ندارند: از بوک خارج شده یا در آلبوم نیامده‌اند.</p>${bar}${leg}</div>
+  <div class="box"><h2>فروش ماهانه به تفکیک کارخانه</h2><div style="display:flex;gap:4px;align-items:flex-end;direction:rtl;margin-top:8px">${cols}</div></div>
+  <div class="box"><h2>مقایسه</h2><div class="wrap"><table><tr><th>کارخانه</th><th class="n">متر</th><th class="n">سهم</th><th class="n">تعداد کد</th><th class="n">متر به‌ازای هر کد</th><th class="n">مشتری</th><th class="n">میانگین ماهانه</th><th class="n">تغییر آخرین ماه</th></tr>${rows}</table></div>
+  ${best?`<p class="note">کارآمدترین (فروش به‌ازای هر کد): <b>${best.n}</b>. اگر کارخانه‌ای سهم کد بالا ولی فروش به‌ازای هر کد پایین دارد، کدهایش پراکنده‌اند.</p>`:''}</div>
+  <div class="box"><h2>ریز کدهای خارج از بوک</h2><div class="wrap"><table>${subH}</table></div></div>`;
+}
 function viewCodes(){
   if(!ACC)return `<div class="box"><h2>کدها</h2><p class="note">برای دیدن آمار کدها، از ⚙ تنظیمات «اکسل حسابداری» را بارگذاری کنید.</p></div>`;
   const all=Object.values(ACC.code),mx=ACC.maxM,sub=S.ksub||'all';
   const act=all.filter(o=>o.act&&o.q>0).sort((a,b)=>b.q-a.q),out=all.filter(o=>!o.act&&o.q>0).sort((a,b)=>b.q-a.q);
   const ta=act.reduce((x,o)=>x+o.q,0),to=out.reduce((x,o)=>x+o.q,0);
-  const seg=`<div class="seg">${[['all',`همه کدها (${fa(all.filter(o=>o.q!==0).length)})`],['new',`کدهای بوک جدید (${fa(act.length)})`],['out',`کدهای خارج‌شده (${fa(out.length)})`],['low','کم‌فروش‌ها / نامزد خروج']].map(([k,t])=>`<button class="${sub===k?'on':''}" data-ksub="${k}">${t}</button>`).join('')}</div>`;
+  const seg=`<div class="seg">${[['all',`همه کدها (${fa(all.filter(o=>o.q!==0).length)})`],['new',`کدهای بوک جدید (${fa(act.length)})`],['out',`کدهای خارج‌شده (${fa(out.length)})`],['fac','تفکیک کارخانه (پایا / دلوان / خارج از بوک)'],['low','کم‌فروش‌ها / نامزد خروج']].map(([k,t])=>`<button class="${sub===k?'on':''}" data-ksub="${k}">${t}</button>`).join('')}</div>`;
   const cards=`<div class="cards"><div class="card g"><div class="l">فروش بوک جدید</div><div class="v">${fm(ta)}</div><div class="s">متر · ${fa(ta+to?ta/(ta+to)*100:0)}٪ کل</div></div><div class="card w"><div class="l">فروش کدهای خارج‌شده</div><div class="v">${fm(to)}</div><div class="s">متر · ته‌مانده فروش</div></div><div class="card"><div class="l">جمع حسابداری</div><div class="v">${fm(ta+to)}</div><div class="s">متر · تا ${MONTHS[mx-1]}</div></div></div>`;
   let body='';
   if(sub==='all'){
     const q=(S.kq||'').trim().toLowerCase();
     body=`<div class="box"><h2>همه کدها</h2><p class="note">هر کد = طرح و رنگ. مثلاً <b>P-1407/D-1219F</b> یعنی طرح ۱۴۰۷ رنگ ۱۲۱۹، و <b>2708-2254/201</b> یعنی طرح ۲۷۰۸ رنگ ۲۰۱. بخشی از کد، طرح یا رنگ را جست‌وجو کن. روی هر کد بزن تا مغازه‌ها، متراژ و تاریخ سفارش‌ها را ببینی.</p><input id="kq" placeholder="جستجو: 1407 یا 1219 یا 2708..." value="${esc(S.kq||'')}" dir="ltr" style="width:100%;margin:6px 0"><div id="kt"></div></div>`;
   }else if(sub==='new')body=`<div class="box"><h2>کدهای بوک جدید — چطور می‌فروشند</h2><p class="note">گروه فروش RION. روی هر کد بزن تا لیست مشتری‌هایش باز شود.</p>${codeTable(act,ta,mx)}</div>`;
+  else if(sub==='fac')body=facHTML(all,mx);
   else if(sub==='out')body=`<div class="box"><h2>کدهای خارج‌شده</h2><p class="note">کدهایی که گروه فروششان RION نیست (خارج، امید جیناک، هنگل و ...). فروش آن‌ها از موجودی باقی‌مانده است.</p>${codeTable(out,to,mx)}</div>`;
   else{
     const med=[...act].map(o=>o.q).sort((a,b)=>a-b)[Math.floor(act.length/2)]||0;
@@ -1055,15 +1084,39 @@ $('file').onchange=async e=>{
 };
 $('afile').onchange=async e=>{
   const f=e.target.files[0];if(!f)return;
-  const rows=parseAcc(await f.text());
-  if(!rows.length){alert('ردیفی در این فایل پیدا نشد');return}
+  const S={};const rows=parseAcc(await f.text(),S);
+  const hn=(S.hdr||[]).map(x=>String(x).replace(/[<>]/g,''));
+  const hdrOk=hn.length===9&&ACC_RX.every((rx,i)=>rx.test(hn[i]));
+  const w=[];
+  if(!rows.length)w.push('هیچ ردیف معتبری پیدا نشد.');
+  if(!hdrOk)w.push('ستون‌های فایل درست نیست. ستون‌های لازم، به همین ترتیب: '+ACC_COLS.join('، ')+'. ستون‌های فایل شما: '+(hn.join('، ')||'—'));
+  if(S.skip)w.push(fa(S.skip)+' ردیف رد شد (تعداد ستون غلط یا متر/ماه نامعتبر).');
+  PEND={rows,w,hdrOk,total:rows.reduce((a,r)=>a+r[4],0),name:f.name};
+  draw();
+  $('afile').value='';
+};
+function accPrevHTML(){
+  const p=PEND;
+  let h='<div class="note" style="margin-top:8px">ستون‌های لازم اکسل حسابداری (به همین ترتیب): '+ACC_COLS.join('، ')+'</div>';
+  if(!p)return h;
+  h+='<div style="margin-top:10px;padding:12px;border:1px solid #e3c96b;border-radius:10px;background:#fffdf4">'
+   +'<b>پیش‌نمایش: '+p.name+'</b><div class="note">'+fa(p.rows.length)+' ردیف، '+fa(Math.round(p.total))+' متر. هنوز اعمال نشده است.</div>';
+  p.w.forEach(x=>{h+='<div style="color:#b42318;margin-top:6px">⚠ '+x+'</div>'});
+  h+='<div style="margin-top:10px;display:flex;gap:8px"><button class="btn" onclick="accSave()" '+(p.rows.length?'':'disabled')+'>ذخیره و اعمال روی داشبورد</button><button class="btn" onclick="accCancel()">انصراف</button></div></div>';
+  return h;
+}
+let PEND=null;
+async function accSave(){
+  if(!PEND||!PEND.rows.length)return;
+  const rows=PEND.rows;PEND=null;
   try{localStorage.setItem('rionAcc',JSON.stringify(rows))}catch(err){}
   ACCR=rows;buildAcc(rows);applyAcc();draw();
   let st='✔ اکسل حسابداری فقط روی این مرورگر ذخیره شد';
   if(localStorage.getItem(GHK)){try{const r=await ghPush(rows,GH.accPath,'accounting');st=r==='ok'?'✔ اکسل حسابداری ذخیره شد و روی همه دستگاه‌ها به‌روز می‌شود':st}catch(e){st='⚠ روی این مرورگر ذخیره شد ولی در گیت‌هاب ثبت نشد ('+e.message+')'}}
   else st='⚠ توکن گیت‌هاب ثبت نشده؛ فقط روی این مرورگر ذخیره شد';
   alert(st);
-};
+}
+function accCancel(){PEND=null;draw()}
 $('app').addEventListener('click',e=>{
   const c=e.target.closest('[data-code]'),s=e.target.closest('[data-shop]'),u=e.target.closest('[data-cust]'),k=e.target.closest('[data-ksub]');
   if(k){S.ksub=k.dataset.ksub;draw();return}
