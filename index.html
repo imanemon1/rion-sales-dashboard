@@ -293,7 +293,7 @@ const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرد�
 const DEF={target:40000,newGoal:80,base:null};
 const getCfg=()=>{try{return {...DEF,...JSON.parse(localStorage.getItem('rionCfg')||'{}')}}catch(e){return {...DEF}}};
 const setCfg=c=>localStorage.setItem('rionCfg',JSON.stringify(c));
-const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها و راسته‌ها'],['reps','نماینده‌ها'],['acc','لیست حسابداری'],['codes','کدها'],['plan','پخش کشور'],['clist','لیست پخش کالیته']];
+const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها و راسته‌ها'],['reps','نماینده‌ها'],['codes','کدها'],['plan','پخش کشور'],['clist','لیست پخش کالیته']];
 const STL={ok:'فعال',g1:'یک ماه بی‌خرید',g2:'دو ماه بی‌خرید',g3:'سه ماه+ بی‌خرید',never:'بدون خرید'};
 const mcell=(v,cls='',attr='')=>`<td class="n ${cls}" ${attr}>${v==null?'':fa(v)}</td>`;
 const fa=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:1});
@@ -707,7 +707,8 @@ function buildAcc(rows){
   });
   CAL.forEach(s=>{if(!s.acc)s.acc={tot:0,act:0,mo:Array(13).fill(0),codes:{},cust:[]}});
   Object.values(code).forEach(o=>{o.nc=Object.values(o.cu).filter(v=>v>0).length;o.last=0;for(let i=12;i>=1;i--)if(o.mo[i]>0){o.last=i;break}});
-  ACC={rows,cust,code,maxM,unm,fz,total:Object.values(cust).reduce((a,u)=>a+u.tot,0)};
+  const RET={};rows.forEach(r=>{if(r[4]<0){const x=RET[r[0]]||(RET[r[0]]={name:r[0],q:0,a:0,mo:Array(13).fill(0),L:[]});x.q+=r[4];x.a+=r[5];x.mo[r[6]]+=r[4];x.L.push(r)}});
+  ACC={RET,rows,cust,code,maxM,unm,fz,total:Object.values(cust).reduce((a,u)=>a+u.tot,0)};
 }
 const fm=v=>fa(Math.round(v*10)/10);
 function dsn(k){const s=String(k),n=s.match(/\d+/g)||[];let d=n[0]||'',c='';const m=s.match(/[A-Za-z]-?\s?(\d+)/g);
@@ -1005,29 +1006,10 @@ function shopProfile(id){
   modal(h);
 }
 function custProfile(c){
-  const u=ACC&&ACC.cust[c];if(!u)return;const mx=ACC.maxM;
+  const u=ACC&&ACC.cust[c];if(!u)return;window._rt=ACC.RET[c]?`<p class="note" style="color:#dc2626">برگشت از فروش: ${fm(-ACC.RET[c].q)} متر (از جمع کم شده)</p>`:'';const mx=ACC.maxM;
   const act={},old={};Object.entries(u.codes).forEach(([k,v])=>(isAct(v.g)?act:old)[k]=v);
   modal(`<h3>${esc(u.name)}</h3><p class="note">بدون کالیته (در لیست مغازه‌ها نیست) · ${fm(u.tot)} متر</p><div class="wrap"><table><tr>${MONTHS.slice(0,mx).map(m=>`<th class="n">${m.slice(0,4)}</th>`).join('')}</tr><tr>${u.mo.slice(1,mx+1).map(v=>mcell(Math.round(v*10)/10,v===0?'z':'')).join('')}</tr></table></div>`+codeBlock(act,mx,'بوک جدید')+codeBlock(old,mx,'قدیمی / خارج‌شده'));
 }
-function viewAcc(){
-  if(!ACC)return `<div class="box"><h2>حسابداری و بوک‌ها</h2><p class="note">اکسل حسابداری را از ⚙ تنظیمات بارگذاری کنید.</p></div>`;
-  const mx=ACC.maxM,Y={};
-  CAL.forEach(s=>{const y=Y[s.year]||(Y[s.year]={n:0,b:0,t:0,a:0});y.n++;if(s.acc.act>0)y.b++;y.t+=s.acc.tot;y.a+=s.acc.act});
-  const low=CAL.filter(s=>s.year>=4&&s.acc.act<30).sort((a,b)=>a.acc.act-b.acc.act);
-  const unm=[...ACC.unm].sort((a,b)=>b.tot-a.tot);
-  const man=CAL.reduce((x,s)=>x+s.m.slice(1,mx+1).reduce((p,v)=>p+(v||0),0),0);
-  const mrow=k=>CAL.reduce((x,s)=>x+(s.m[k]||0),0);
-  return `<div class="box"><h2>مقایسه‌ی حسابداری و لیست ماهانه</h2><div class="wrap"><table><tr><th></th>${MONTHS.slice(0,mx).map(m=>`<th class="n">${m.slice(0,4)}</th>`).join('')}<th class="n">جمع</th></tr>
-  <tr><td>لیست ماهانه</td>${Array.from({length:mx},(_,i)=>mcell(Math.round(mrow(i+1)))).join('')}<td class="n"><b>${fa(Math.round(man))}</b></td></tr>
-  <tr><td>حسابداری (مغازه‌های لیست)</td>${Array.from({length:mx},(_,i)=>mcell(Math.round(CAL.reduce((x,s)=>x+s.acc.mo[i+1],0)))).join('')}<td class="n"><b>${fa(Math.round(CAL.reduce((x,s)=>x+s.acc.tot,0)))}</b></td></tr>
-  <tr><td>حسابداری (بدون کالیته)</td>${Array.from({length:mx},(_,i)=>mcell(Math.round(unm.reduce((x,u)=>x+u.mo[i+1],0)))).join('')}<td class="n"><b>${fa(Math.round(unm.reduce((x,u)=>x+u.tot,0)))}</b></td></tr></table></div></div>
-  <div class="box"><h2>مغازه‌ها به تفکیک سال بوک</h2><div class="wrap"><table><tr><th>بوک</th><th class="n">مغازه</th><th class="n">با خرید RION</th><th class="n">متر کل</th><th class="n">متر RION</th></tr>
-  ${Object.entries(Y).sort((a,b)=>b[0]-a[0]).map(([y,v])=>`<tr><td>${ytag(+y)}</td><td class="n">${fa(v.n)}</td><td class="n">${fa(v.b)}</td><td class="n">${fm(v.t)}</td><td class="n">${fm(v.a)}</td></tr>`).join('')}</table></div></div>
-  <div class="box"><h2>بوک ۴ و ۵ با خرید کم یا صفر (کمتر از ۳۰ متر RION)</h2><div class="wrap"><table><tr><th>مغازه</th><th>بوک</th><th class="n">متر RION</th></tr>${low.map(s=>`<tr class="clk" data-shop="${s.id}"><td>${esc(s.name)}</td><td>${ytag(s.year)}</td><td class="n">${fm(s.acc.act)}</td></tr>`).join('')}</table></div></div>
-  <div class="box"><h2>بدون کالیته (${fa(unm.length)} مشتری)</h2><p class="note">در حسابداری هستند ولی در لیست مغازه‌ها نیستند؛ خطا حساب نمی‌شوند.</p><div class="wrap"><table><tr><th>مشتری</th><th class="n">متر</th><th class="n">RION</th></tr>${unm.map(u=>`<tr class="clk" data-cust="${esc(u.name)}"><td>${esc(u.name)}</td><td class="n"><b>${fm(u.tot)}</b></td><td class="n">${fm(u.act)}</td></tr>`).join('')}</table></div></div>
-  ${ACC.fz.length?`<div class="box"><h2>تطبیق‌های تقریبی (برای بازبینی)</h2><div class="wrap"><table>${ACC.fz.map(f=>`<tr><td>${esc(f[0])}</td><td>←</td><td>${esc(f[1])}</td></tr>`).join('')}</table></div></div>`:''}`;
-}
-
 const LCOL=['#2f5bea','#16a34a','#f59e0b','#dc2626','#7c3aed','#0891b2'];
 // نمودار خطی: هر سری = یک نماینده، محور افقی ماه‌ها تا ماه جاری
 function lineChart(series,focus){
@@ -1144,7 +1126,7 @@ function _draw(){
   $('gear').classList.toggle('on',S.tab==='settings');
   if(!D){$('nav').innerHTML='';$('app').innerHTML=S.tab==='settings'?viewSettings():'<div id="empty">برای شروع، از ⚙ گوشه بالا-چپ فایل اکسل را بارگذاری کنید.</div>';if(S.tab==='settings')bindSettings();return}
   $('nav').innerHTML=TABS.map(([k,t])=>`<button class="${S.tab===k?'on':''}" data-t="${k}">${t}</button>`).join('');
-  const v={over:viewOver,shops:viewShops,inactive:viewInactive,collect:viewCollect,sheets:viewSheets,reps:viewReps,acc:viewAcc,codes:viewCodes,plan:viewPlan,clist:viewCList,settings:viewSettings}[S.tab];
+  const v={over:viewOver,shops:viewShops,inactive:viewInactive,collect:viewCollect,sheets:viewSheets,reps:viewReps,codes:viewCodes,plan:viewPlan,clist:viewCList,settings:viewSettings}[S.tab];
   $('app').innerHTML=v();
   if(S.tab==='shops')bindShops();
   if(S.tab==='sheets')bindSheets();
