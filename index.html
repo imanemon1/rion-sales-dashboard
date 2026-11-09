@@ -815,12 +815,14 @@ function clPickDone(n,sn,shop){
   const box=document.getElementById('cl_pick');if(box)box.remove();
   S.clclosed=S.clclosed||{};S.clclosed[sn]=false;S.tab='clist';
   keepDraw();
-  aliasSave().then(ok=>msg(ok?'✔ «'+n+'» به «'+shop+'» در راستای «'+sn+'» وصل شد و ثبت شد':'✔ وصل شد (فقط روی این مرورگر)'));
+  const setMsg=x=>{const m=document.getElementById('cl_msg');if(m)m.textContent=x};
+  aliasSave().then(ok=>setMsg(ok?'✔ «'+n+'» به «'+shop+'» در راستای «'+sn+'» اتصال خورد و ثبت شد. از این فهرست حذف شد.':'✔ «'+n+'» به «'+shop+'» اتصال خورد (فقط روی این مرورگر ذخیره شد). از این فهرست حذف شد.'));
 }
 function clUnmHTML(){
   if(!ACC||!ACC.unm)return '';
   const ign=new Set(getIgn());
-  const list=ACC.unm.filter(u=>!ign.has(nrm(u.name))).sort((a,b)=>b.tot-a.tot);
+  const al=getAlias();
+  const list=ACC.unm.filter(u=>!ign.has(nrm(u.name))&&!al[u.name]).sort((a,b)=>b.tot-a.tot);
   if(!list.length)return `<div class="box" style="background:#eaf7ee;border:1px solid #9fd5ae;margin:8px 0"><b>✔ همه مشتریان حسابداری در لیست یا در «حذف» هستند.</b></div>`;
   const rows=list.map(u=>{
     const cn=core(nz(u.name));
