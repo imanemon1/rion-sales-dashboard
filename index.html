@@ -794,7 +794,7 @@ function bkCls(v){v=String(v??'');if(/-5$/.test(v))return 'bk5';if(/-4$/.test(v)
 let IGN=null;
 function getIgn(){if(!IGN){try{IGN=JSON.parse(localStorage.getItem('rionIgn')||'null')}catch(e){}if(!Array.isArray(IGN))IGN=[]}return IGN}
 async function ignSave(){localStorage.setItem('rionIgn',JSON.stringify(getIgn()));try{return await ghPush(getIgn(),GH.ignPath,'ignored')==='ok'}catch(e){return false}}
-function clShopOpts(){return Object.entries(CLW).map(([sn,rows])=>{const hi=hdrIdx(rows);if(hi<0)return '';const nc=hdrOf(rows[hi]).indexOf('نام مغازه');const o=rows.slice(hi+1).filter(r=>isDataRow(r,nc)).map(r=>r[nc]).filter(Boolean);return o.length?`<optgroup label="${esc(sn)}">${o.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}</optgroup>`:''}).join('')}
+function clShopOpts(sn){const rows=CLW[sn];if(!rows)return '<option value="">مغازه…</option>';const hi=hdrIdx(rows);if(hi<0)return '';const nc=hdrOf(rows[hi]).indexOf('نام مغازه');const o=rows.slice(hi+1).filter(r=>isDataRow(r,nc)).map(r=>r[nc]).filter(Boolean);return '<option value="">مغازه…</option>'+o.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}
 function clUnmHTML(){
   if(!ACC||!ACC.unm)return '';
   const ign=new Set(getIgn());
@@ -803,7 +803,7 @@ function clUnmHTML(){
   const rows=list.map(u=>{
     const cn=core(nz(u.name));
     const sug=CAL.map(s=>({s,r:lev(cn,core(nz(s.name)))})).filter(x=>x.r>=0.5).sort((a,b)=>b.r-a.r).slice(0,3).map(x=>esc(x.s.name)).join('، ')||'—';
-    return `<tr><td><b>${esc(u.name)}</b></td><td class="n">${fa(Math.round(u.tot))}</td><td>ندارد</td><td>${sug}</td><td style="white-space:nowrap"><select class="cl_ual" data-n="${esc(u.name)}" style="max-width:140px"><option value="">اتصال به لیست کالیته…</option>${clShopOpts()}</select> <button class="btn sec cl_udef" data-n="${esc(u.name)}">تعریف در لیست</button> <button class="btn sec cl_udel" data-n="${esc(u.name)}">حذف</button></td></tr>`}).join('');
+    return `<tr><td><b>${esc(u.name)}</b></td><td class="n">${fa(Math.round(u.tot))}</td><td>ندارد</td><td>${sug}</td><td style="white-space:nowrap"><select class="cl_ush" data-n="${esc(u.name)}" style="max-width:120px"><option value="">۱) راستا / شهر…</option>${Object.keys(CLW).map(sn=>`<option value="${esc(sn)}">${esc(sn)}</option>`).join('')}</select> <select class="cl_ual" data-n="${esc(u.name)}" style="max-width:150px"><option value="">۲) مغازه…</option></select> <button class="btn sec cl_udef" data-n="${esc(u.name)}">تعریف در لیست</button> <button class="btn sec cl_udel" data-n="${esc(u.name)}">حذف</button></td></tr>`}).join('');
   return `<div class="box" style="margin:8px 0"><h2>مغازه‌های بدون کالیته (${fa(list.length)})</h2><p class="note">مشتریانی که در فایل فروش هستند ولی در لیست مغازه‌ها نیستند. «حذف» یعنی مشتری واقعی نیست و برای همیشه از این فهرست کنار گذاشته می‌شود.</p><div style="max-height:320px;overflow:auto"><table class="t"><tr><th>مشتری</th><th class="n">متر</th><th>کالیته</th><th>شبیه به</th><th></th></tr>${rows}</table></div></div>`}
 function clCols(rows){const hi=hdrIdx(rows),h=hdrOf(rows[hi]);return h.map((x,i)=>i).filter(i=>h[i]!==''&&h[i]!=='ردیف')}
 function viewCList(){
@@ -896,6 +896,7 @@ function bindCList(){
     if(h[c].startsWith('بوک-')||/^\d+$/.test(h[c])||(h[c]==='هنگر'&&h.filter(x=>x.startsWith('بوک')).length>1))v=v===''?null:num(v);
     rows[+i.dataset.r][c]=v===''?null:v};
   app.onchange=e=>{
+    const us=e.target.closest('.cl_ush');if(us){const td=us.parentElement,ms=td.querySelector('.cl_ual');if(ms)ms.innerHTML=clShopOpts(us.value);return}
     const ua=e.target.closest('.cl_ual');if(ua){const v=ua.value;if(!v)return;getAlias()[ua.dataset.n]=v;reloadAcc();keepDraw();aliasSave().then(ok=>msg(ok?'✔ «'+ua.dataset.n+'» به «'+v+'» وصل شد و در گیت‌هاب ثبت شد':'✔ وصل شد (فقط روی این مرورگر؛ توکن گیت‌هاب ثبت نشده)'));return}
     const mv=e.target.closest('.cl_mv');
     if(mv&&mv.value){const sn=mv.dataset.s,src=CLW[sn],dst=CLW[mv.value],r=src[+mv.dataset.r],sh=hdrOf(src[hdrIdx(src)]),dh=hdrOf(dst[hdrIdx(dst)]);
