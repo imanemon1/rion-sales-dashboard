@@ -794,6 +794,7 @@ function bkCls(v){v=String(v??'');if(/-5$/.test(v))return 'bk5';if(/-4$/.test(v)
 let IGN=null;
 function getIgn(){if(!IGN){try{IGN=JSON.parse(localStorage.getItem('rionIgn')||'null')}catch(e){}if(!Array.isArray(IGN))IGN=[]}return IGN}
 async function ignSave(){localStorage.setItem('rionIgn',JSON.stringify(getIgn()));try{return await ghPush(getIgn(),GH.ignPath,'ignored')==='ok'}catch(e){return false}}
+function clShopOpts(){return Object.entries(CLW).map(([sn,rows])=>{const hi=hdrIdx(rows);if(hi<0)return '';const nc=hdrOf(rows[hi]).indexOf('نام مغازه');const o=rows.slice(hi+1).filter(r=>isDataRow(r,nc)).map(r=>r[nc]).filter(Boolean);return o.length?`<optgroup label="${esc(sn)}">${o.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}</optgroup>`:''}).join('')}
 function clUnmHTML(){
   if(!ACC||!ACC.unm)return '';
   const ign=new Set(getIgn());
@@ -802,7 +803,7 @@ function clUnmHTML(){
   const rows=list.map(u=>{
     const cn=core(nz(u.name));
     const sug=CAL.map(s=>({s,r:lev(cn,core(nz(s.name)))})).filter(x=>x.r>=0.5).sort((a,b)=>b.r-a.r).slice(0,3).map(x=>esc(x.s.name)).join('، ')||'—';
-    return `<tr><td><b>${esc(u.name)}</b></td><td class="n">${fa(Math.round(u.tot))}</td><td>ندارد</td><td>${sug}</td><td style="white-space:nowrap"><button class="btn sec cl_udef" data-n="${esc(u.name)}">تعریف در لیست</button> <button class="btn sec cl_udel" data-n="${esc(u.name)}">حذف</button></td></tr>`}).join('');
+    return `<tr><td><b>${esc(u.name)}</b></td><td class="n">${fa(Math.round(u.tot))}</td><td>ندارد</td><td>${sug}</td><td style="white-space:nowrap"><select class="cl_ual" data-n="${esc(u.name)}" style="max-width:140px"><option value="">اتصال به لیست کالیته…</option>${clShopOpts()}</select> <button class="btn sec cl_udef" data-n="${esc(u.name)}">تعریف در لیست</button> <button class="btn sec cl_udel" data-n="${esc(u.name)}">حذف</button></td></tr>`}).join('');
   return `<div class="box" style="margin:8px 0"><h2>مغازه‌های بدون کالیته (${fa(list.length)})</h2><p class="note">مشتریانی که در فایل فروش هستند ولی در لیست مغازه‌ها نیستند. «حذف» یعنی مشتری واقعی نیست و برای همیشه از این فهرست کنار گذاشته می‌شود.</p><div style="max-height:320px;overflow:auto"><table class="t"><tr><th>مشتری</th><th class="n">متر</th><th>کالیته</th><th>شبیه به</th><th></th></tr>${rows}</table></div></div>`}
 function clCols(rows){const hi=hdrIdx(rows),h=hdrOf(rows[hi]);return h.map((x,i)=>i).filter(i=>h[i]!==''&&h[i]!=='ردیف')}
 function viewCList(){
@@ -811,7 +812,6 @@ function viewCList(){
   const edit=S.clm==='edit';
   const cntOf=n=>{const rr=CLW[n],hh=hdrIdx(rr);if(hh<0)return 0;const nn=hdrOf(rr[hh]).indexOf('نام مغازه');return rr.slice(hh+1).filter(r=>isDataRow(r,nn)).length};
   const tot=names.reduce((a,n)=>a+cntOf(n),0);
-  const ALO=(ACC&&ACC.unm?ACC.unm.map(u=>u.name):[]).filter(n=>!getIgn().includes(nrm(n))&&!getAlias()[n]);
   const legend=`<div class="note" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center"><span><i class="bk5" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۵ (۵-)</span><span><i class="bk4" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۴ (۴-)</span><span><i class="bkS" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> سند</span></div>`;
   const cities=new Set(Object.values(CITYMAP));try{JSON.parse(PLAN.match(/const R=(\[.*?\]),P=/s)[1]).forEach(x=>cities.add(x.c))}catch(e){}
   const secs=names.map(sn=>{
@@ -826,7 +826,7 @@ function viewCList(){
         if(!edit)return `<td class="${cls.trim()}">${esc(r[c]??'')}</td>`;
         const isBk=h[c].startsWith('بوک');
         return `<td class="${cls.trim()}"><input class="cl_in${isBk?' '+bkCls(r[c]):''}${BAD.has(sn+'|'+i+'|'+c)?' bad':''}" ${h[c]==='شهر'?'list="cl_cities"':''} data-s="${esc(sn)}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`}).join('');
-      const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td>${ALO.length?`<select class="cl_al" data-s="${esc(sn)}" data-r="${i}"><option value="">اتصال حسابداری…</option>${ALO.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`:''}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
+      const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
       body.push(`<tr><td class="n">${fa(k)}</td>${cells}${tail}</tr>`)}
     const hd=cols.map(c=>`<th>${esc(h[c])}</th>`).join('');
     return `<div class="box cl_sec" style="flex:0 0 ${closed?'170px':'440px'};max-width:88vw;margin:0;padding:0;overflow:hidden;direction:rtl">
@@ -896,7 +896,7 @@ function bindCList(){
     if(h[c].startsWith('بوک-')||/^\d+$/.test(h[c])||(h[c]==='هنگر'&&h.filter(x=>x.startsWith('بوک')).length>1))v=v===''?null:num(v);
     rows[+i.dataset.r][c]=v===''?null:v};
   app.onchange=e=>{
-    const al=e.target.closest('.cl_al');if(al){const v=al.value;if(!v)return;const rows=CLW[al.dataset.s],nc=hdrOf(rows[hdrIdx(rows)]).indexOf('نام مغازه');const shop=(rows[+al.dataset.r]||[])[nc];if(!shop){alert('این ردیف نام مغازه ندارد');return}getAlias()[v]=shop;reloadAcc();keepDraw();aliasSave().then(ok=>msg(ok?'✔ «'+v+'» به «'+shop+'» وصل شد و در گیت‌هاب ثبت شد':'✔ وصل شد (فقط روی این مرورگر؛ توکن گیت‌هاب ثبت نشده)'));return}
+    const ua=e.target.closest('.cl_ual');if(ua){const v=ua.value;if(!v)return;getAlias()[ua.dataset.n]=v;reloadAcc();keepDraw();aliasSave().then(ok=>msg(ok?'✔ «'+ua.dataset.n+'» به «'+v+'» وصل شد و در گیت‌هاب ثبت شد':'✔ وصل شد (فقط روی این مرورگر؛ توکن گیت‌هاب ثبت نشده)'));return}
     const mv=e.target.closest('.cl_mv');
     if(mv&&mv.value){const sn=mv.dataset.s,src=CLW[sn],dst=CLW[mv.value],r=src[+mv.dataset.r],sh=hdrOf(src[hdrIdx(src)]),dh=hdrOf(dst[hdrIdx(dst)]);
       const nr=dh.map(x=>{const k=sh.indexOf(x);return x==='ردیف'||k<0?null:r[k]});
