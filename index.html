@@ -178,7 +178,7 @@ header{background:#fff;border-bottom:1px solid var(--line);box-shadow:none;posit
 .gear:focus-visible,nav button:focus-visible,.btn:focus-visible,.seg button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
 .btn{background:var(--pri);color:#fff;min-height:40px}
 .btn.sec{background:var(--bg);color:var(--navy);border:1px solid var(--line)}
-nav{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:6px;padding-bottom:4px;scrollbar-width:thin}
+nav{justify-content:flex-start;flex-wrap:wrap;gap:6px;padding-bottom:4px}
 nav button{background:#fff;color:var(--navy);border:1px solid var(--line);min-height:40px;padding:6px 14px;font-size:13px;flex:0 0 auto}
 nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
 .seg button{border-color:var(--line);min-height:40px}
@@ -639,6 +639,7 @@ function hintOf(a){
   return null;
 }
 function matchShop(a,shops){
+  const al=getAlias()[a];if(al){const t=nz(al);const s=shops.find(x=>nz(x.name)===t);if(s)return {s,how:'manual'}}
   const man=Object.keys(ACC_MAN).find(k=>nz(k)===a);
   if(man){const t=nz(ACC_MAN[man]);const s=shops.find(x=>nz(x.name)===t)||shops.find(x=>core(nz(x.name))===core(t));return s?{s,how:'manual'}:null}
   const ca=core(a);if(!ca)return null;
@@ -810,6 +811,7 @@ function viewCList(){
   const edit=S.clm==='edit';
   const cntOf=n=>{const rr=CLW[n],hh=hdrIdx(rr);if(hh<0)return 0;const nn=hdrOf(rr[hh]).indexOf('نام مغازه');return rr.slice(hh+1).filter(r=>isDataRow(r,nn)).length};
   const tot=names.reduce((a,n)=>a+cntOf(n),0);
+  const ALO=(ACC&&ACC.unm?ACC.unm.map(u=>u.name):[]).filter(n=>!getIgn().includes(nrm(n))&&!getAlias()[n]);
   const legend=`<div class="note" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center"><span><i class="bk5" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۵ (۵-)</span><span><i class="bk4" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۴ (۴-)</span><span><i class="bkS" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> سند</span></div>`;
   const cities=new Set(Object.values(CITYMAP));try{JSON.parse(PLAN.match(/const R=(\[.*?\]),P=/s)[1]).forEach(x=>cities.add(x.c))}catch(e){}
   const secs=names.map(sn=>{
@@ -824,7 +826,7 @@ function viewCList(){
         if(!edit)return `<td class="${cls.trim()}">${esc(r[c]??'')}</td>`;
         const isBk=h[c].startsWith('بوک');
         return `<td class="${cls.trim()}"><input class="cl_in${isBk?' '+bkCls(r[c]):''}${BAD.has(sn+'|'+i+'|'+c)?' bad':''}" ${h[c]==='شهر'?'list="cl_cities"':''} data-s="${esc(sn)}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`}).join('');
-      const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
+      const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td>${ALO.length?`<select class="cl_al" data-s="${esc(sn)}" data-r="${i}"><option value="">اتصال حسابداری…</option>${ALO.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`:''}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
       body.push(`<tr><td class="n">${fa(k)}</td>${cells}${tail}</tr>`)}
     const hd=cols.map(c=>`<th>${esc(h[c])}</th>`).join('');
     return `<div class="box cl_sec" style="flex:0 0 ${closed?'170px':'440px'};max-width:88vw;margin:0;padding:0;overflow:hidden;direction:rtl">
@@ -850,7 +852,12 @@ function viewCList(){
   <datalist id="cl_cities">${[...cities].map(c=>`<option value="${esc(c)}">`).join('')}</datalist>
   <div id="cl_row" style="display:flex;gap:10px;overflow-x:auto;align-items:flex-start;padding:6px 2px 12px;direction:rtl">${secs}</div>
   <div id="cl_val">${clValHTML()}${clUnmHTML()}</div></div>`}
-const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json',ignPath:'kalite/ignored.json'};
+const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json',ignPath:'kalite/ignored.json',aliasPath:'kalite/alias.json'};
+let ALIAS=null;
+function getAlias(){if(!ALIAS){try{ALIAS=JSON.parse(localStorage.getItem('rionAlias')||'null')}catch(e){}if(!ALIAS||typeof ALIAS!=='object'||Array.isArray(ALIAS))ALIAS={}}return ALIAS}
+async function aliasSave(){localStorage.setItem('rionAlias',JSON.stringify(getAlias()));try{return await ghPush(getAlias(),GH.aliasPath,'alias')==='ok'}catch(e){return false}}
+async function fetchAlias(){try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.aliasPath}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch(e){return null}}
+function reloadAcc(){const x=ACCR||PRELOAD_ACC||JSON.parse(localStorage.getItem('rionAcc')||'null');if(x){buildAcc(x);applyAcc()}}
 async function fetchIgn(){try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.ignPath}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch(e){return null}}
 let ACCR=null;
 const GHK='rionGhTok';
@@ -889,6 +896,7 @@ function bindCList(){
     if(h[c].startsWith('بوک-')||/^\d+$/.test(h[c])||(h[c]==='هنگر'&&h.filter(x=>x.startsWith('بوک')).length>1))v=v===''?null:num(v);
     rows[+i.dataset.r][c]=v===''?null:v};
   app.onchange=e=>{
+    const al=e.target.closest('.cl_al');if(al){const v=al.value;if(!v)return;const rows=CLW[al.dataset.s],nc=hdrOf(rows[hdrIdx(rows)]).indexOf('نام مغازه');const shop=(rows[+al.dataset.r]||[])[nc];if(!shop){alert('این ردیف نام مغازه ندارد');return}getAlias()[v]=shop;reloadAcc();keepDraw();aliasSave().then(ok=>msg(ok?'✔ «'+v+'» به «'+shop+'» وصل شد و در گیت‌هاب ثبت شد':'✔ وصل شد (فقط روی این مرورگر؛ توکن گیت‌هاب ثبت نشده)'));return}
     const mv=e.target.closest('.cl_mv');
     if(mv&&mv.value){const sn=mv.dataset.s,src=CLW[sn],dst=CLW[mv.value],r=src[+mv.dataset.r],sh=hdrOf(src[hdrIdx(src)]),dh=hdrOf(dst[hdrIdx(dst)]);
       const nr=dh.map(x=>{const k=sh.indexOf(x);return x==='ردیف'||k<0?null:r[k]});
@@ -1201,6 +1209,7 @@ $('guide').addEventListener('click',e=>{
 
 const SAVED=(()=>{try{return JSON.parse(localStorage.getItem('rionData')||'null')}catch(e){return null}})();
 (async()=>{const ra=await fetchRemoteAcc();if(ra&&ra.length){ACCR=ra;localStorage.setItem('rionAcc',JSON.stringify(ra))}
+const rl=await fetchAlias();if(rl&&typeof rl==='object'&&!Array.isArray(rl)){ALIAS=rl;localStorage.setItem('rionAlias',JSON.stringify(rl))}
 const ri=await fetchIgn();if(Array.isArray(ri)){IGN=ri;localStorage.setItem('rionIgn',JSON.stringify(ri))}
 const rm=await fetchRemote();if(rm){localStorage.setItem(CLK,JSON.stringify(rm));CLW=null}
 if(PRELOAD)load(getCL());else if(SAVED)load(SAVED);else{draw()}})();
