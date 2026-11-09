@@ -654,17 +654,17 @@ function matchShop(a,shops){
 }
 const ACC_COLS=['مشتری','تاریخ','کد کالا/خدمت','گروه فروش','مقدار-اصلی','خالص','مبلغ فروش','تخفیف','ماه'];
 const ACC_RX=[/مشتر/,/تاریخ|تاريخ/,/کد|كد/,/گروه/,/مقدار/,/خالص/,/مبلغ/,/تخفیف|تخفيف/,/ماه/];
-function parseAcc(t,S){S=S||{};S.rows=0;S.skip=0;S.hdr=null;
+function parseAcc(t,S){S=S||{};S.rows=0;S.skip=0;S.hdr=null;S.bad=[];let rn=0;
   const un=s=>s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;|&#39;/g,"'").replace(/&amp;/g,'&');
   const out=[];
   for(const r of (t.match(/<Row\b[\s\S]*?<\/Row>/g)||[])){
     const c=[...r.matchAll(/<Cell\b[^>]*?(?:\/>|>([\s\S]*?)<\/Cell>)/g)].map(m=>{const d=(m[1]||'').match(/<Data[^>]*>([\s\S]*?)<\/Data>/);return d?un(d[1]).trim():''});
-    if(!c.some(x=>x))continue;
+    rn++;if(!c.some(x=>x))continue;
     if(S.hdr===null){S.hdr=c;continue}
     S.rows++;
-    if(c.length!==9){S.skip++;continue}
+    if(c.length!==9){S.skip++;S.bad.push([rn,'تعداد ستون '+c.length+' به‌جای ۹',c]);continue}
     const q=parseFloat(c[4]),m=parseInt(c[8]);
-    if(!c[0]||isNaN(q)||isNaN(m)){S.skip++;continue}
+    if(!c[0]||isNaN(q)||isNaN(m)){S.skip++;S.bad.push([rn,!c[0]?'نام مشتری خالی':isNaN(q)?'متر نامعتبر: «'+c[4]+'»':'ماه نامعتبر: «'+c[8]+'»',c]);continue}
     out.push([nz(c[0]),c[1],c[2],nz(c[3]),q,parseFloat(c[5])||0,m]);
   }
   return out;
@@ -1211,7 +1211,7 @@ $('afile').onchange=async e=>{
   if(!rows.length)w.push('هیچ ردیف معتبری پیدا نشد.');
   if(!hdrOk)w.push('ستون‌های فایل درست نیست. ستون‌های لازم، به همین ترتیب: '+ACC_COLS.join('، ')+'. ستون‌های فایل شما: '+(hn.join('، ')||'—'));
   if(S.skip)w.push(fa(S.skip)+' ردیف رد شد (تعداد ستون غلط یا متر/ماه نامعتبر).');
-  PEND={rows,w,hdrOk,total:rows.reduce((a,r)=>a+r[4],0),name:f.name};
+  PEND={rows,bad:S.bad,w,hdrOk,total:rows.reduce((a,r)=>a+r[4],0),name:f.name};
   draw();
   $('afile').value='';
 };
@@ -1222,6 +1222,7 @@ function accPrevHTML(){
   h+='<div style="margin-top:10px;padding:12px;border:1px solid #e3c96b;border-radius:10px;background:#fffdf4">'
    +'<b>پیش‌نمایش: '+p.name+'</b><div class="note">'+fa(p.rows.length)+' ردیف، '+fa(Math.round(p.total))+' متر. هنوز اعمال نشده است.</div>';
   p.w.forEach(x=>{h+='<div style="color:#b42318;margin-top:6px">⚠ '+x+'</div>'});
+  if(p.bad&&p.bad.length)h+='<div style="margin-top:10px;padding:10px;border:1px solid #f1b5ae;border-radius:10px;background:#fff5f4"><b style="color:#b42318">ردیف‌های ردشده ('+fa(p.bad.length)+') — در جمع‌ها حساب نشده‌اند</b><div style="max-height:220px;overflow:auto;margin-top:6px"><table class="t"><tr><th>ردیف فایل</th><th>مشکل</th><th>محتوای ردیف</th></tr>'+p.bad.map(b=>'<tr><td>'+fa(b[0])+'</td><td>'+esc(b[1])+'</td><td dir="auto" style="font-size:12px">'+esc(b[2].join(' | '))+'</td></tr>').join('')+'</table></div></div>';
   h+='<div style="margin-top:10px;display:flex;gap:8px"><button class="btn" onclick="accSave()" '+(p.rows.length?'':'disabled')+'>ذخیره و اعمال روی داشبورد</button><button class="btn" onclick="accCancel()">انصراف</button></div></div>';
   return h;
 }
