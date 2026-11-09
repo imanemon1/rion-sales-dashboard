@@ -818,7 +818,14 @@ function clPickDone(n,sn,shop){
   const setMsg=x=>{const m=document.getElementById('cl_msg');if(m)m.textContent=x};
   aliasSave().then(ok=>setMsg(ok?'✔ «'+n+'» به «'+shop+'» در راستای «'+sn+'» اتصال خورد و ثبت شد. از این فهرست حذف شد.':'✔ «'+n+'» به «'+shop+'» اتصال خورد (فقط روی این مرورگر ذخیره شد). از این فهرست حذف شد.'));
 }
-function clUnmHTML(){
+function clHistHTML(){
+  const al=getAlias(),ak=Object.keys(al),ig=getIgn();
+  let h='';
+  if(ak.length)h+=`<div class="box" style="margin:8px 0"><h2 style="margin:0 0 6px">اتصال‌های انجام‌شده (${fa(ak.length)})</h2><p class="note">اگر اشتباه وصل شده، «جابجایی» را بزنید و مغازه درست را انتخاب کنید، یا «لغو اتصال» تا به فهرست بدون کالیته برگردد.</p><div style="max-height:280px;overflow:auto"><table class="t"><tr><th>نام در حسابداری</th><th>وصل به</th><th></th></tr>${ak.map(n=>`<tr><td><b>${esc(n)}</b></td><td>${esc(al[n])}</td><td style="white-space:nowrap"><button class="btn sec cl_umove" data-n="${esc(n)}">جابجایی</button> <button class="btn sec cl_unlink" data-n="${esc(n)}">لغو اتصال</button></td></tr>`).join('')}</table></div></div>`;
+  if(ig.length)h+=`<div class="box" style="margin:8px 0"><h2 style="margin:0 0 6px">حذف‌شده‌ها (${fa(ig.length)})</h2><p class="note">فروش این مشتریان همچنان در آمار کل حساب می‌شود. «بازگردانی» آن را به فهرست بدون کالیته برمی‌گرداند.</p><div style="max-height:240px;overflow:auto"><table class="t">${ig.map(n=>`<tr><td><b>${esc(n)}</b></td><td style="white-space:nowrap"><button class="btn sec cl_urest" data-n="${esc(n)}">بازگردانی</button></td></tr>`).join('')}</table></div></div>`;
+  return h}
+function clUnmHTML(){return clUnmMain()+clHistHTML()}
+function clUnmMain(){
   if(!ACC||!ACC.unm)return '';
   const ign=new Set(getIgn());
   const al=getAlias();
@@ -943,6 +950,9 @@ function bindCList(){
       const nr=h.map(x=>x==='نام مغازه'?n:x==='شهر'?city:null);let last=hi;rows.forEach((q,i)=>{if(i>hi&&isDataRow(q,nc))last=i});rows.splice(last+1,0,nr);
       if(rc>=0){let k=0;rows.forEach((q,i)=>{if(i>hi&&isDataRow(q,nc))q[rc]=++k})}
       keepDraw();msg('«'+n+'» به شیت «'+sn+'» اضافه شد. برای ثبت نهایی ذخیره کنید.');return}
+    if(t.classList.contains('cl_umove')){clConnect(t.dataset.n);return}
+    if(t.classList.contains('cl_unlink')){const n=t.dataset.n;if(!confirm('اتصال «'+n+'» لغو شود؟'))return;delete getAlias()[n];reloadAcc();keepDraw();aliasSave().then(ok=>msg(ok?'✔ اتصال «'+n+'» لغو شد و به فهرست بدون کالیته برگشت':'✔ اتصال لغو شد (فقط روی این مرورگر)'));return}
+    if(t.classList.contains('cl_urest')){const n=t.dataset.n,i=getIgn().indexOf(n);if(i>=0)getIgn().splice(i,1);keepDraw();ignSave().then(ok=>msg(ok?'✔ «'+n+'» بازگردانی شد':'✔ بازگردانی شد (فقط روی این مرورگر)'));return}
     if(t.classList.contains('cl_udel')){const n=nrm(t.dataset.n);if(!confirm('«'+n+'» برای همیشه از فهرست بدون کالیته حذف شود؟'))return;
       getIgn().push(n);keepDraw();ignSave().then(ok=>msg(ok?'✔ حذف شد و در گیت‌هاب ثبت شد':'✔ حذف شد (فقط روی این مرورگر؛ توکن گیت‌هاب ثبت نشده)'));return}
     if(t.classList.contains('cl_fix')){CLW[t.dataset.s][+t.dataset.r][+t.dataset.c]=t.dataset.v;keepDraw();return}
