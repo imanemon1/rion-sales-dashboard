@@ -494,15 +494,22 @@ function viewShops(){
    <button class="btn sec" id="csv">خروجی CSV</button></div>
   <div class="wrap" id="stbl"></div></div>`;
 }
+function cityOf(name){
+  const nz=s=>String(s??'').replace(/\s+/g,' ').trim();
+  const n=nz(name);let c=CITYMAP[n]||'';
+  for(const rows of Object.values(getCL())){const hi=hdrIdx(rows);if(hi<0)continue;const h=hdrOf(rows[hi]);
+    const nc=h.indexOf('نام مغازه'),cc=h.indexOf('شهر');if(cc<0||c)continue;
+    for(let i=hi+1;i<rows.length;i++){if(nz(rows[i][nc])===n){c=String(rows[i][cc]??'').trim();if(c)break}}}
+  return c||'—'}
 function shopsTable(){
   const a=filtered(),c=S.cur;
   const th=(k,t,cls='')=>`<th class="${cls}" data-sort="${k}">${t}${S.sort===k?(S.dir>0?' ▲':' ▼'):''}</th>`;
   const ms=[];for(let k=1;k<=12;k++)ms.push(th('m'+k,MONTHS[k-1].slice(0,4),'n'));
   const sum=a.reduce((x,s)=>x+s.total,0);
-  $('stbl').innerHTML=`<table><tr><th>#</th>${th('name','مغازه')}${th('sheet','شیت')}${th('book','بوک')}${th('hanger','هنگر')}${ms.join('')}${th('total','جمع','n')}${th('status','وضعیت')}</tr>
-  ${a.map((s,i)=>`<tr><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td>${ytag(s.year)} <small>${esc(s.book)}</small></td><td>${s.hanger?'✔':''}</td>
+  $('stbl').innerHTML=`<table><tr><th>#</th>${th('name','مغازه')}${th('sheet','شیت')}<th>شهر</th>${th('book','بوک')}${th('hanger','هنگر')}${ms.join('')}${th('total','جمع','n')}${th('status','وضعیت')}</tr>
+  ${a.map((s,i)=>`<tr><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td>${esc(cityOf(s.name))}</td><td>${ytag(s.year)} <small>${esc(s.book)}</small></td><td>${s.hanger?'✔':''}</td>
   ${s.m.slice(1).map((v,k)=>mcell(v,v===0?'z':'',k+1>c?'style="opacity:.4"':'')).join('')}<td class="n"><b>${fa(s.total)}</b></td><td>${stag(s.status)}</td></tr>`).join('')}
-  <tr><td></td><td><b>جمع (${fa(a.length)} مغازه)</b></td><td></td><td></td><td></td>${Array.from({length:12},(_,k)=>{const has=a.some(s=>s.m[k+1]!=null);return `<td class="n"><b>${has?fa(a.reduce((x,s)=>x+(s.m[k+1]||0),0)):''}</b></td>`}).join('')}<td class="n"><b>${fa(sum)}</b></td><td></td></tr></table>`;
+  <tr><td></td><td><b>جمع (${fa(a.length)} مغازه)</b></td><td></td><td></td><td></td><td></td>${Array.from({length:12},(_,k)=>{const has=a.some(s=>s.m[k+1]!=null);return `<td class="n"><b>${has?fa(a.reduce((x,s)=>x+(s.m[k+1]||0),0)):''}</b></td>`}).join('')}<td class="n"><b>${fa(sum)}</b></td><td></td></tr></table>`;
 }
 function bindSheets(){document.querySelectorAll('#app [data-hl]').forEach(el=>el.onclick=()=>{const v=el.dataset.hl;S.hl=S.hl===v?null:v;draw()})}
 function bindShops(){
