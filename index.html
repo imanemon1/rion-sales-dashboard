@@ -545,45 +545,81 @@ async function fetchFU(){try{const r=await fetch(`https://raw.githubusercontent.
 function fuSave(){localStorage.setItem('rionFU',JSON.stringify(getFU()));clearTimeout(FUT);const m=$('fu_msg');if(m)m.textContent='در حال ذخیره…';
   FUT=setTimeout(async()=>{let r='';try{r=await ghPush(getFU(),GH.fuPath,'followup')==='ok'?'✔ ذخیره شد':'ذخیره فقط روی این مرورگر (توکن ثبت نشده)'}catch(e){r='⚠ ثبت در گیت‌هاب نشد ('+e.message+')'}FUMSG=r;const m=$('fu_msg');if(m)m.textContent=r},700)}
 const fuKey=s=>s.sheet+'|'+String(s.name).replace(/\s+/g,' ').trim();
-const FU_ST=[['open','باز'],['prog','در حال پیگیری'],['back','بازگشته به خرید'],['closed','بسته شد']];
 const FU_RS=['','قیمت','موجودی / کمبود کد','ارسال / حمل','طرح قدیمی شده','فروش کم شده','جواب نداد','نیاز به تماس بعدی','سایر'];
 const FU_TPL={g1:'سلام {name} عزیز، وقت بخیر. مدتی است سفارش نداشتیم؛ اگر چیزی نیاز دارید در خدمتیم.',g2:'سلام {name} عزیز، وقت بخیر. چند وقتی است خبری از شما نداریم. اگر مشکلی از قیمت، موجودی یا ارسال بوده بفرمایید تا حلش کنیم.',g3:'سلام {name} عزیز، وقت بخیر. از شما دلتنگ شدیم! طرح و کدهای جدیدی داریم که فکر می‌کنم برای مغازه‌تان مناسب است. اجازه هست نمونه‌اش را بفرستم؟',never:'سلام {name} عزیز، وقت بخیر. من از مجموعه ریون هستم. خوشحال می‌شویم معرفی کوتاهی از طرح‌هایمان داشته باشیم و برای اولین سفارش در خدمتتان باشیم.'};
 const fuPh=v=>{let d=String(v||'').replace(/[۰-۹]/g,c=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace(/\D/g,'');if(d.startsWith('0098'))d=d.slice(4);else if(d.startsWith('98'))d=d.slice(2);if(d.startsWith('0'))d=d.slice(1);return d};
+function g2j(gy,gm,gd){const gdm=[0,31,59,90,120,151,181,212,243,273,304,334];let jy=gy<=1600?0:979;gy-=gy<=1600?621:1600;const gy2=gm>2?gy+1:gy;let days=365*gy+Math.floor((gy2+3)/4)-Math.floor((gy2+99)/100)+Math.floor((gy2+399)/400)-80+gd+gdm[gm-1];jy+=33*Math.floor(days/12053);days%=12053;jy+=4*Math.floor(days/1461);days%=1461;if(days>365){jy+=Math.floor((days-1)/365);days=(days-1)%365}const jm=days<186?1+Math.floor(days/31):7+Math.floor((days-186)/30),jd=1+(days<186?days%31:(days-186)%30);return[jy,jm,jd]}
+function j2g(jy,jm,jd){jy+=1595;let days=-355668+365*jy+Math.floor(jy/33)*8+Math.floor(((jy%33)+3)/4)+jd+(jm<7?(jm-1)*31:(jm-7)*30+186);let gy=400*Math.floor(days/146097);days%=146097;if(days>36524){gy+=100*Math.floor(--days/36524);days%=36524;if(days>=365)days++}gy+=4*Math.floor(days/1461);days%=1461;if(days>365){gy+=Math.floor((days-1)/365);days=(days-1)%365}let gd=days+1;const m=[0,31,(gy%4==0&&gy%100!=0)||gy%400==0?29:28,31,30,31,30,31,31,30,31,30,31];let gm;for(gm=0;gm<13&&gd>m[gm];gm++)gd-=m[gm];return[gy,gm,gd]}
+const JM=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+function jDateSel(iso){let jy=0,jm=0,jd=0;if(iso){const[a,b,c]=iso.split('-').map(Number);[jy,jm,jd]=g2j(a,b,c)}const ty=g2j(...new Date().toISOString().slice(0,10).split('-').map(Number))[0];
+ return `<span class="fu_d"><select class="fu_j" data-p="d"><option value="">روز</option>${Array.from({length:31},(_,i)=>`<option value="${i+1}" ${jd==i+1?'selected':''}>${fa(i+1)}</option>`).join('')}</select><select class="fu_j" data-p="m"><option value="">ماه</option>${JM.map((n,i)=>`<option value="${i+1}" ${jm==i+1?'selected':''}>${n}</option>`).join('')}</select><select class="fu_j" data-p="y">${[ty,ty+1].map(y=>`<option value="${y}" ${jy==y||(!jy&&y==ty)?'selected':''}>${String(y).replace(/\d/g,c=>'۰۱۲۳۴۵۶۷۸۹'[c])}</option>`).join('')}</select></span>`}
 const fuToday=()=>new Date().toISOString().slice(0,10);
+const DY=Math.max(1405,...Object.keys(YEARS_RAW||{}).map(y=>+y+1));
+const jNow=()=>g2j(...fuToday().split('-').map(Number));
+const jStr=iso=>{if(!iso)return '—';const[y,m,d]=g2j(...iso.split('-').map(Number));return fa(d)+' '+JM[m-1]};
+// خرید بعد از شروع پیگیری
+function fuBought(s,r){if(!r.start||!r.sj)return 0;const[jy,jm]=r.sj;if(jy>DY)return 0;let t=0;
+  if(jy<DY){for(let k=1;k<=12;k++)t+=s.m[k]||0;return t}
+  for(let k=jm+1;k<=12;k++)t+=s.m[k]||0;return t+Math.max(0,(s.m[jm]||0)-(r.sv||0))}
+function fuState(s,r){if(r.st==='closed')return 'closed';if(!r.start)return 'open';return fuBought(s,r)>0?'win':'prog'}
+const FUS={open:['پیگیری نشده','#6b7280'],prog:['در حال پیگیری','#2563eb'],win:['خرید کرد — منتظر تأیید','#16a34a'],closed:['بسته شد','#374151']};
+function fuStart(s,r){if(r.start)return;r.start=fuToday();const[jy,jm]=jNow();r.sj=[jy,jm];r.sv=jy===DY?(s.m[jm]||0):0}
 function viewFU(){
-  const today=fuToday(),F=getFU(),g=S.fg||'all';
+  const today=fuToday(),F=getFU(),g=S.fg||'all',fs=S.fs||'act';
   const names={g3:'۳ ماه یا بیشتر',g2:'۲ ماه',g1:'۱ ماه',never:'هرگز خرید نکرده'};
-  let all=D.shops.filter(s=>names[s.status]);
   const rec=s=>F[fuKey(s)]||{};
-  const due=all.filter(s=>{const r=rec(s);return r.next&&r.next<=today&&r.st!=='closed'&&r.st!=='back'});
-  const cnt=k=>all.filter(s=>s.status===k).length;
-  let a=all.filter(s=>g==='all'||(g==='due'?due.includes(s):s.status===g));
-  if(S.fs&&S.fs!=='all')a=a.filter(s=>(rec(s).st||'open')===S.fs);
+  const st=s=>fuState(s,rec(s));
+  const inact=D.shops.filter(s=>names[s.status]);
+  const wins=D.shops.filter(s=>st(s)==='win');
+  const act=inact.filter(s=>st(s)!=='closed'&&st(s)!=='win');
+  const closed=D.shops.filter(s=>st(s)==='closed');
+  const isDue=s=>{const r=rec(s);return r.next&&r.next<=today&&!r.done&&st(s)==='prog'};
+  const revived=D.shops.flatMap(s=>(rec(s).hist||[]).map(h=>({s,h}))).sort((x,y)=>y.h.back.localeCompare(x.h.back));
+  const [jy,jm]=jNow(),thisM=revived.filter(x=>{const[a,b]=g2j(...x.h.back.split('-').map(Number));return a===jy&&b===jm});
+  const card=(l,v,c,k)=>`<div class="card" data-fs="${k}" style="cursor:pointer;border-top:3px solid ${c};${fs===k?'outline:2px solid '+c:''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;
+  let h=`<p class="note">مبنا: ماه <b>${MONTHS[S.cur-1]}</b>. با ثبت دلیل، یادداشت، تاریخ یا تیک، وضعیت خودکار «در حال پیگیری» می‌شود. اگر بعد از شروع پیگیری خریدی ثبت شود، سبز می‌شود تا تأیید کنید. <b id="fu_msg">${esc(FUMSG)}</b></p>
+  <div class="grid">${card('راکد / بی‌خرید (فعال در لیست)',fa(act.length),'#dc2626','act')}${card('موعد پیگیری امروز',fa(act.filter(isDue).length),'#ea580c','due')}${card('خرید کرد — منتظر تأیید',fa(wins.length),'#16a34a','win')}${card('احیا شده این ماه / کل',fa(thisM.length)+' / '+fa(revived.length),'#0d9488','rev')}${card('بسته شده',fa(closed.length),'#374151','closed')}</div>`;
+  if(wins.length)h+=`<div class="box" style="border:2px solid #16a34a;background:#f0fdf4"><h3 style="color:#16a34a">✔ بعد از پیگیری خرید کردند — تأیید کنید تا از لیست خارج شوند</h3><div class="wrap"><table><tr><th>مغازه</th><th>شروع پیگیری</th><th class="n">خرید بعد از پیگیری</th><th>یادداشت</th><th></th></tr>
+   ${wins.sort((x,y)=>fuBought(y,rec(y))-fuBought(x,rec(x))).map(s=>{const r=rec(s);return `<tr data-k="${esc(fuKey(s))}" style="background:#dcfce7">${shopCell(s)}<td>${jStr(r.start)}</td><td class="n"><b>${fa(+fuBought(s,r).toFixed(1))}</b></td><td><small>${esc(r.note||'')}</small></td><td><button class="btn" data-fa="ok">✔ تأیید احیا</button></td></tr>`}).join('')}</table></div></div>`;
+  if(fs==='rev')return h+`<div class="box"><h3>احیا شده‌ها</h3><div class="wrap"><table><tr><th>مغازه</th><th>شروع پیگیری</th><th>تأیید احیا</th><th class="n">خرید</th><th>دلیل</th><th>یادداشت</th></tr>${revived.map(({s,h})=>`<tr>${shopCell(s)}<td>${jStr(h.start)}</td><td>${jStr(h.back)}</td><td class="n">${fa(+(h.amt||0).toFixed(1))}</td><td>${esc(h.reason||'')}</td><td><small>${esc(h.note||'')}</small></td></tr>`).join('')||'<tr><td>هنوز موردی نیست</td></tr>'}</table></div></div>`;
+  if(fs==='closed')return h+`<div class="box"><h3>بسته شده‌ها</h3><div class="wrap"><table><tr><th>مغازه</th><th>یادداشت</th><th></th></tr>${closed.map(s=>`<tr data-k="${esc(fuKey(s))}">${shopCell(s)}<td><small>${esc(rec(s).note||'')}</small></td><td><button class="btn sec" data-fa="reopen">بازگرداندن به لیست</button></td></tr>`).join('')||'<tr><td>موردی نیست</td></tr>'}</table></div></div>`;
+  if(fs==='win')return h;
+  let a=fs==='due'?act.filter(isDue):act;
+  a=a.filter(s=>g==='all'||(['open','prog'].includes(g)?st(s)===g:s.status===g));
   const ord={g3:0,g2:1,g1:2,never:3};
-  a.sort((x,y)=>(due.includes(y)-due.includes(x))||(ord[x.status]-ord[y.status])||y.total-x.total);
+  a.sort((x,y)=>(isDue(y)-isDue(x))||(ord[x.status]-ord[y.status])||y.total-x.total);
+  const cnt=f=>act.filter(f).length;
   const chip=(k,l,n)=>`<button class="btn ${g===k?'':'sec'}" data-fg="${k}">${l} (${fa(n)})</button>`;
-  return `<p class="note">مغازه‌های بی‌خرید با ماه جاری (<b>${MONTHS[S.cur-1]}</b>). هر تغییر خودکار ذخیره می‌شود. <b id="fu_msg">${esc(FUMSG)}</b></p>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${chip('all','همه',all.length)}${chip('due','موعد پیگیری',due.length)}${chip('g1','۱ ماه',cnt('g1'))}${chip('g2','۲ ماه',cnt('g2'))}${chip('g3','۳+ ماه',cnt('g3'))}${chip('never','بدون خرید',cnt('never'))}
-  <select id="fu_fs" style="padding:6px;border-radius:8px"><option value="all">همه وضعیت‌ها</option>${FU_ST.map(([k,l])=>`<option value="${k}" ${S.fs===k?'selected':''}>${l}</option>`).join('')}</select></div>
-  <div class="box"><div class="wrap"><table><tr><th>مغازه</th><th>گروه</th><th class="n">جمع سال</th><th>شماره</th><th>وضعیت</th><th>دلیل</th><th>یادداشت</th><th>پیگیری بعدی</th><th>ثبت‌کننده</th></tr>
-  ${a.map(s=>{const k=fuKey(s),r=rec(s),ph=fuPh(r.phone),od=r.next&&r.next<=today&&r.st!=='closed'&&r.st!=='back';
+  return h+`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${chip('all','همه',act.length)}${chip('open','پیگیری نشده',cnt(s=>st(s)==='open'))}${chip('prog','در حال پیگیری',cnt(s=>st(s)==='prog'))} | ${chip('g1','۱ ماه',cnt(s=>s.status==='g1'))}${chip('g2','۲ ماه',cnt(s=>s.status==='g2'))}${chip('g3','۳+ ماه',cnt(s=>s.status==='g3'))}${chip('never','بدون خرید',cnt(s=>s.status==='never'))}</div>
+  <div class="box"><div class="wrap"><table><tr><th>مغازه</th><th>گروه</th><th class="n">جمع سال</th><th>شماره</th><th>وضعیت</th><th>دلیل</th><th>یادداشت</th><th>پیگیری بعدی</th><th>انجام شد</th><th></th></tr>
+  ${a.map(s=>{const k=fuKey(s),r=rec(s),ph=fuPh(r.phone),od=isDue(s),S_=FUS[st(s)];
    const wa=ph.length>=10?`<a class="btn" target="_blank" rel="noopener" href="https://wa.me/98${ph}?text=${encodeURIComponent((FU_TPL[s.status]||'').replace('{name}',s.name))}">واتساپ</a> <a class="btn sec" href="tel:+98${ph}">تماس</a>`:'';
    return `<tr data-k="${esc(k)}" ${od?'style="background:#fff4e0"':''}>${shopCell(s)}<td><small>${names[s.status]}</small></td><td class="n">${fa(s.total)}</td>
    <td><input class="fu_i" data-f="phone" value="${esc(r.phone||'')}" placeholder="09…" style="width:110px;direction:ltr"> ${wa}</td>
-   <td><select class="fu_i" data-f="st">${FU_ST.map(([v,l])=>`<option value="${v}" ${(r.st||'open')===v?'selected':''}>${l}</option>`).join('')}</select></td>
+   <td><span class="st" style="background:${S_[1]}">${S_[0]}</span>${r.start?`<br><small>از ${jStr(r.start)}${r.cnt?' • '+fa(r.cnt)+' بار':''}</small>`:''}</td>
    <td><select class="fu_i" data-f="reason">${FU_RS.map(v=>`<option ${r.reason===v?'selected':''}>${v}</option>`).join('')}</select></td>
    <td><input class="fu_i" data-f="note" value="${esc(r.note||'')}" style="min-width:150px"></td>
-   <td><input type="date" class="fu_i" data-f="next" value="${esc(r.next||'')}"></td>
-   <td><select class="fu_i" data-f="by"><option></option>${['من','میثم'].map(v=>`<option ${r.by===v?'selected':''}>${v}</option>`).join('')}</select></td></tr>`}).join('')||'<tr><td>موردی نیست ✔</td></tr>'}</table></div></div>`}
+   <td>${jDateSel(r.next)}</td>
+   <td><input type="checkbox" class="fu_c" ${r.done?'checked':''}></td>
+   <td><button class="btn sec" data-fa="close" title="بستن (مغازه تعطیل شد / دیگر کار نمی‌کند)">✖</button></td></tr>`}).join('')||'<tr><td>موردی نیست ✔</td></tr>'}</table></div></div>`}
 function bindFU(){
-  const app=$('app');
-  const upd=e=>{const i=e.target.closest('.fu_i');if(!i)return;const tr=i.closest('tr'),k=tr.dataset.k,F=getFU();const r=F[k]=F[k]||{};r[i.dataset.f]=i.value;r.ts=new Date().toISOString();
-    if(i.dataset.f==='st'&&(i.value==='prog'||i.value==='back')&&!r.start)r.start=fuToday();
-    if(i.dataset.f!=='note'&&i.dataset.f!=='phone')fuSave()};
-  app.oninput=e=>{const i=e.target.closest('.fu_i');if(i&&(i.dataset.f==='note'||i.dataset.f==='phone')){upd(e);clearTimeout(bindFU.t);bindFU.t=setTimeout(fuSave,900)}};
-  app.onchange=e=>{if(e.target.id==='fu_fs'){S.fs=e.target.value;draw();return}upd(e);if(e.target.dataset&&(e.target.dataset.f==='phone'||e.target.dataset.f==='note')){fuSave();if(e.target.dataset.f==='phone')draw()}
-    if(e.target.dataset&&e.target.dataset.f==='next')draw()};
-  app.onclick=e=>{const b=e.target.closest('[data-fg]');if(b){S.fg=b.dataset.fg;draw()}};
+  const app=$('app'),SH={};D.shops.forEach(s=>SH[fuKey(s)]=s);
+  const R=el=>{const k=el.closest('tr').dataset.k,F=getFU();return [F[k]=F[k]||{},SH[k]]};
+  const stamp=r=>{r.ts=new Date().toISOString();delete r.st_old};
+  app.oninput=e=>{const i=e.target.closest('.fu_i');if(!i||!['note','phone'].includes(i.dataset.f))return;const[r]=R(i);r[i.dataset.f]=i.value;stamp(r);clearTimeout(bindFU.t);bindFU.t=setTimeout(fuSave,900)};
+  app.onchange=e=>{const el=e.target;
+    if(el.classList.contains('fu_c')){const[r,s]=R(el);r.done=el.checked;if(el.checked){fuStart(s,r);r.doneAt=fuToday();r.cnt=(r.cnt||0)+1}stamp(r);fuSave();draw();return}
+    if(el.classList.contains('fu_j')){const sp=el.closest('.fu_d'),v=q=>+sp.querySelector(`[data-p=${q}]`).value,[r,s]=R(el);
+      if(v('d')&&v('m')){const[a,b,c]=j2g(v('y'),v('m'),v('d'));r.next=`${a}-${String(b).padStart(2,'0')}-${String(c).padStart(2,'0')}`;r.done=false;fuStart(s,r)}else r.next='';stamp(r);fuSave();draw();return}
+    if(el.classList.contains('fu_i')){const[r,s]=R(el);r[el.dataset.f]=el.value;if(el.dataset.f!=='phone'&&el.value)fuStart(s,r);stamp(r);fuSave();draw()}};
+  app.onclick=e=>{const b=e.target.closest('[data-fg]');if(b){S.fg=b.dataset.fg;S.fs='act';draw();return}
+    const c=e.target.closest('[data-fs]');if(c){S.fs=S.fs===c.dataset.fs?'act':c.dataset.fs;draw();return}
+    const x=e.target.closest('[data-fa]');if(!x)return;const[r,s]=R(x),act=x.dataset.fa;
+    if(act==='ok'){(r.hist=r.hist||[]).push({start:r.start,back:fuToday(),amt:fuBought(s,r),reason:r.reason||'',note:r.note||'',cnt:r.cnt||0});
+      ['start','sj','sv','note','reason','next','done','doneAt','cnt','st'].forEach(f=>delete r[f])}
+    else if(act==='close'){if(!confirm('این مغازه بسته شود و از لیست پیگیری خارج شود؟'))return;r.st='closed'}
+    else if(act==='reopen')delete r.st;
+    stamp(r);fuSave();draw()};
 }
 
 /* ---- collect books ---- */
