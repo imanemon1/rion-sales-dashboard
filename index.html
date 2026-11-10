@@ -257,7 +257,7 @@ html,body{max-width:100%;overflow-x:hidden}
 @media (prefers-reduced-motion:reduce){
  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
-.clk{cursor:pointer}.clk:hover td{background:#f4f7ff}.spk{display:inline-flex;align-items:flex-end;gap:2px;height:22px}.spk i{display:block;width:5px;background:#2f5bea;border-radius:1px}
+.shl{cursor:pointer;color:inherit;text-decoration:underline dotted;text-underline-offset:3px}.shl:hover{color:#1d4ed8}.clk{cursor:pointer}.clk:hover td{background:#f4f7ff}.spk{display:inline-flex;align-items:flex-end;gap:2px;height:22px}.spk i{display:block;width:5px;background:#2f5bea;border-radius:1px}
 .cl_in.bad{border:2px solid #c0392b!important;background:#fdecea}
 .bk5{background:#cfe3ff!important}.bk4{background:#d4f5dc!important}.bkS{background:#ffe3c2!important}
 .cl_t{width:auto}.cl_t td,.cl_t th{padding:4px 6px;vertical-align:middle}.cl_t td.nm{min-width:260px;white-space:normal;line-height:1.6}.cl_t .cl_in{width:120px;box-sizing:border-box}.cl_t td.nm .cl_in{width:260px}.cl_t td.n{white-space:nowrap}
@@ -348,7 +348,7 @@ const yl=y=>y?'۱۴۰'+fa(y):'؟';
 const ytag=y=>`<span class="tag ${y>=5?'new':y===4?'mid':y?'old':'gray'}">بوک ${yl(y)}</span>`;
 const stag=s=>`<span class="st ${s}">${STL[s]}</span>`;
 const shopId=s=>{if(!s)return -1;const n=x=>String(x??'').replace(/\s+/g,' ').trim();if(s.id!=null&&CAL[s.id]&&n(CAL[s.id].name)===n(s.name))return s.id;const c=CAL.find(x=>x.sheet===s.sheet&&n(x.name)===n(s.name))||CAL.find(x=>n(x.name)===n(s.name));return c?c.id:-1};
-const shopA=s=>{const i=shopId(s);return i<0?esc(s.name):`<a class="shl" data-shop="${i}" style="cursor:pointer;color:#1d4ed8;text-decoration:underline dotted">${esc(s.name)}</a>`};
+const shopA=s=>{const i=shopId(s);return i<0?esc(s.name):`<a class="shl" data-shop="${i}">${esc(s.name)}</a>`};
 const shopCell=s=>`<td>${shopA(s)}</td>`;
 
 // تعداد بوک‌های تحویلی به نماینده‌ها، به تفکیک سال بوک (۴ یا ۵)
