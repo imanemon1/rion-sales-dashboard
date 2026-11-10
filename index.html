@@ -749,8 +749,8 @@ function mineByCity(){
   const m={};const cl=getCL();
   for(const rows of Object.values(cl)){const hi=hdrIdx(rows);if(hi<0)continue;const h=hdrOf(rows[hi]);
     if(h.filter(x=>x.startsWith('بوک')).length>1)continue;
-    const nc=h.indexOf('نام مغازه'),cc=h.indexOf('شهر');if(cc<0)continue;
-    for(let i=hi+1;i<rows.length;i++){const nm=String(rows[i][nc]??'').trim(),c=String(rows[i][cc]??'').trim();
+    const nc=h.indexOf('نام مغازه'),cc=h.indexOf('شهر');
+    for(let i=hi+1;i<rows.length;i++){const nm=String(rows[i][nc]??'').replace(/\s+/g,' ').trim(),c=(cc>=0?String(rows[i][cc]??'').trim():'')||CITYMAP[nm]||'';
       if(nm&&!nm.startsWith('جمع')&&c)m[c]=(m[c]||0)+1}}
   return m}
 function isDataRow(r,nc){const nm=String(r[nc]??'').trim();return nm&&!nm.startsWith('جمع')}
