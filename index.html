@@ -859,7 +859,8 @@ function viewCList(){
         const isBk=h[c].startsWith('بوک');
         return `<td class="${cls.trim()}"><input class="cl_in${isBk?' '+bkCls(r[c]):''}${BAD.has(sn+'|'+i+'|'+c)?' bad':''}" ${h[c]==='شهر'?'list="cl_cities"':''} data-s="${esc(sn)}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`}).join('');
       const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
-      body.push(`<tr><td class="n">${fa(k)}</td>${cells}${tail}</tr>`)}
+      const sh=edit?null:CAL.find(x=>x.sheet===sn&&nz(x.name)===nz(r[nc]));
+      body.push(`<tr${sh?` class="clk" data-shop="${sh.id}"`:''}><td class="n">${fa(k)}</td>${cells}${tail}</tr>`)}
     const hd=cols.map(c=>`<th>${esc(h[c])}</th>`).join('');
     return `<div class="box cl_sec" style="width:100%;margin:0;padding:0;overflow:hidden;direction:rtl">
      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:#faf6ec;border-bottom:1px solid #eadfc4">
@@ -1134,12 +1135,37 @@ function codeBlock(codes,mx,title){
   const tot=l.reduce((x,[,v])=>x+v.q,0),top=l[0][1].q||1;
   return `<h4>${title} <small>(${fa(l.length)} کد · ${fm(tot)} متر)</small></h4><div class="wrap"><table>${l.map(([k,v])=>`<tr class="clk" data-code="${esc(k)}"><td dir="ltr" style="text-align:right">${esc(k)}</td><td class="n"><b>${fm(v.q)}</b></td><td style="min-width:70px"><div class="bar"><i style="width:${Math.max(0,v.q/top*100)}%"></i></div></td><td>${spark(v.mo,mx)}</td></tr>`).join('')}</table></div>`;
 }
+function shopExtra(s,a,mx){
+  const all=CAL.filter(x=>x.acc&&x.acc.tot>0).sort((p,q)=>q.acc.tot-p.acc.tot);
+  const rk=all.findIndex(x=>x===s)+1,sh=all.filter(x=>x.sheet===s.sheet),rs=sh.findIndex(x=>x===s)+1;
+  const names=new Set(a.cust),rows=ACC.rows.filter(r=>names.has(r[0]));
+  const pos=rows.filter(r=>r[4]>0),ret=rows.filter(r=>r[4]<0).reduce((t,r)=>t+r[4],0);
+  const dates=[...new Set(pos.map(r=>r[1]))].sort(),nOrd=dates.length;
+  const act=a.mo.slice(1,mx+1),act0=act.filter(v=>v>0).length;
+  const l3=act.slice(-3).reduce((x,y)=>x+y,0),p3=act.slice(-6,-3).reduce((x,y)=>x+y,0);
+  const tr=p3?Math.round((l3-p3)/p3*100):null;
+  const lastM=act.map((v,i)=>v>0?i+1:0).reduce((x,y)=>Math.max(x,y),0);
+  const share=ACC.total?a.tot/ACC.total*100:0;
+  const nCodes=Object.keys(a.codes).filter(k=>a.codes[k].q>0).length;
+  const top=Object.entries(a.codes).sort((p,q)=>q[1].q-p[1].q).slice(0,5);
+  const card=(l,v,sb)=>`<div class="card"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${sb||''}</div></div>`;
+  let x=card('رتبه در کل مشتریان','#'+fa(rk),'از '+fa(all.length)+' مشتری فعال')+card('رتبه در راسته','#'+fa(rs),esc(s.sheet)+' · از '+fa(sh.length))+card('سهم از کل فروش',fa(Math.round(share*10)/10)+'٪','')
+   +card('تعداد روز سفارش',fa(nOrd),'میانگین '+fm(nOrd?a.tot/nOrd:0)+' متر در هر سفارش')+card('ماه‌های فعال',fa(act0)+' از '+fa(mx),'میانگین ماهانه '+fm(mx?a.tot/mx:0))
+   +card('تعداد کد خریداری‌شده',fa(nCodes),'')+card('آخرین سفارش',dates.length?esc(dates[dates.length-1]):'-',lastM&&lastM<mx?'<span style="color:#dc2626">'+fa(mx-lastM)+' ماه بدون خرید</span>':'')
+   +card('روند ۳ ماه اخیر',tr==null?'-':(tr>0?'▲ ':tr<0?'▼ ':'')+fa(Math.abs(tr))+'٪',tr==null?'':'نسبت به ۳ ماه قبل');
+  if(ret)x+=card('برگشتی',fm(-ret),'متر');
+  let t='';if(top.length){const mx0=top[0][1].q||1;t=`<h4>پرخرید‌ترین کدها</h4><div class="wrap"><table>${top.map(([k,v])=>`<tr class="clk" data-code="${esc(k)}"><td>${esc(k)}</td><td>${esc(v.g||'')}</td><td class="n"><b>${fm(v.q)}</b></td><td class="n">${fa(Math.round(v.q/a.tot*100))}٪</td><td style="min-width:80px"><div class="bar"><i style="width:${Math.max(0,v.q/mx0*100)}%"></i></div></td></tr>`).join('')}</table></div>`}
+  const mm=Math.max(1,...act);
+  const ch=`<h4>روند سفارش (متر در ماه)</h4><div class="months" style="height:110px">${act.map((v,i)=>`<div class="mc"><span>${v?fa(Math.round(v)):''}</span><b style="height:${Math.max(0,v)/mm*100}%"></b></div>`).join('')}</div><div class="note" style="display:flex;justify-content:space-around">${act.map((v,i)=>`<small>${MONTHS[i].slice(0,3)}</small>`).join('')}</div>`;
+  return `</div><h4>خلاصه و رتبه</h4><div class="cards">${x}</div>`+ch+t+`<div class="cards" style="display:none">`;
+}
 function shopProfile(id){
   const s=CAL[id];if(!s)return;const a=ACC&&s.acc&&s.acc.cust.length?s.acc:null,mx=ACC?ACC.maxM:S.cur;
   const rowsM=[];for(let k=1;k<=Math.max(mx,S.cur);k++)rowsM.push(k);
   let h=`<h3>${esc(s.name)}</h3><p class="note">${esc(s.sheet)} · ${ytag(s.year)} <small>${esc(s.book)}</small> ${s.hanger?'· هنگر دارد':''} · ${stag(s.status)}</p>
   <div class="cards"><div class="card"><div class="l">خرید طبق لیست ماهانه</div><div class="v">${fm(s.total)}</div><div class="s">متر</div></div>`;
   if(a)h+=`<div class="card g"><div class="l">خرید طبق حسابداری</div><div class="v">${fm(a.tot)}</div><div class="s">متر · اختلاف ${fm(a.tot-s.total)}</div></div><div class="card"><div class="l">بوک جدید (RION)</div><div class="v">${fm(a.act)}</div><div class="s">متر</div></div><div class="card w"><div class="l">قدیمی / سایر</div><div class="v">${fm(a.tot-a.act)}</div><div class="s">متر</div></div>`;
+  if(a)h+=shopExtra(s,a,mx);
   h+=`</div><h4>خرید ماه به ماه</h4><div class="wrap"><table><tr><th></th>${rowsM.map(k=>`<th class="n">${MONTHS[k-1].slice(0,4)}</th>`).join('')}</tr>
   <tr><td>لیست ماهانه</td>${rowsM.map(k=>mcell(s.m[k],s.m[k]===0?'z':'')).join('')}</tr>
   ${a?`<tr><td>حسابداری</td>${rowsM.map(k=>mcell(Math.round(a.mo[k]*10)/10,!a.mo[k]?'z':'')).join('')}</tr><tr><td>اختلاف</td>${rowsM.map(k=>{const d=Math.round((a.mo[k]-(s.m[k]||0))*10)/10;return `<td class="n" style="${d?'color:#b45309':''}">${d?fa(d):''}</td>`}).join('')}</tr>`:''}</table></div>`;
