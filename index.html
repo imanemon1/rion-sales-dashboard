@@ -694,6 +694,10 @@ function buildCal(sheets){
 function applyAcc(){
   if(!ACC||!CAL.length)return;
   CAL.forEach((s,i)=>{s.id=i;s.m=s.acc.mo.slice();s.m[0]=0;s.total=s.m.reduce((a,b)=>a+b,0)});
+  D.reps.forEach(r=>{
+    r.m0=r.m0||r.m.slice();
+    if(r.acc&&r.acc.cust.length){const mo=r.acc.mo.slice();mo[0]=0;r.m=mo;r.total=mo.reduce((a,b)=>a+b,0)}
+  });
   D.shops=CAL;
   if(!S.curSet){S.cur=ACC.maxM;S.curSet=1;const e=$('cur');if(e)e.value=S.cur}
   enrich();
@@ -712,8 +716,10 @@ function buildAcc(rows){
     o.q+=q;o.amt+=a;o.mo[m]+=q;o.cu[c]=(o.cu[c]||0)+q;(o.ev=o.ev||[]).push([c,d,q,a]);
   });
   const unm=[],fz=[];
+  D.reps.forEach(r=>{r.acc=null});
   Object.values(cust).forEach(u=>{
-    const r=matchShop(u.name,CAL);
+    let r=matchShop(u.name,CAL);
+    if(!r){const rr=matchShop(u.name,D.reps);if(rr)r=rr}
     if(r){u.shop=r.s;u.how=r.how;if(r.how==='fuzzy')fz.push([u.name,r.s.name,r.r]);
       const s=r.s;s.acc=s.acc||{tot:0,act:0,mo:Array(13).fill(0),codes:{},cust:[]};
       s.acc.tot+=u.tot;s.acc.act+=u.act;u.mo.forEach((v,i)=>s.acc.mo[i]+=v);s.acc.cust.push(u.name);
