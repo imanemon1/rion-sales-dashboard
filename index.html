@@ -294,7 +294,7 @@ const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرد�
 const DEF={target:40000,newGoal:80,base:null};
 const getCfg=()=>{try{return {...DEF,...JSON.parse(localStorage.getItem('rionCfg')||'{}')}}catch(e){return {...DEF}}};
 const setCfg=c=>localStorage.setItem('rionCfg',JSON.stringify(c));
-const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها، راسته‌ها و نماینده‌ها'],['codes','کدها'],['years','مقایسه سال‌ها'],['plan','پخش کشور'],['clist','لیست پخش کالیته']];
+const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['fu','پیگیری'],['collect','جمع‌آوری بوک'],['sheets','شهرها، راسته‌ها و نماینده‌ها'],['codes','کدها'],['years','مقایسه سال‌ها'],['plan','پخش کشور'],['clist','لیست پخش کالیته']];
 const STL={ok:'فعال',g1:'یک ماه بی‌خرید',g2:'دو ماه بی‌خرید',g3:'سه ماه+ بی‌خرید',never:'بدون خرید'};
 const mcell=(v,cls='',attr='')=>`<td class="n ${cls}" ${attr}>${v==null?'':fa(v)}</td>`;
 const fa=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:1});
@@ -535,6 +535,55 @@ function viewInactive(){
   ${groups.map(([k,t])=>{const a=D.shops.filter(s=>s.status===k).sort((x,y)=>y.total-x.total);
    return `<div class="box"><h2>${t} (${fa(a.length)})</h2><div class="wrap"><table><tr><th>مغازه</th><th>شیت</th><th>بوک</th><th class="n">آخرین خرید</th><th class="n">جمع سال</th></tr>
    ${a.map(s=>`<tr>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td>${ytag(s.year)} <small>${esc(s.book)}</small></td><td class="n">${s.lastBuy?MONTHS[s.lastBuy-1]:'—'}</td><td class="n">${fa(s.total)}</td></tr>`).join('')||'<tr><td>موردی نیست ✔</td></tr>'}</table></div></div>`}).join('')}`;
+}
+
+
+/* ---- follow-up ---- */
+let FU=null,FUT=null,FUMSG='';
+function getFU(){if(!FU){try{FU=JSON.parse(localStorage.getItem('rionFU')||'null')}catch(e){}if(!FU||typeof FU!=='object'||Array.isArray(FU))FU={}}return FU}
+async function fetchFU(){try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.fuPath}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch(e){return null}}
+function fuSave(){localStorage.setItem('rionFU',JSON.stringify(getFU()));clearTimeout(FUT);const m=$('fu_msg');if(m)m.textContent='در حال ذخیره…';
+  FUT=setTimeout(async()=>{let r='';try{r=await ghPush(getFU(),GH.fuPath,'followup')==='ok'?'✔ ذخیره شد':'ذخیره فقط روی این مرورگر (توکن ثبت نشده)'}catch(e){r='⚠ ثبت در گیت‌هاب نشد ('+e.message+')'}FUMSG=r;const m=$('fu_msg');if(m)m.textContent=r},700)}
+const fuKey=s=>s.sheet+'|'+String(s.name).replace(/\s+/g,' ').trim();
+const FU_ST=[['open','باز'],['prog','در حال پیگیری'],['back','بازگشته به خرید'],['closed','بسته شد']];
+const FU_RS=['','قیمت','موجودی / کمبود کد','ارسال / حمل','طرح قدیمی شده','فروش کم شده','جواب نداد','نیاز به تماس بعدی','سایر'];
+const FU_TPL={g1:'سلام {name} عزیز، وقت بخیر. مدتی است سفارش نداشتیم؛ اگر چیزی نیاز دارید در خدمتیم.',g2:'سلام {name} عزیز، وقت بخیر. چند وقتی است خبری از شما نداریم. اگر مشکلی از قیمت، موجودی یا ارسال بوده بفرمایید تا حلش کنیم.',g3:'سلام {name} عزیز، وقت بخیر. از شما دلتنگ شدیم! طرح و کدهای جدیدی داریم که فکر می‌کنم برای مغازه‌تان مناسب است. اجازه هست نمونه‌اش را بفرستم؟',never:'سلام {name} عزیز، وقت بخیر. من از مجموعه ریون هستم. خوشحال می‌شویم معرفی کوتاهی از طرح‌هایمان داشته باشیم و برای اولین سفارش در خدمتتان باشیم.'};
+const fuPh=v=>{let d=String(v||'').replace(/[۰-۹]/g,c=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(c)).replace(/\D/g,'');if(d.startsWith('0098'))d=d.slice(4);else if(d.startsWith('98'))d=d.slice(2);if(d.startsWith('0'))d=d.slice(1);return d};
+const fuToday=()=>new Date().toISOString().slice(0,10);
+function viewFU(){
+  const today=fuToday(),F=getFU(),g=S.fg||'all';
+  const names={g3:'۳ ماه یا بیشتر',g2:'۲ ماه',g1:'۱ ماه',never:'هرگز خرید نکرده'};
+  let all=D.shops.filter(s=>names[s.status]);
+  const rec=s=>F[fuKey(s)]||{};
+  const due=all.filter(s=>{const r=rec(s);return r.next&&r.next<=today&&r.st!=='closed'&&r.st!=='back'});
+  const cnt=k=>all.filter(s=>s.status===k).length;
+  let a=all.filter(s=>g==='all'||(g==='due'?due.includes(s):s.status===g));
+  if(S.fs&&S.fs!=='all')a=a.filter(s=>(rec(s).st||'open')===S.fs);
+  const ord={g3:0,g2:1,g1:2,never:3};
+  a.sort((x,y)=>(due.includes(y)-due.includes(x))||(ord[x.status]-ord[y.status])||y.total-x.total);
+  const chip=(k,l,n)=>`<button class="btn ${g===k?'':'sec'}" data-fg="${k}">${l} (${fa(n)})</button>`;
+  return `<p class="note">مغازه‌های بی‌خرید با ماه جاری (<b>${MONTHS[S.cur-1]}</b>). هر تغییر خودکار ذخیره می‌شود. <b id="fu_msg">${esc(FUMSG)}</b></p>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${chip('all','همه',all.length)}${chip('due','موعد پیگیری',due.length)}${chip('g1','۱ ماه',cnt('g1'))}${chip('g2','۲ ماه',cnt('g2'))}${chip('g3','۳+ ماه',cnt('g3'))}${chip('never','بدون خرید',cnt('never'))}
+  <select id="fu_fs" style="padding:6px;border-radius:8px"><option value="all">همه وضعیت‌ها</option>${FU_ST.map(([k,l])=>`<option value="${k}" ${S.fs===k?'selected':''}>${l}</option>`).join('')}</select></div>
+  <div class="box"><div class="wrap"><table><tr><th>مغازه</th><th>گروه</th><th class="n">جمع سال</th><th>شماره</th><th>وضعیت</th><th>دلیل</th><th>یادداشت</th><th>پیگیری بعدی</th><th>ثبت‌کننده</th></tr>
+  ${a.map(s=>{const k=fuKey(s),r=rec(s),ph=fuPh(r.phone),od=r.next&&r.next<=today&&r.st!=='closed'&&r.st!=='back';
+   const wa=ph.length>=10?`<a class="btn" target="_blank" rel="noopener" href="https://wa.me/98${ph}?text=${encodeURIComponent((FU_TPL[s.status]||'').replace('{name}',s.name))}">واتساپ</a> <a class="btn sec" href="tel:+98${ph}">تماس</a>`:'';
+   return `<tr data-k="${esc(k)}" ${od?'style="background:#fff4e0"':''}>${shopCell(s)}<td><small>${names[s.status]}</small></td><td class="n">${fa(s.total)}</td>
+   <td><input class="fu_i" data-f="phone" value="${esc(r.phone||'')}" placeholder="09…" style="width:110px;direction:ltr"> ${wa}</td>
+   <td><select class="fu_i" data-f="st">${FU_ST.map(([v,l])=>`<option value="${v}" ${(r.st||'open')===v?'selected':''}>${l}</option>`).join('')}</select></td>
+   <td><select class="fu_i" data-f="reason">${FU_RS.map(v=>`<option ${r.reason===v?'selected':''}>${v}</option>`).join('')}</select></td>
+   <td><input class="fu_i" data-f="note" value="${esc(r.note||'')}" style="min-width:150px"></td>
+   <td><input type="date" class="fu_i" data-f="next" value="${esc(r.next||'')}"></td>
+   <td><select class="fu_i" data-f="by"><option></option>${['من','میثم'].map(v=>`<option ${r.by===v?'selected':''}>${v}</option>`).join('')}</select></td></tr>`}).join('')||'<tr><td>موردی نیست ✔</td></tr>'}</table></div></div>`}
+function bindFU(){
+  const app=$('app');
+  const upd=e=>{const i=e.target.closest('.fu_i');if(!i)return;const tr=i.closest('tr'),k=tr.dataset.k,F=getFU();const r=F[k]=F[k]||{};r[i.dataset.f]=i.value;r.ts=new Date().toISOString();
+    if(i.dataset.f==='st'&&(i.value==='prog'||i.value==='back')&&!r.start)r.start=fuToday();
+    if(i.dataset.f!=='note'&&i.dataset.f!=='phone')fuSave()};
+  app.oninput=e=>{const i=e.target.closest('.fu_i');if(i&&(i.dataset.f==='note'||i.dataset.f==='phone')){upd(e);clearTimeout(bindFU.t);bindFU.t=setTimeout(fuSave,900)}};
+  app.onchange=e=>{if(e.target.id==='fu_fs'){S.fs=e.target.value;draw();return}upd(e);if(e.target.dataset&&(e.target.dataset.f==='phone'||e.target.dataset.f==='note')){fuSave();if(e.target.dataset.f==='phone')draw()}
+    if(e.target.dataset&&e.target.dataset.f==='next')draw()};
+  app.onclick=e=>{const b=e.target.closest('[data-fg]');if(b){S.fg=b.dataset.fg;draw()}};
 }
 
 /* ---- collect books ---- */
@@ -907,7 +956,7 @@ function viewCList(){
   <div id="cl_chips" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;direction:rtl">${names.map(n=>`<button class="btn ${n===S.clsel?'':'sec'} cl_chip" data-s="${esc(n)}">${esc(n)} <span style="opacity:.7;font-size:12px">${fa(cntOf(n))}</span></button>`).join('')}</div>
   <div id="cl_row" style="direction:rtl">${secs}</div>
   <div id="cl_val">${clValHTML()}${clUnmHTML()}</div></div>`}
-const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json',ignPath:'kalite/ignored.json',aliasPath:'kalite/alias.json'};
+const GH={repo:'imanemon1/rion-sales-dashboard',branch:'main',path:'kalite/calist.json',accPath:'kalite/accounting.json',ignPath:'kalite/ignored.json',aliasPath:'kalite/alias.json',fuPath:'kalite/followup.json'};
 let ALIAS=null;
 function getAlias(){if(!ALIAS){try{ALIAS=JSON.parse(localStorage.getItem('rionAlias')||'null')}catch(e){}if(!ALIAS||typeof ALIAS!=='object'||Array.isArray(ALIAS))ALIAS={}}return ALIAS}
 async function aliasSave(){localStorage.setItem('rionAlias',JSON.stringify(getAlias()));try{return await ghPush(getAlias(),GH.aliasPath,'alias')==='ok'}catch(e){return false}}
@@ -1319,11 +1368,12 @@ function _draw(){
   $('gear').classList.toggle('on',S.tab==='settings');
   if(!D){$('nav').innerHTML='';$('app').innerHTML=S.tab==='settings'?viewSettings():'<div id="empty">برای شروع، از ⚙ گوشه بالا-چپ فایل اکسل را بارگذاری کنید.</div>';if(S.tab==='settings')bindSettings();return}
   $('nav').innerHTML=TABS.map(([k,t])=>`<button class="${S.tab===k?'on':''}" data-t="${k}">${t}</button>`).join('');
-  const v={over:viewOver,shops:viewShops,inactive:viewInactive,collect:viewCollect,sheets:viewSheetsReps,codes:viewCodes,years:viewYears,plan:viewPlan,clist:viewCList,settings:viewSettings}[S.tab];
+  const v={over:viewOver,shops:viewShops,inactive:viewInactive,fu:viewFU,collect:viewCollect,sheets:viewSheetsReps,codes:viewCodes,years:viewYears,plan:viewPlan,clist:viewCList,settings:viewSettings}[S.tab];
   $('app').innerHTML=v();
   if(S.tab==='shops')bindShops();
   if(S.tab==='sheets')bindSheets();
   if(S.tab==='clist')bindCList();
+  if(S.tab==='fu')bindFU();
   if(S.tab==='settings')bindSettings();
 }
 $('gear').onclick=()=>{S.tab='settings';draw(false);scrollTo(0,0)};
@@ -1398,6 +1448,7 @@ $('guide').addEventListener('click',e=>{
 
 const SAVED=(()=>{try{return JSON.parse(localStorage.getItem('rionData')||'null')}catch(e){return null}})();
 (async()=>{const ra=await fetchRemoteAcc();if(ra&&ra.length){ACCR=ra;localStorage.setItem('rionAcc',JSON.stringify(ra))}
+{const fr=await fetchFU();if(fr&&typeof fr==='object'&&!Array.isArray(fr)){FU=fr;localStorage.setItem('rionFU',JSON.stringify(fr))}}
 const rl=await fetchAlias();if(rl&&typeof rl==='object'&&!Array.isArray(rl)){ALIAS=rl;localStorage.setItem('rionAlias',JSON.stringify(rl))}
 const ri=await fetchIgn();if(Array.isArray(ri)){IGN=ri;localStorage.setItem('rionIgn',JSON.stringify(ri))}
 const rm=await fetchRemote();if(rm){localStorage.setItem(CLK,JSON.stringify(rm));CLW=null}
