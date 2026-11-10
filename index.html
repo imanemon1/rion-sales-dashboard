@@ -294,7 +294,7 @@ const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرد�
 const DEF={target:40000,newGoal:80,base:null};
 const getCfg=()=>{try{return {...DEF,...JSON.parse(localStorage.getItem('rionCfg')||'{}')}}catch(e){return {...DEF}}};
 const setCfg=c=>localStorage.setItem('rionCfg',JSON.stringify(c));
-const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها و راسته‌ها'],['reps','نماینده‌ها'],['codes','کدها'],['years','مقایسه سال‌ها'],['plan','پخش کشور'],['clist','لیست پخش کالیته']];
+const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['collect','جمع‌آوری بوک'],['sheets','شهرها، راسته‌ها و نماینده‌ها'],['codes','کدها'],['years','مقایسه سال‌ها'],['plan','پخش کشور'],['clist','لیست پخش کالیته']];
 const STL={ok:'فعال',g1:'یک ماه بی‌خرید',g2:'دو ماه بی‌خرید',g3:'سه ماه+ بی‌خرید',never:'بدون خرید'};
 const mcell=(v,cls='',attr='')=>`<td class="n ${cls}" ${attr}>${v==null?'':fa(v)}</td>`;
 const fa=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:1});
@@ -603,6 +603,10 @@ function viewSheets(){
 /* ---- reps ---- */
 const SET_PASS='3594';
 const unlocked=()=>sessionStorage.getItem('rionOK')==='1';
+function viewSheetsReps(){
+  const a=viewSheets(),b=D.reps.length?viewReps():'';
+  return a+b;
+}
 function viewSettings(){
   if(!unlocked())return `<div class="box"><h2>ورود به تنظیمات</h2><p class="note">برای ورود به تنظیمات، رمز را وارد کنید.</p>
   <div class="upl"><input id="s_pw" type="password" inputmode="numeric" placeholder="رمز" autocomplete="off" style="padding:9px 12px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;width:160px"><button class="btn" id="s_login">ورود</button></div>
@@ -1072,7 +1076,7 @@ function viewYears(){
   if(sub==='trend'){
     const prev=L.length>1?L[L.length-2]:null,best=L.filter(o=>!o.partial).sort((a,b)=>tot(b)-tot(a))[0];
     body=`<div class="cards"><div class="card"><div class="l">${yname(cur)} تا ${MONTHS[up-1]}</div><div class="v">${fm(per(cur))}</div><div class="s">متر</div></div>
-    ${prev?`<div class="card ${per(cur)>=per(prev)?'g':'b'}"><div class="l">همین بازه در ${yname(prev).split(' ')[0]}</div><div class="v">${fm(per(prev))}</div><div class="s">تغییر: ${ychg(ypct(per(cur),per(prev)))}</div></div>`:''}
+    ${L.length>1?`<div class="card b" style="grid-column:1/-1"><div class="l">${yname(cur)} تا ${MONTHS[up-1]} نسبت به سال‌های قبل</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:10px">${L.slice(0,-1).map(o=>{const v=ypct(per(cur),per(o));return `<div style="aspect-ratio:1;border:1px solid #e2e8f0;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px;background:#fff"><div style="font-size:12px;color:#64748b">همین بازه در ${yname(o).split(' ')[0]}</div><div style="font-weight:bold;font-size:15px;margin:4px 0">${fm(per(o))}</div><div style="font-size:12px">${v==null?'—':ychg(v)}</div></div>`}).join('')}</div></div>`:''}
     ${best?`<div class="card w"><div class="l">بهترین سال کامل</div><div class="v">${yname(best)}</div><div class="s">${fm(tot(best))} متر</div></div>`:''}</div>
     <div class="box"><h2>متراژ فروش هر سال</h2>${yBars(L,L.map(tot))}${note}</div>
     <div class="box"><h2>جدول مقایسه</h2><div class="wrap"><table><tr><th>سال</th><th class="n">کل سال (متر)</th><th class="n">تا ${MONTHS[up-1]}</th><th class="n">تغییر در همین بازه</th><th class="n">مشتری</th><th class="n">کد</th><th class="n">ردیف سفارش</th><th class="n">متر به‌ازای هر مشتری</th><th class="n">برگشتی (متر)</th></tr>
@@ -1225,7 +1229,8 @@ function lineChart(series,focus){
   const lab=MONTHS.map((m,i)=>`<text x="${xs(i+1)}" y="${H-10}" text-anchor="middle">${m.slice(0,4)}</text>`).join('');
   return `<svg class="lc" viewBox="0 0 ${W} ${H}" role="img" aria-label="نمودار خطی فروش"><defs>${defs}</defs>${g}${lab}${body}</svg>`;
 }
-function viewReps(){
+function viewReps(){ // merged into viewSheetsReps
+
   if(!D.reps.length)return '<div class="box">نماینده‌ای در فایل نیست.</div>';
   const series=D.reps.map((r,i)=>({name:r.name,color:LCOL[i%LCOL.length],vals:r.m}));
   const tot=Array(13).fill(0);D.reps.forEach(r=>{for(let k=1;k<=12;k++)tot[k]+=r.m[k]});
@@ -1252,7 +1257,7 @@ function guideItems(){
     if(b>0&&a<b*.8)it.push({pr:2,t:'فروش ماه جاری از ماه قبل کمتر است',d:`${fa(a)} متر در برابر ${fa(b)} متر ماه قبل. دلیل افت را با مغازه‌های بی‌خرید بررسی کنید.`,tab:'over'});
     else if(a>b*1.2&&b>0)it.push({pr:3,t:'فروش ماه جاری رشد داشته',d:`${fa(a)} متر در برابر ${fa(b)} متر ماه قبل.`,tab:'over'});
     const drop=D.reps.filter(r=>r.m[c-1]>0&&r.m[c]<r.m[c-1]*.7).map(r=>r.name);
-    if(drop.length)it.push({pr:2,t:'افت فروش نماینده‌ها',d:`فروش این ماه کمتر از ماه قبل: ${drop.join('، ')}.`,tab:'reps'});
+    if(drop.length)it.push({pr:2,t:'افت فروش نماینده‌ها',d:`فروش این ماه کمتر از ماه قبل: ${drop.join('، ')}.`,tab:'sheets'});
   }
   const inactive=D.shops.filter(s=>['g1','g2','g3'].includes(s.status));
   if(inactive.length){
@@ -1308,7 +1313,7 @@ function _draw(){
   $('gear').classList.toggle('on',S.tab==='settings');
   if(!D){$('nav').innerHTML='';$('app').innerHTML=S.tab==='settings'?viewSettings():'<div id="empty">برای شروع، از ⚙ گوشه بالا-چپ فایل اکسل را بارگذاری کنید.</div>';if(S.tab==='settings')bindSettings();return}
   $('nav').innerHTML=TABS.map(([k,t])=>`<button class="${S.tab===k?'on':''}" data-t="${k}">${t}</button>`).join('');
-  const v={over:viewOver,shops:viewShops,inactive:viewInactive,collect:viewCollect,sheets:viewSheets,reps:viewReps,codes:viewCodes,years:viewYears,plan:viewPlan,clist:viewCList,settings:viewSettings}[S.tab];
+  const v={over:viewOver,shops:viewShops,inactive:viewInactive,collect:viewCollect,sheets:viewSheetsReps,codes:viewCodes,years:viewYears,plan:viewPlan,clist:viewCList,settings:viewSettings}[S.tab];
   $('app').innerHTML=v();
   if(S.tab==='shops')bindShops();
   if(S.tab==='sheets')bindSheets();
