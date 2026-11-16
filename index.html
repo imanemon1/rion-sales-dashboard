@@ -259,7 +259,7 @@ html,body{max-width:100%;overflow-x:hidden}
 }
 .shl{cursor:pointer;color:inherit;text-decoration:underline dotted;text-underline-offset:3px}.shl:hover{color:#1d4ed8}.clk{cursor:pointer}.clk:hover td{background:#f4f7ff}.spk{display:inline-flex;align-items:flex-end;gap:2px;height:22px}.spk i{display:block;width:5px;background:#2f5bea;border-radius:1px}
 .cl_in.bad{border:2px solid #c0392b!important;background:#fdecea}
-.bk5{background:#cfe3ff!important}.bk4{background:#d4f5dc!important}.bkS{background:#ffe3c2!important}
+.bkS{background:#ffe3c2!important}
 .cl_t{width:auto}.cl_t td,.cl_t th{padding:4px 6px;vertical-align:middle}.cl_t td.nm{min-width:260px;white-space:normal;line-height:1.6}.cl_t .cl_in{width:120px;box-sizing:border-box}.cl_t td.nm .cl_in{width:260px}.cl_t td.n{white-space:nowrap}
 </style>
 </head>
@@ -345,7 +345,12 @@ function enrich(){
   });
 }
 const yl=y=>y?'۱۴۰'+fa(y):'؟';
-const ytag=y=>`<span class="tag ${y>=5?'new':y===4?'mid':y?'old':'gray'}">بوک ${yl(y)}</span>`;
+const YC0={5:'#cfe3ff',4:'#d4f5dc',3:'#fee2e2',2:'#fef3c7',1:'#e9d5ff',0:'#e5e7eb'};
+function getYC(){try{return Object.assign({},YC0,JSON.parse(localStorage.getItem('rionYC')||'{}'))}catch(e){return Object.assign({},YC0)}}
+function applyYC(){const c=getYC();let st=document.getElementById('ycss');if(!st){st=document.createElement('style');st.id='ycss';document.head.appendChild(st)}
+  st.textContent=Object.keys(c).map(y=>`.bk${y}{background:${c[y]}!important}.tag.y${y}{background:${c[y]};color:#1f2937}`).join('')}
+applyYC();
+const ytag=y=>`<span class="tag ${y?'y'+y:'gray'}">بوک ${yl(y)}</span>`;
 const stag=s=>`<span class="st ${s}">${STL[s]}</span>`;
 const shopId=s=>{if(!s)return -1;const n=x=>String(x??'').replace(/\s+/g,' ').trim();if(s.id!=null&&CAL[s.id]&&n(CAL[s.id].name)===n(s.name))return s.id;const c=CAL.find(x=>x.sheet===s.sheet&&n(x.name)===n(s.name))||CAL.find(x=>n(x.name)===n(s.name));return c?c.id:-1};
 const shopA=s=>{const i=shopId(s);return i<0?esc(s.name):`<a class="shl" data-shop="${i}">${esc(s.name)}</a>`};
@@ -937,7 +942,7 @@ function clValHTML(){
   <div style="max-height:260px;overflow:auto;margin-top:6px"><table class="t"><tbody>${is.map((x,j)=>`<tr><td style="color:${x.lv==='e'?'#c0392b':'#b9770e'}">${x.lv==='e'?'خطا':'هشدار'}</td><td>${esc(x.sn)}</td><td><b>${esc(x.nm)}</b></td><td>${lab[x.k]}: ${esc(x.m)}</td><td style="white-space:nowrap"><button class="btn sec cl_go" data-s="${esc(x.sn)}" data-r="${x.i}" data-c="${x.c}">برو به سلول</button>${x.fix?` <button class="btn cl_fix" data-s="${esc(x.sn)}" data-r="${x.i}" data-c="${x.c}" data-v="${esc(x.fix)}">اصلاح به ${esc(x.fix)}</button>`:''}${x.del?` <button class="btn sec cl_rm" data-s="${esc(x.sn)}" data-r="${x.i}">حذف این ردیف</button>`:''}</td></tr>`).join('')}</tbody></table></div>
   <p class="note">قبل از ذخیره، موارد قرمز را اصلاح کنید.</p></div>`}
 function keepDraw(){const y=window.scrollY,p=document.querySelector('#cl_val>div>div'),pt=p?p.scrollTop:0;draw();scrollTo(0,y);const q=document.querySelector('#cl_val>div>div');if(q)q.scrollTop=pt}
-function bkCls(v){v=String(v??'');if(/-5$/.test(v))return 'bk5';if(/-4$/.test(v))return 'bk4';if(/سند/.test(v))return 'bkS';return ''}
+function bkCls(v){v=String(v??'');const m=v.match(/-(\d)\s*$/);if(m)return 'bk'+m[1];if(/سند/.test(v))return 'bkS';return ''}
 let IGN=null;
 function getIgn(){if(!IGN){try{IGN=JSON.parse(localStorage.getItem('rionIgn')||'null')}catch(e){}if(!Array.isArray(IGN))IGN=[]}return IGN}
 async function ignSave(){localStorage.setItem('rionIgn',JSON.stringify(getIgn()));try{return await ghPush(getIgn(),GH.ignPath,'ignored')==='ok'}catch(e){return false}}
@@ -990,7 +995,7 @@ function viewCList(){
   const edit=S.clm==='edit';
   const cntOf=n=>{const rr=CLW[n],hh=hdrIdx(rr);if(hh<0)return 0;const nn=hdrOf(rr[hh]).indexOf('نام مغازه');return rr.slice(hh+1).filter(r=>isDataRow(r,nn)).length};
   const tot=names.reduce((a,n)=>a+cntOf(n),0);
-  const legend=`<div class="note" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center"><span><i class="bk5" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۵ (۵-)</span><span><i class="bk4" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> بوک ۱۴۰۴ (۴-)</span><span><i class="bkS" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> سند</span></div>`;
+  const yc=getYC(),legend=`<div class="note" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center"><b>رنگ هر سال (قابل تغییر):</b>${[5,4,3,2,1,0].map(y=>`<label style="display:flex;align-items:center;gap:4px"><input type="color" class="cl_yc" data-y="${y}" value="${yc[y]}" style="width:28px;height:22px;padding:0;border:0"> ${yl(y)} (${fa(y)}-)</label>`).join('')}<span><i class="bkS" style="display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle"></i> سند</span></div>`;
   const cities=new Set(Object.values(CITYMAP));try{JSON.parse(PLAN.match(/const R=(\[.*?\]),P=/s)[1]).forEach(x=>cities.add(x.c))}catch(e){}
   const secs=names.filter(n=>n===S.clsel).map(sn=>{
     const rows=CLW[sn],hi=hdrIdx(rows),h=hdrOf(rows[hi]),nc=h.indexOf('نام مغازه');
@@ -1076,6 +1081,7 @@ function bindCList(){
     if(h[c].startsWith('بوک-')||/^\d+$/.test(h[c])||(h[c]==='هنگر'&&h.filter(x=>x.startsWith('بوک')).length>1))v=v===''?null:num(v);
     rows[+i.dataset.r][c]=v===''?null:v};
   app.onchange=e=>{
+    if(e.target.classList.contains('cl_yc')){const c=getYC();c[e.target.dataset.y]=e.target.value;localStorage.setItem('rionYC',JSON.stringify(c));applyYC();return}
     const mv=e.target.closest('.cl_mv');
     if(mv&&mv.value){const sn=mv.dataset.s,src=CLW[sn],dst=CLW[mv.value],r=src[+mv.dataset.r],sh=hdrOf(src[hdrIdx(src)]),dh=hdrOf(dst[hdrIdx(dst)]);
       const nr=dh.map(x=>{const k=sh.indexOf(x);return x==='ردیف'||k<0?null:r[k]});
