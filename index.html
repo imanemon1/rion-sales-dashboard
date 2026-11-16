@@ -331,6 +331,7 @@ function parse(sheets){
   return {shops,reps};
 }
 
+const todayM=()=>g2j(...new Date().toISOString().slice(0,10).split('-').map(Number))[1];
 function lastMonth(){let l=0;[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)if(s.m[k]>0&&k>l)l=k});return l||1}
 function enrich(){
   const c=S.cur;
@@ -374,7 +375,15 @@ function ovNums(){
   const nShops=D.shops.length, base=cfg.base??nShops, added=NEWSH().length, gN=cfg.newGoal||0;
   return {cfg,target,c,mon,sold,left,rem,need,pace,proj,cnt,inact,coll,shopM,repM,nShops,base,added,gN};
 }
-const NEWSH=()=>(CAL||[]).filter(s=>s.sheet==='جدید');
+// مغازه‌هایی که در سال جاری در شیت «جدید» بوده‌اند تا آخر سال شمرده می‌شوند، حتی بعد از انتقال به شیت دیگر
+function NEWSH(){
+  const y='y'+g2j(...new Date().toISOString().slice(0,10).split('-').map(Number))[0];
+  let R={};try{R=JSON.parse(localStorage.getItem('rionNewReg')||'{}')}catch(e){}
+  const set=new Set(R.y===y?R.n:[]),n0=set.size;
+  (CAL||[]).forEach(s=>{if(s.sheet==='جدید')set.add(s.name)});
+  if(set.size!==n0||R.y!==y)localStorage.setItem('rionNewReg',JSON.stringify({y,n:[...set]}));
+  return (CAL||[]).filter(s=>set.has(s.name));
+}
 function statBlock(){
   const c=S.cur, by=k=>D.shops.filter(s=>s.status===k);
   const upd=D.shops.filter(s=>s.year===4&&['ok','g1','g2'].includes(s.status));
@@ -471,7 +480,7 @@ function viewOver(){
    <div class="months"><div class="tline" style="bottom:${mT/maxM*100}%"><em>هدف ${fa(mT)}</em></div>
    ${o.mon.slice(1).map((v,i)=>`<div class="mc ${i+1>c?'f':''} ${i+1===c?'cur':''}"><span>${v?fa(v):''}</span><b style="height:${v/maxM*100}%"></b></div>`).join('')}</div>
    <div class="mlab">${MONTHS.map(m=>`<div><span>${m}</span></div>`).join('')}</div></div>
-  <div class="two"><div class="box"><h2>۱۰ مغازه برتر</h2><div class="wrap"><table>${[...D.shops].sort(byTot).slice(0,10).map((s,i)=>`<tr><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td class="n">${fa(s.total)}</td></tr>`).join('')}</table></div></div>
+  <div class="two"><div class="box"><h2>۲۰ مغازه برتر</h2><div class="wrap"><table>${[...D.shops].sort(byTot).slice(0,20).map((s,i)=>`<tr><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td class="n">${fa(s.total)}</td></tr>`).join('')}</table></div></div>
   <div class="box"><h2>سهم بوک‌ها از فروش مغازه‌ها</h2>${yearTable()}</div></div>`;
 }
 function yearTable(){
@@ -789,7 +798,7 @@ function applyAcc(){
     if(r.acc&&r.acc.cust.length){const mo=r.acc.mo.slice();mo[0]=0;r.m=mo;r.total=mo.reduce((a,b)=>a+b,0)}
   });
   D.shops=CAL;
-  if(!S.curSet){S.cur=ACC.maxM;S.curSet=1;const e=$('cur');if(e)e.value=S.cur}
+  if(!S.curSet){S.cur=todayM();S.curSet=1;const e=$('cur');if(e)e.value=S.cur}
   enrich();
 }
 function buildAcc(rows){
@@ -851,7 +860,7 @@ async function fetchDisc(){try{const r=await fetch(`https://raw.githubuserconten
 function dsChg(){DSDIRTY=true;dsSave();DSMSG='';draw()}
 async function dsPush(){
   DSDIRTY=false;dsSave();
-  try{DSMSG=await ghPush(getDS(),GH.dsPath,'discount')==='ok'?'✔ ذخیره شد و برای همه ثبت شد':'✔ ذخیره شد (فقط روی این مرورگر؛ توکن گیت‌هاب ثبت نشده)'}catch(e){DSMSG='⚠ روی این مرورگر ذخیره شد ولی در گیت‌هاب ثبت نشد ('+e.message+')'}
+  try{DSMSG=await ghPush(getDS(),GH.dsPath,'discount')==='ok'?'✔ ذخیره شد و برای همه ثبت شد':(alert('⚠ ذخیره نشد: توکن وجود ندارد. تغییرات فقط روی این مرورگر ماند و برای بقیه ثبت نشد'),'⚠ ذخیره نشد: توکن وجود ندارد؛ فقط روی این مرورگر ماند')}catch(e){DSMSG='⚠ روی این مرورگر ذخیره شد ولی در گیت‌هاب ثبت نشد ('+e.message+')'}
   draw();
 }
 function dsWhere(d,g,n){return DS_SUB.filter(([k])=>k!==g&&d.g[k].shops[n]).map(([,l])=>l)}
@@ -861,6 +870,8 @@ function dsTbl(d,g,mo,ed){
     if(g==='t'){const disc=dsOut(dsStair(o.qn));return{k,sh:s.sheet,s:o,r:o.n?disc/o.n*100:0,disc}}
     if(g==='y'){const disc=dsOut(Math.max(0,o.qn-30)*3e5);return{k,sh:s.sheet,s:o,r:o.n?disc/o.n*100:0,disc}}
     const r=dsM(o.n)>50?10:dsM(o.n)>10?5:0;return{k,sh:s.sheet,s:o,r,disc:dsOut(o.n*r/100)}});
+  const key=x=>x.miss?-1:(g==='p'?x.s.n:x.s.qn);
+  rows.sort((a,b)=>key(b)-key(a));
   const tot=rows.reduce((a,x)=>a+(x.disc||0),0);
   const th='padding:8px 10px;background:#f3f6fb;color:#334;font-weight:600;border-bottom:1px solid #e2e7f0;white-space:nowrap';
   const td='padding:8px 10px;border-bottom:1px solid #eef1f6;white-space:nowrap';
@@ -902,7 +913,7 @@ function viewDisc(){
   </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 8px">${DS_SUB.map(([k,l])=>tab(k,l)).join('')}</div>
   <div class="note" style="margin-bottom:12px">${note} — واحد: ریال</div>
-  <div class="note" id="ds_msg" style="margin-bottom:8px">${DSMSG||(DSDIRTY?'تغییرات ذخیره نشده':'')}</div>
+  <div class="note" id="ds_msg" style="margin-bottom:8px;color:${DSMSG.includes('⚠')?'var(--bad)':'inherit'}">${DSMSG||(DSDIRTY?'تغییرات ذخیره نشده':'')}</div>
   <div class="wrap" style="overflow-x:auto" id="ds_tbl">${dsTbl(d,g,mo,ed)}</div></div>${pick}`;
 }
 function bindDisc(){
@@ -1513,7 +1524,7 @@ function load(sheets){
   D=parse(sheets);
   if(!D.shops.length&&!D.reps.length){$('app').innerHTML='<div id="empty">در این فایل شیتی با ستون «نام مغازه» پیدا نشد.</div>';return}
   LASTMSG='✔ فایل بارگذاری شد: '+fa(D.shops.length)+' مغازه';
-  S.cur=lastMonth();
+  S.cur=todayM();
   $('cur').innerHTML=MONTHS.map((m,i)=>`<option value="${i+1}" ${i+1===S.cur?'selected':''}>${m}</option>`).join('');
   D.shops.forEach((s,i)=>s.id=i);
   enrich();
