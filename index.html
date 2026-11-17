@@ -713,6 +713,7 @@ let _SHN=null;
 function shopOfDesc(d){const x=nz(d);if(!x)return null;if(!_SHN||_SHN.n!==CAL.length)_SHN={n:CAL.length,l:CAL.map(s=>[nz(s.name),s.name]).filter(a=>a[0].length>2).sort((a,b)=>b[0].length-a[0].length)};
   const h=_SHN.l.find(a=>x.includes(a[0]));return h?h[1]:null}
 const isVit=d=>/ویترین|ويترين/.test(d||'');
+function vitSet(){const s=new Set();if(ACC&&ACC.rows)ACC.rows.forEach(r=>{if(isVit(r[7])){const n=shopOfDesc(r[7]);if(n)s.add(nz(n))}});return s}
 function repRows(){const o={};if(!ACC)return o;ACC.rows.forEach(r=>{const u=ACC.cust[r[0]],s=u&&u.shop;if(s&&D.reps.includes(s))(o[s.name]=o[s.name]||[]).push(r)});return o}
 function grpBy(rows,keyf){const m={};rows.forEach(r=>{const k=keyf(r);if(!k)return;const o=m[k]||(m[k]={k,q:0,n:0,last:'',codes:{},ev:[]});o.q+=r[4];o.n++;if(r[1]>o.last)o.last=r[1];o.codes[r[2]]=(o.codes[r[2]]||0)+r[4];o.ev.push(r)});return Object.values(m).sort((a,b)=>b.q-a.q)}
 function gTbl(l,first){return `<div class="wrap"><table><tr><th>#</th><th>${first}</th><th class="n">متر</th><th class="n">تعداد ردیف</th><th>کدها</th><th>آخرین تاریخ</th></tr>${l.map((o,i)=>`<tr class="clk" data-evk="${esc(o.k)}"><td>${fa(i+1)}</td><td>${esc(o.k)}</td><td class="n"><b>${fm(o.q)}</b></td><td class="n">${fa(o.n)}</td><td dir="ltr" style="text-align:right">${Object.keys(o.codes).slice(0,4).map(esc).join('، ')}${Object.keys(o.codes).length>4?'…':''}</td><td>${esc(o.last)}</td></tr>`).join('')}</table></div>`}
@@ -1099,7 +1100,7 @@ function viewCList(){
   const secs=names.filter(n=>n===S.clsel).map(sn=>{
     const rows=CLW[sn],hi=hdrIdx(rows),h=hdrOf(rows[hi]),nc=h.indexOf('نام مغازه');
     const cols=clCols(rows,edit),MULTI=h.filter(x=>x.startsWith('بوک')).length>1;
-    const closed=false;const cnt=cntOf(sn);
+    const closed=false;const cnt=cntOf(sn);const VS=vitSet();
     const TG=names.filter(n=>n!==sn&&hdrOf(CLW[n][hdrIdx(CLW[n])]).filter(x=>x.startsWith('بوک')).length<2);
     const ISS=clIssues(),BAD=new Set(ISS.map(x=>x.sn+'|'+x.i+'|'+x.c));
     let k=0;const body=[];
@@ -1108,9 +1109,10 @@ function viewCList(){
         if(!edit)return `<td class="${cls.trim()}">${esc(r[c]??'')}</td>`;
         const isBk=h[c].startsWith('بوک');
         return `<td class="${cls.trim()}"><input class="cl_in${isBk?' '+bkCls(r[c]):''}${BAD.has(sn+'|'+i+'|'+c)?' bad':''}" ${h[c]==='شهر'?'list="cl_cities"':''} data-s="${esc(sn)}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`}).join('');
+      const vt=`<td class="n" style="text-align:center">${VS.has(nz(r[nc]))?'<span title="ویترین آویزان شده" style="color:#16a34a;font-weight:700;font-size:16px">✔</span>':''}</td>`;
       const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
       const sh=edit?null:CAL.find(x=>x.sheet===sn&&nz(x.name)===nz(r[nc]));
-      body.push(`<tr${sh?` class="clk" data-shop="${sh.id}"`:''}><td class="n">${fa(k)}</td>${cells}${tail}</tr>`)}
+      body.push(`<tr${sh?` class="clk" data-shop="${sh.id}"`:''}><td class="n">${fa(k)}</td>${cells}${vt}${tail}</tr>`)}
     const hd=cols.map(c=>`<th>${esc(h[c])}</th>`).join('');
     return `<div class="box cl_sec" style="width:100%;margin:0;padding:0;overflow:hidden;direction:rtl">
      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:#faf6ec;border-bottom:1px solid #eadfc4">
@@ -1120,7 +1122,7 @@ function viewCList(){
          <button class="btn sec cl_addcol" data-s="${esc(sn)}">＋ ستون جدید</button>
          ${cnt===0&&names.length>1?`<button class="btn sec cl_ds" data-s="${esc(sn)}">حذف شیت خالی</button>`:''}</span>`:''}
      </div>
-     ${closed?'':`<div style="overflow:auto;max-height:70vh;padding:8px"><table class="t cl_t"><thead><tr><th>#</th>${hd}${edit?(MULTI?'':'<th>جابجایی</th>')+'<th></th>':''}</tr></thead><tbody>${body.join('')||'<tr><td colspan="9" class="note">مغازه‌ای نیست</td></tr>'}</tbody></table></div>`}
+     ${closed?'':`<div style="overflow:auto;max-height:70vh;padding:8px"><table class="t cl_t"><thead><tr><th>#</th>${hd}<th style="text-align:center">ویترین</th>${edit?(MULTI?'':'<th>جابجایی</th>')+'<th></th>':''}</tr></thead><tbody>${body.join('')||'<tr><td colspan="99" class="note">مغازه‌ای نیست</td></tr>'}</tbody></table></div>`}
     </div>`}).join('');
   return `<div class="box"><h2>لیست پخش کالیته</h2>
   <p class="note">مجموع: <b>${fa(tot)}</b> مغازه. یک راسته را از دکمه‌های زیر انتخاب کنید تا کامل نمایش داده شود. برای تغییر، دکمه «✏️ ویرایش» را بزنید.</p>
