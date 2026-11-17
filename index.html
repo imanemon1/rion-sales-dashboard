@@ -523,10 +523,10 @@ function shopsTable(){
   const th=(k,t,cls='')=>`<th class="${cls}" data-sort="${k}">${t}${S.sort===k?(S.dir>0?' ▲':' ▼'):''}</th>`;
   const ms=[];for(let k=1;k<=12;k++)ms.push(th('m'+k,MONTHS[k-1].slice(0,4),'n'));
   const sum=a.reduce((x,s)=>x+s.total,0);
-  $('stbl').innerHTML=`<table><tr><th>#</th>${th('name','مغازه')}${th('sheet','شیت')}<th>شهر</th>${th('book','بوک')}<th>ویترین</th>${th('hanger','هنگر')}${ms.join('')}${th('total','جمع','n')}${th('status','وضعیت')}</tr>
-  ${a.map((s,i)=>{const cs=CAL.find(x=>x===s)||CAL.find(x=>x.sheet===s.sheet&&nz(x.name)===nz(s.name))||CAL.find(x=>nz(x.name)===nz(s.name));return `<tr${cs?` class="clk" data-shop="${cs.id}"`:''}><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td>${esc(cityOf(s.name))}</td><td>${ytag(s.year)} <small>${esc(s.book)}</small></td><td>${vitTick(s.name)}</td><td>${s.hanger?'✔':''}</td>
+  $('stbl').innerHTML=`<table><tr><th>#</th><th>ویترین</th>${th('name','مغازه')}${th('sheet','شیت')}<th>شهر</th>${th('book','بوک')}${th('hanger','هنگر')}${ms.join('')}${th('total','جمع','n')}${th('status','وضعیت')}</tr>
+  ${a.map((s,i)=>{const cs=CAL.find(x=>x===s)||CAL.find(x=>x.sheet===s.sheet&&nz(x.name)===nz(s.name))||CAL.find(x=>nz(x.name)===nz(s.name));return `<tr${cs?` class="clk" data-shop="${cs.id}"`:''}><td>${fa(i+1)}</td><td>${vitTick(s.name)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td>${esc(cityOf(s.name))}</td><td>${ytag(s.year)} <small>${esc(s.book)}</small></td><td>${s.hanger?'✔':''}</td>
   ${s.m.slice(1).map((v,k)=>mcell(v,v===0?'z':'',k+1>c?'style="opacity:.4"':'')).join('')}<td class="n"><b>${fa(s.total)}</b></td><td>${stag(s.status)}</td></tr>`}).join('')}
-  <tr><td></td><td><b>جمع (${fa(a.length)} مغازه)</b></td><td></td><td></td><td></td><td></td><td></td>${Array.from({length:12},(_,k)=>{const has=a.some(s=>s.m[k+1]!=null);return `<td class="n"><b>${has?fa(a.reduce((x,s)=>x+(s.m[k+1]||0),0)):''}</b></td>`}).join('')}<td class="n"><b>${fa(sum)}</b></td><td></td></tr></table>`;
+  <tr><td></td><td></td><td><b>جمع (${fa(a.length)} مغازه)</b></td><td></td><td></td><td></td><td></td>${Array.from({length:12},(_,k)=>{const has=a.some(s=>s.m[k+1]!=null);return `<td class="n"><b>${has?fa(a.reduce((x,s)=>x+(s.m[k+1]||0),0)):''}</b></td>`}).join('')}<td class="n"><b>${fa(sum)}</b></td><td></td></tr></table>`;
 }
 function bindSheets(){document.querySelectorAll('#app [data-hl]').forEach(el=>el.onclick=()=>{const v=el.dataset.hl;S.hl=S.hl===v?null:v;draw()})}
 function bindShops(){
@@ -712,12 +712,12 @@ function viewSheetsReps(){
 let _SHN=null;
 function shopOfDesc(d){const x=nz(d);if(!x)return null;if(!_SHN||_SHN.n!==CAL.length)_SHN={n:CAL.length,l:CAL.map(s=>[nz(s.name),s.name]).filter(a=>a[0].length>2).sort((a,b)=>b[0].length-a[0].length)};
   const h=_SHN.l.find(a=>x.includes(a[0]));return h?h[1]:null}
-const isVit=d=>/ویترین|ويترين/.test(d||'');
-function vitMap(){if(!ACC||!ACC.rows)return {};if(window._vmSrc===ACC)return window._vm;const m={};ACC.rows.forEach(r=>{if(!isVit(r[7]))return;let n=shopOfDesc(r[7]);if(!n){const u=ACC.cust[r[0]];if(u&&u.shop)n=u.shop.name}if(!n)return;(m[nz(n)]=m[nz(n)]||[]).push(r)});window._vmSrc=ACC;window._vm=m;return m}
+const isVitRow=r=>/^[\d\u06F0-\u06F9\u0660-\u0669]+$/.test(String(r[2]==null?'':r[2]).trim());
+function vitMap(){if(!ACC||!ACC.rows)return {};if(window._vmSrc===ACC)return window._vm;const m={};ACC.rows.forEach(r=>{if(!isVitRow(r))return;let n=null;const u=ACC.cust[r[0]];if(u&&u.shop)n=u.shop.name;if(!n)n=shopOfDesc(r[7]);if(!n)return;(m[nz(n)]=m[nz(n)]||[]).push(r)});window._vmSrc=ACC;window._vm=m;return m}
 function vitSet(){return new Set(Object.keys(vitMap()))}
-function vitTick(name){const k=nz(name);return vitMap()[k]?`<span data-vit="${esc(k)}" title="ویترین آویزان شده — برای دیدن کد و تاریخ بزنید" style="color:#16a34a;font-weight:700;font-size:16px;cursor:pointer">✔</span>`:''}
-function showVit(k){const L=vitMap()[k]||[];const cs=CAL.find(s=>nz(s.name)===k);const nm=cs?cs.name:k;
-  modal(`<h3>ویترین: ${esc(nm)}</h3><p class="note">${fa(L.length)} ردیف توضیحاتِ حاوی «ویترین»</p><div class="wrap"><table><tr><th>تاریخ</th><th>کد کالا</th><th class="n">متر</th><th>توضیحات</th></tr>${L.slice().sort((a,b)=>String(b[1]).localeCompare(String(a[1]))).map(r=>`<tr><td>${esc(r[1])}</td><td dir="ltr">${esc(r[2])}</td><td class="n">${fm(r[4])}</td><td>${esc(r[7])}</td></tr>`).join('')||'<tr><td colspan="4" class="note">ردیفی نیست</td></tr>'}</table></div>`)}
+function vitTick(name){const k=nz(name);return vitMap()[k]?`<span data-vit="${esc(k)}" title="کد ویترین را ببینید" style="color:#16a34a;font-weight:700;font-size:16px;cursor:pointer">✔</span>`:''}
+function vitRowsModal(title,L){modal(`<h3>ویترین: ${esc(title)}</h3><p class="note">${fa(L.length)} ردیف با کد ویترین</p><div class="wrap"><table><tr><th>تاریخ</th><th>کد ویترین</th><th class="n">متر</th><th>مشتری حسابداری</th></tr>${L.slice().sort((a,b)=>String(b[1]).localeCompare(String(a[1]))).map(r=>`<tr><td>${esc(r[1])}</td><td dir="ltr" style="text-align:right">${esc(r[2])}</td><td class="n">${fm(r[4])}</td><td>${esc(r[0])}</td></tr>`).join('')||'<tr><td colspan="4" class="note">ردیفی نیست</td></tr>'}</table></div>`)}
+function showVit(k){const cs=CAL.find(s=>nz(s.name)===k);vitRowsModal(cs?cs.name:k,vitMap()[k]||[])}
 function repRows(){const o={};if(!ACC)return o;ACC.rows.forEach(r=>{const u=ACC.cust[r[0]],s=u&&u.shop;if(s&&D.reps.includes(s))(o[s.name]=o[s.name]||[]).push(r)});return o}
 function grpBy(rows,keyf){const m={};rows.forEach(r=>{const k=keyf(r);if(!k)return;const o=m[k]||(m[k]={k,q:0,n:0,last:'',codes:{},ev:[]});o.q+=r[4];o.n++;if(r[1]>o.last)o.last=r[1];o.codes[r[2]]=(o.codes[r[2]]||0)+r[4];o.ev.push(r)});return Object.values(m).sort((a,b)=>b.q-a.q)}
 function gTbl(l,first){return `<div class="wrap"><table><tr><th>#</th><th>${first}</th><th class="n">متر</th><th class="n">تعداد ردیف</th><th>کدها</th><th>آخرین تاریخ</th></tr>${l.map((o,i)=>`<tr class="clk" data-evk="${esc(o.k)}"><td>${fa(i+1)}</td><td>${esc(o.k)}</td><td class="n"><b>${fm(o.q)}</b></td><td class="n">${fa(o.n)}</td><td dir="ltr" style="text-align:right">${Object.keys(o.codes).slice(0,4).map(esc).join('، ')}${Object.keys(o.codes).length>4?'…':''}</td><td>${esc(o.last)}</td></tr>`).join('')}</table></div>`}
@@ -1116,7 +1116,7 @@ function viewCList(){
       const vt=`<td class="n" style="text-align:center">${vitTick(r[nc])}</td>`;
       const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
       const sh=edit?null:CAL.find(x=>x.sheet===sn&&nz(x.name)===nz(r[nc]));
-      body.push(`<tr${sh?` class="clk" data-shop="${sh.id}"`:''}><td class="n">${fa(k)}</td>${vt}${cells}${tail}</tr>`)}
+      body.push(`<tr${sh?` class="clk" data-shop="${sh.id}"`:''}>${vt}<td class="n">${fa(k)}</td>${cells}${tail}</tr>`)}
     const hd=cols.map(c=>`<th>${esc(h[c])}</th>`).join('');
     return `<div class="box cl_sec" style="width:100%;margin:0;padding:0;overflow:hidden;direction:rtl">
      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:#faf6ec;border-bottom:1px solid #eadfc4">
@@ -1126,7 +1126,7 @@ function viewCList(){
          <button class="btn sec cl_addcol" data-s="${esc(sn)}">＋ ستون جدید</button>
          ${cnt===0&&names.length>1?`<button class="btn sec cl_ds" data-s="${esc(sn)}">حذف شیت خالی</button>`:''}</span>`:''}
      </div>
-     ${closed?'':`<div style="overflow:auto;max-height:70vh;padding:8px"><table class="t cl_t" style="width:auto"><thead><tr><th>#</th><th style="text-align:center">ویترین</th>${hd}${edit?(MULTI?'':'<th>جابجایی</th>')+'<th></th>':''}</tr></thead><tbody>${body.join('')||'<tr><td colspan="99" class="note">مغازه‌ای نیست</td></tr>'}</tbody></table></div>`}
+     ${closed?'':`<div style="overflow:auto;max-height:70vh;padding:8px"><table class="t cl_t" style="width:auto"><thead><tr><th style="text-align:center">ویترین</th><th>#</th>${hd}${edit?(MULTI?'':'<th>جابجایی</th>')+'<th></th>':''}</tr></thead><tbody>${body.join('')||'<tr><td colspan="99" class="note">مغازه‌ای نیست</td></tr>'}</tbody></table></div>`}
     </div>`}).join('');
   return `<div class="box"><h2>لیست پخش کالیته</h2>
   <p class="note">مجموع: <b>${fa(tot)}</b> مغازه. یک راسته را از دکمه‌های زیر انتخاب کنید تا کامل نمایش داده شود. برای تغییر، دکمه «✏️ ویرایش» را بزنید.</p>
