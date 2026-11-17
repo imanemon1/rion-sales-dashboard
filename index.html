@@ -294,7 +294,7 @@ const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرد�
 const DEF={target:40000,newGoal:80,base:null};
 const getCfg=()=>{try{return {...DEF,...JSON.parse(localStorage.getItem('rionCfg')||'{}')}}catch(e){return {...DEF}}};
 const setCfg=c=>localStorage.setItem('rionCfg',JSON.stringify(c));
-const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['fu','پیگیری'],['collect','جمع‌آوری بوک'],['repc','فروش نماینده‌ها و ویترین'],['sheets','شهرها، راسته‌ها و نماینده‌ها'],['codes','کدها'],['years','مقایسه سال‌ها'],['plan','پخش کشور'],['clist','لیست پخش کالیته'],['disc','تخفیف']];
+const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['inactive','بی‌خرید / راکد'],['fu','پیگیری'],['collect','جمع‌آوری بوک'],['repc','فروش نماینده‌ها'],['sheets','شهرها، راسته‌ها و نماینده‌ها'],['codes','کدها'],['years','مقایسه سال‌ها'],['plan','پخش کشور'],['clist','لیست پخش کالیته'],['disc','تخفیف']];
 const STL={ok:'فعال',g1:'یک ماه بی‌خرید',g2:'دو ماه بی‌خرید',g3:'سه ماه+ بی‌خرید',never:'بدون خرید'};
 const mcell=(v,cls='',attr='')=>`<td class="n ${cls}" ${attr}>${v==null?'':fa(v)}</td>`;
 const fa=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:1});
@@ -720,22 +720,16 @@ function viewRepC(){
   if(!ACC)return '<div class="box"><p class="note">ابتدا اکسل حسابداری را بارگذاری کنید.</p></div>';
   if(!ACC.rows.some(r=>r[7]))return '<div class="box"><p class="note">ستون «توضیحات» در اکسل حسابداری پیدا نشد. فایل را با ستون دهم (توضیحات) در تنظیمات بارگذاری کنید.</p></div>';
   const R=repRows(),names=Object.keys(R).sort((a,b)=>R[b].reduce((s,r)=>s+r[4],0)-R[a].reduce((s,r)=>s+r[4],0));
-  const sub=S.rsub||names[0]||'vit',tabs=names.map(n=>`<button class="btn ${sub===n?'':'sec'}" data-rsub="${esc(n)}">${esc(n)}</button>`).join(' ')+` <button class="btn ${sub==='@vit'?'':'sec'}" data-rsub="@vit">🪟 ویترین</button> <button class="btn ${sub==='@own'?'':'sec'}" data-rsub="@own">مشتریان خودم</button>`;
-  let h=`<div class="box"><h2>فروش نماینده‌ها و ویترین</h2><p class="note">مغازه‌ی هر خرید نماینده از ستون «توضیحات» تشخیص داده می‌شود. روی هر ردیف بزنید تا ریز کد و تاریخ ببینید.</p><div style="display:flex;gap:6px;flex-wrap:wrap">${tabs}</div></div>`;
+  const sub=S.rsub||names[0]||'@own',tabs=names.map(n=>`<button class="btn ${sub===n?'':'sec'}" data-rsub="${esc(n)}">${esc(n)}</button>`).join(' ')+` <button class="btn ${sub==='@own'?'':'sec'}" data-rsub="@own">مشتریان خودم</button>`;
+  let h=`<div class="box"><h2>فروش نماینده‌ها</h2><p class="note">مغازه‌ی هر خرید نماینده از ستون «توضیحات» تشخیص داده می‌شود. روی هر ردیف بزنید تا ریز کد و تاریخ ببینید.</p><div style="display:flex;gap:6px;flex-wrap:wrap">${tabs}</div></div>`;
   window._evm={};
   const reg=(l)=>l.forEach(o=>window._evm[o.k]=o);
-  if(sub==='@vit'){
-    const vr=ACC.rows.filter(r=>isVit(r[7])),l=grpBy(vr,r=>shopOfDesc(r[7])||ACC.cust[r[0]]&&ACC.cust[r[0]].shop&&!D.reps.includes(ACC.cust[r[0]].shop)&&ACC.cust[r[0]].shop.name||nz(r[7]).slice(0,40)||r[0]);reg(l);
-    const has=new Set(l.map(o=>o.k)),no=CAL.filter(s=>!has.has(s.name)&&s.total>0).sort((a,b)=>b.total-a.total);
-    h+=`<div class="box"><h3>سفارش ویترین (${fa(l.length)} مغازه · ${fm(l.reduce((a,o)=>a+o.q,0))} متر)</h3>${l.length?gTbl(l,'مغازه'):'<p class="note">ردیفی با کلمه‌ی «ویترین» در توضیحات نیست.</p>'}</div>
-    <div class="box"><h3>مغازه‌های فعال بدون سفارش ویترین (${fa(no.length)})</h3><p class="note">برای پیشنهاد ویترین.</p><div class="wrap"><table><tr><th>#</th><th>مغازه</th><th>شیت</th><th class="n">جمع متر</th></tr>${no.slice(0,200).map((s,i)=>`<tr class="clk" data-shop="${s.id}"><td>${fa(i+1)}</td><td>${esc(s.name)}</td><td>${esc(s.sheet||'')}</td><td class="n">${fm(s.total)}</td></tr>`).join('')}</table></div></div>`;
-  }else if(sub==='@own'){
+  if(sub==='@own'){
     const rows=ACC.rows.filter(r=>{const u=ACC.cust[r[0]];return !(u&&u.shop&&D.reps.includes(u.shop))}),l=grpBy(rows,r=>r[0]);reg(l);
     h+=`<div class="box"><h3>خرید مشتریان خودم (${fa(l.length)})</h3>${gTbl(l,'مشتری')}</div>`;
   }else{
     const rows=R[sub]||[],l=grpBy(rows,r=>shopOfDesc(r[7])||nz(r[7]).slice(0,40)||'(بدون توضیح)');reg(l);
-    const vq=rows.filter(r=>isVit(r[7])).reduce((a,r)=>a+r[4],0);
-    h+=`<div class="box"><h3>${esc(sub)} · ${fm(rows.reduce((a,r)=>a+r[4],0))} متر · ${fa(l.length)} مشتری${vq?` · ویترین ${fm(vq)} متر`:''}</h3>${gTbl(l,'مشتری (از توضیحات)')}</div>`;
+    h+=`<div class="box"><h3>${esc(sub)} · ${fm(rows.reduce((a,r)=>a+r[4],0))} متر · ${fa(l.length)} مشتری</h3>${gTbl(l,'مشتری (از توضیحات)')}</div>`;
   }
   return h;
 }
