@@ -426,7 +426,7 @@ nav button::before{right:6px!important;width:7px!important;height:7px!important}
 .pg-head h1{font-size:15px!important}
 }
 /* تبلت ۱۰ تا ۱۲ اینچ */
-@media(min-width:701px) and (max-width:1180px){
+@media(min-width:701px) and (max-width:2500px){
 :root{--sbw:200px;--gap:14px;--pad:16px;--fs:13px;--fs-s:11.5px;--fs-l:12.5px;--h1:20px;--vbig:28px;--vmid:22px}
 header{padding:18px 12px!important}
 nav button{font-size:13px!important;height:42px!important;white-space:normal!important}
@@ -444,7 +444,7 @@ main{padding:28px 32px!important}
 .ov-st .grid{grid-template-columns:repeat(5,1fr)!important}
 }
 /* ===== اصلاح کارت‌های نمای کلی (ovx) برای موبایل ===== */
-@media(max-width:700px){
+@media(max-width:2500px){
 main{padding:10px 8px!important}
 .ovx-top{gap:8px;margin-bottom:10px}
 .ovx-pills{gap:6px;width:100%}
@@ -482,7 +482,7 @@ main{padding:10px 8px!important}
 /* ===== موبایل ۳۹۰: نوار بالا + منوی کشویی + نمای کلی ===== */
 #mbar,#mbk{display:none}
 .mv-top,.mv-sec,.mv-grid,.mv-big{direction:rtl}
-@media(max-width:700px){
+@media(max-width:2500px){
 body{display:block!important;background:#f3f8ff}
 body.locked #mbar button{display:none}
 #mbar{display:flex;position:fixed;top:0;left:0;right:0;height:53px;z-index:50;background:#fff;border-bottom:1px solid #e3edfa;align-items:center;justify-content:space-between;padding:0 16px;direction:rtl}
@@ -543,7 +543,7 @@ main{padding:65px 14px 24px!important}
 .mv-st .drill{margin-top:12px}
 }
 #mclose,.ng,.ni,.nc{display:none}
-@media(max-width:700px){
+@media(max-width:2500px){
 header{display:flex!important;flex-direction:column!important;width:min(324px,83.07vw)!important;padding:28px 0 0!important;gap:0!important;overflow:hidden!important;background:#fff!important;border:0!important;border-radius:0!important}
 header .top,header .brand,header .brand>div,header .logo,header .lft{display:contents!important}
 header .sub,header .lft input{display:none!important}
@@ -569,6 +569,73 @@ header nav button.on::after{content:"";position:absolute;right:-20px;top:14px;bo
 header .lft>.gear{order:6;display:flex!important;align-items:center;justify-content:flex-start;flex-direction:row-reverse;gap:14px;width:auto!important;height:64px!important;margin:0 20px;border:0!important;border-top:1px solid #e3e9f1!important;border-radius:0!important;background:transparent!important;color:#1f2f45!important;font-size:19px;font-weight:500;padding:0 16px!important;box-shadow:none!important;flex:0 0 auto}
 header .lft>.gear::after{content:"تنظیمات";font-family:inherit;margin-inline-end:auto;margin-left:0;flex:1;text-align:right}
 header .lft>.gear.on{color:#1765F5!important}
+}
+
+/* ---- mobile performance / ranking pages (phone) ---- */
+.mp-hd{display:flex;justify-content:space-between;align-items:flex-end;margin:6px 0 12px;direction:rtl}
+.mp-hd h1{margin:0;font-size:24px;font-weight:800;color:#1f2f45}
+.mp-hd2{margin-top:22px;justify-content:flex-start}.mp-hd2 h1{font-size:20px}
+.mp-date{font-size:12px;color:#71869d}
+.mp-card{background:#fff;border:1px solid #e6edf6;border-radius:16px;padding:14px 14px 12px;margin-bottom:10px;box-shadow:0 1px 4px #1f2f450a;direction:rtl;text-align:right;min-width:0}
+.mp-card.on{border-color:#9ec0fb}
+.mp-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mp-row h2,.mp-row h3,.mp-card h3{margin:0;font-size:16px;font-weight:800;color:#1f2f45}
+.mp-tag{font-size:11px;color:#1765F5;background:#eaf2ff;border-radius:8px;padding:2px 9px;direction:ltr}
+.mp-kv{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px}
+.mp-kv b{font-size:30px;font-weight:800;color:#1765F5}.mp-kv b small{font-size:15px;color:#1f2f45;font-weight:700}
+.mp-pc{font-size:13px;color:#1765F5}
+.mp-bar,.mp-bar.g{height:6px;background:#e9eef5;border-radius:4px;margin:12px 0 10px;overflow:hidden}
+.mp-bar i{display:block;height:100%;background:#1765F5;border-radius:4px}
+.mp-bar.g i{background:#0f9b8e}
+.mp-meta{display:flex;justify-content:space-between;font-size:11.5px;color:#71869d;gap:6px}
+.mp-link{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #eef2f8;margin-top:12px;padding-top:12px;font-size:13px;color:#1765F5}
+.mp-link i{font-style:normal;font-size:18px;color:#1765F5}
+.mp-two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.mp-two .mp-card{margin-bottom:0}
+.mp-card p{margin:4px 0 0;font-size:12px;color:#71869d}
+.mp-two b{display:block;margin-top:10px;font-size:22px;font-weight:800;color:#1f2f45}.mp-two b small{font-size:12px;font-weight:700}
+.mp-two p{font-size:11px}
+.mp-foot{display:flex;justify-content:space-between;border-top:1px solid #eef2f8;margin-top:10px;padding-top:9px;font-size:11px;color:#1765F5}
+.mp-foot span{color:#71869d}.mp-foot em{font-style:normal}
+.mp-new{margin-top:0}.mp-new .mp-g{font-size:15px;color:#0f9b8e}
+.mp-new p{margin:6px 0 0}
+.mp-sub{margin:4px 0 10px!important;font-size:12px;color:#71869d}
+.mp-hint{display:flex;justify-content:space-between;align-items:center;background:#f3f6fa;border-radius:10px;padding:9px 12px;font-size:12px;color:#35516d;margin-bottom:12px}
+.mp-hint b{color:#d6403b;font-weight:700}
+.mp-mr{display:grid;grid-template-columns:52px 1fr 44px;align-items:center;gap:8px;padding:6px 6px;border-radius:8px;margin-bottom:2px}
+.mp-mr.cur{background:#eef9f5}.mp-mr.cur .mp-mn{color:#0f9b8e;font-weight:700}
+.mp-mr.f{opacity:.45}
+.mp-mv{font-size:12px;color:#1f2f45;white-space:nowrap}
+.mp-mn{font-size:12px;color:#35516d;text-align:right;grid-column:3;grid-row:1}
+.mp-mr{grid-template-columns:52px 1fr 44px}
+.mp-mr .mp-track{grid-column:2;grid-row:1}
+.mp-track{position:relative;height:8px;background:#e9eef5;border-radius:4px}
+.mp-track b{position:absolute;right:0;top:0;bottom:0;background:#1765F5;border-radius:4px}
+.mp-mr.cur .mp-track b{background:#0f9b8e}
+.mp-tl{position:absolute;top:-4px;bottom:-4px;width:2px;background:#d6403b;border-radius:2px}
+.mp-leg{display:flex;justify-content:space-between;font-size:11px;color:#71869d;border-top:1px solid #eef2f8;margin-top:10px;padding-top:10px}
+.mp-leg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-left:4px}.mp-leg i.g{background:#0f9b8e}.mp-leg i.r{background:#d6403b}
+.mp-th{display:grid;grid-template-columns:44px 1fr 90px;font-size:11px;color:#71869d;background:#f3f6fa;border-radius:8px;padding:7px 8px;margin-bottom:6px}
+.mp-th span:last-child{text-align:left}
+.mp-rk{display:grid;grid-template-columns:44px 1fr 96px;align-items:center;padding:9px 8px;border-bottom:1px solid #eef2f8}
+.mp-rk:last-child{border-bottom:0}
+.mp-n{width:26px;height:26px;border-radius:50%;background:#f3f6fa;color:#35516d;font-size:12px;display:flex;align-items:center;justify-content:center}
+.mp-nm b{display:block;font-size:13px;color:#1765F5;font-weight:700}
+.mp-nm small{font-size:10.5px;color:#71869d}
+.mp-vv{text-align:left}
+.mp-vv b{font-size:14px;color:#1f2f45;display:block}.mp-vv b.hi{color:#1f2f45}
+.mp-mb{height:3px;background:#e9eef5;border-radius:3px;margin-top:4px;overflow:hidden}
+.mp-mb b{display:block;height:100%;background:#1765F5;border-radius:3px}
+.mp-bk{padding:12px 0 10px;border-bottom:1px solid #eef2f8}.mp-bk:last-child{border-bottom:0}
+.mp-bk .mp-pc2{font-size:19px;color:#1765F5;font-weight:800}
+.mp-bk h3{font-size:14px!important}
+.mp-bk .mp-mb{height:6px;margin:8px 0 6px}.mp-bk .mp-mb b{background:#1765F5}
+.mp-bk .mp-meta{font-size:11px}
+@media(min-width:701px) and (max-width:2500px){
+main{max-width:760px!important;margin:0 auto!important;padding-top:70px!important}
+#mbar{padding:0 24px}
+.mp-card,.mp-hd{max-width:100%}
+.mp-hd h1{font-size:28px}
 }
 </style>
 </head>
@@ -777,7 +844,7 @@ function viewOver(){
   const ic={bar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V12M12 20V5M18 20v-7"/></svg>',clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>'};
   const ovc=(k,title,icon,val,unit,body,extra='')=>`<div class="card tap ovx ${S.drill===k?'on':''}" data-d="${k}" role="button" tabindex="0" aria-expanded="${S.drill===k}"><div class="ovx-t"><span class="ovx-i">${icon}</span><span>${title}</span></div><div class="ovx-v"><b>${val}</b>${unit?`<span>${unit}</span>`:''}</div>${body}${extra}</div>`;
   const bar=p=>`<div class="ovx-bar"><i style="width:${Math.max(Math.min(p,100),0)}%"></i></div>`;
-  const M=window.matchMedia('(max-width:700px)').matches;
+  const M=window.matchMedia('(max-width:2500px)').matches;
   let mob='';
   if(M){
     const by=k=>D.shops.filter(s=>s.status===k);
@@ -786,22 +853,46 @@ function viewOver(){
     const sT=(nA+nS+nI+nD)||1, pc=Math.max(Math.min(sold/target*100,100),0);
     const mc=(k,t,v,u,s,cls='')=>`<div class="mv-c tap ${cls} ${S.drill===k?'on':''}" data-d="${k}" role="button" tabindex="0"><div class="t">${t}</div><div class="v"><b>${v}</b>${u?` <span>${u}</span>`:''}</div><div class="s">${s}</div></div>`;
     const sr=(k,l,n,col)=>`<div class="mv-sr tap" data-d="${k}" role="button" tabindex="0"><span class="l"><i style="background:${col}"></i>${l}</span><b>${fa(n)}</b></div>`;
-    mob=`<div class="mv-top"><div class="mv-hd"><h1>فروش کاتینگ ریون</h1><p>${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${String(jy).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])}</p></div><label class="mv-pill">ماه: ${MONTHS[c-1]}<select id="mvcur">${MONTHS.map((m,i)=>`<option value="${i+1}" ${i+1===c?'selected':''}>${m}</option>`).join('')}</select></label></div>
-    <div class="mv-sec"><h2>عملکرد فروش</h2><span>01 &nbsp;/&nbsp; PERFORMANCE</span></div>
-    <div class="mv-c mv-big tap ${S.drill==='sold'?'on':''}" data-d="sold" role="button" tabindex="0"><div class="mv-info"><div class="t">فروش تا امروز</div><div class="v"><b>${fa(sold)} متر</b></div><div class="s">از هدف سالانهٔ ${fa(target)} متر</div></div><div class="mv-ring" style="--p:${pc}"><span>${pct(sold/target*100)}</span></div></div>
-    <div class="mv-grid">
-    ${mc('left','باقی‌مانده تا هدف',fa(left),'متر',fa(rem)+' ماه تا پایان سال','blue')}
-    ${mc('need','لازم در هر ماه',fa(need),'متر','میانگین فعلی: '+fa(pace)+' متر','blue')}
-    ${mc('proj','پیش‌بینی پایان سال',fa(proj),'متر','با همین روند فروش')}
-    ${mc('inact','مغازه‌های بی‌خرید',fa(inact),'مغازه','۱ ماه: '+fa(cnt('g1'))+' ۲ ماه: '+fa(cnt('g2'))+' بیشتر: '+fa(cnt('g3')),'sm')}
-    ${gN?mc('added','مغازهٔ جدید اضافه‌شده',fa(added)+' از '+fa(gN),'',fa(Math.min(added/gN*100,100))+'٪ از هدف'):''}
-    ${mc('coll','بوک برای جمع‌آوری',fa(coll),'بوک','بدون کارکرد در این ماه')}
+    const top=[...D.shops].sort(byTot).slice(0,20), mx=top[0]?.total||1;
+    const yrs={};D.shops.forEach(x=>{const o=yrs[x.year]??={n:0,t:0};o.n++;o.t+=x.total});
+    const yk=Object.keys(yrs).sort((x,y)=>y-x), yT=D.shops.reduce((x,y)=>x+y.total,0)||1;
+    const R=n=>fa(Math.round(n));
+    const vbar=(v,mx2,cls)=>`<div class="mp-mb ${cls}"><b style="width:${Math.max(Math.min(v/mx2*100,100),0)}%"></b></div>`;
+    const cur=o.mon[c]||0, mxm=Math.max(...o.mon.slice(1),mT)*1.05||1;
+    mob=`<div class="mp-hd"><span class="mp-date">${MONTHS[c-1]} ${String(jy).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])}</span><h1>عملکرد فروش</h1></div>
+    <div class="mp-card mp-goal ${S.drill==='top'?'on':''} tap" data-d="top" role="button" tabindex="0">
+      <div class="mp-row"><span class="mp-tag">۰۱</span><h2>هدف سالانه</h2></div>
+      <div class="mp-kv"><b>${R(target)} <small>متر</small></b><span class="mp-pc">${pct(sold/target*100)} تحقق</span></div>
+      <div class="mp-bar"><i style="width:${Math.max(Math.min(sold/target*100,100),0)}%"></i></div>
+      <div class="mp-meta"><span>فروخته‌شده: ${R(sold)} متر</span><span>مانده: ${R(left)} متر</span></div>
+      <div class="mp-link"><span>راهنمای مسیر و پیشنهادها</span><i>‹</i></div>
     </div>
     ${drillPanel('top')}
-    <div class="mv-c mv-st"><h2>وضعیت مغازه‌ها تا ${MONTHS[c-1]}</h2><p>${fa(D.shops.length)} مغازه &nbsp;·&nbsp; بدون نماینده</p>
-    <div class="mv-seg">${[[nA,'#1765F5'],[nS,'#6aaedb'],[nI,'#9fb1cf'],[nD,'#c3cde0']].map(x=>`<i style="flex:${x[0]/sT};background:${x[1]}"></i>`).join('')}</div>
-    <div class="mv-srs">${sr('st_active','فعال',nA,'#1765F5')}${sr('st_semi','نیمه‌فعال',nS,'#6aaedb')}${sr('st_inact','غیرفعال',nI,'#9fb1cf')}${sr('st_dead','راکد',nD,'#c3cde0')}${sr('st_upd','قابل به‌روزرسانی',nU,'#0f9b8e')}</div>
-    ${drillPanel('st')}</div>`;
+    <div class="mp-two">
+      <div class="mp-card tap ${S.drill==='shS'?'on':''}" data-d="shS" role="button" tabindex="0"><h3>فروش مغازه‌ها</h3><b>${R(shopM)} <small>متر</small></b><p>${pct(shopM/tot*100)} از فروش کل</p><div class="mp-foot"><span>${fa(D.shops.length)} مغازه</span><em>جزئیات ‹</em></div></div>
+      <div class="mp-card tap ${S.drill==='repS'?'on':''}" data-d="repS" role="button" tabindex="0"><h3>فروش نماینده‌ها</h3><b>${R(repM)} <small>متر</small></b><p>${pct(repM/tot*100)} از فروش کل</p><div class="mp-foot"><span>${fa(D.reps.length)} نماینده</span><em>جزئیات ‹</em></div></div>
+    </div>
+    ${drillPanel('sh')}
+    ${gN?`<div class="mp-card mp-new"><div class="mp-row"><h3>هدف مغازهٔ جدید</h3><b class="mp-g">${pct(added/gN*100)}</b></div><p>${fa(added)} مغازه اضافه‌شده از هدف ${fa(gN)} مغازه</p><div class="mp-bar g"><i style="width:${Math.min(added/gN*100,100)}%"></i></div></div>`:''}
+    <div class="mp-card mp-month">
+      <div class="mp-row"><h2>فروش ماهانه</h2><span class="mp-tag">۰۲</span></div>
+      <p class="mp-sub">متراژ فروش به تفکیک ماه</p>
+      <div class="mp-hint"><span>هدف ماهانه</span><b>${R(mT)} متر</b></div>
+      ${o.mon.slice(1).map((v,i)=>{const m=i+1,w=Math.max(Math.min(v/mxm*100,100),0),tl=mT/mxm*100;return `<div class="mp-mr ${m===c?'cur':''} ${m>c?'f':''}"><span class="mp-mv">${v?R(v):'—'}</span><div class="mp-track"><i class="mp-tl" style="right:${tl}%"></i><b style="width:${w}%"></b></div><span class="mp-mn">${MONTHS[i]}</span></div>`}).join('')}
+      <div class="mp-leg"><span><i class="g"></i>سبز: ماه جاری</span><span><i class="r"></i>قرمز: هدف ماهانه</span></div>
+    </div>
+    <div class="mp-hd mp-hd2"><h1>رتبه‌بندی و ترکیب فروش</h1></div>
+    <div class="mp-card">
+      <div class="mp-row"><h2>۲۰ مغازه برتر</h2><span class="mp-tag">۰۳</span></div>
+      <p class="mp-sub">به ترتیب متراژ فروش</p>
+      <div class="mp-th"><span>رتبه</span><span>مغازه / محدوده</span><span>فروش (متر)</span></div>
+      ${top.map((x,i)=>`<div class="mp-rk"><span class="mp-n">${fa(i+1)}</span><div class="mp-nm"><b>${esc(x.name)}</b><small>${esc(cityOf(x.name))}</small></div><div class="mp-vv"><b class="${i<3?'hi':''}">${R(x.total)}</b>${vbar(x.total,mx,'sm')}</div></div>`).join('')}
+    </div>
+    <div class="mp-card">
+      <div class="mp-row"><h2>سهم بوک‌ها از فروش مغازه‌ها</h2><span class="mp-tag">۰۴</span></div>
+      <p class="mp-sub">سهم از متراژ فروش مغازه‌ها</p>
+      ${yk.map(y=>{const q=yrs[y],sh=q.t/yT*100;return `<div class="mp-bk"><div class="mp-row"><b class="mp-pc2">${pct(sh)}</b><h3>بوک ${yl(+y)}</h3></div>${vbar(sh,100,'bk')}<div class="mp-meta"><span>میانگین: ${R(q.t/q.n)} متر</span><span>${fa(q.n)} مغازه · ${R(q.t)} متر</span></div></div>`}).join('')}
+    </div>`;
   }
   return `${M?mob:`<div class="ovx-top"><div class="ovx-pills"><div class="ovx-pill">ماه: <b>${MONTHS[c-1]}</b></div><div class="ovx-pill">${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${fa(jy)}</div></div>
   <div class="ovx-title"><small>داشبورد / نمای کلی</small><h1>فروش کاتینگ ریون</h1><p>پیگیری فروش متراژ حریر و توری</p></div></div>
@@ -1993,7 +2084,7 @@ function _draw(){
   if(S.tab==='disc')bindDisc();
   if(S.tab==='settings')bindSettings();
 }
-const MQ=window.matchMedia('(max-width:700px)');
+const MQ=window.matchMedia('(max-width:2500px)');
 MQ.addEventListener&&MQ.addEventListener('change',()=>{document.body.classList.remove('menu');if(D)draw(false)});
 $('mmenu').onclick=()=>{const o=document.body.classList.toggle('menu');$('mmenu').setAttribute('aria-expanded',o)};
 $('mclose').onclick=()=>document.body.classList.remove('menu');
