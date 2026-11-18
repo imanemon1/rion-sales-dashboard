@@ -342,6 +342,53 @@ main{padding:24px}
 .stat-row .card .v{font-size:30px;color:#2563EB}
 }
 @media(max-width:760px){.ov-r1,.ov-r2,.ov-st .grid{grid-template-columns:1fr 1fr}.ov-r1 .card .v{font-size:28px}.ov-r2 .card .v{font-size:24px}}
+
+/* ===== دسکتاپ: سایدبار راست + محتوای اصلی (فقط CSS) ===== */
+@media(min-width:901px){
+:root{--bg:#F3F8FF;--pri:#1765F5;--pri2:#55B9FF;--hov:#EDF5FF;--line:#E3EDFA;--ink:#35516D;--navy:#35516D;--mut:#71869D;--sh:0 8px 28px rgba(42,102,170,.07)}
+body{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh;background:var(--bg);color:var(--ink)}
+header{grid-column:1;grid-row:1;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:18px;padding:24px 16px;background:#fff;border:0;border-left:1px solid var(--line);box-shadow:none;z-index:10}
+header .top{display:flex;flex-direction:column;align-items:stretch;gap:16px}
+.logo{order:0;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px;box-shadow:none;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.logo img{height:56px;max-width:100%;object-fit:contain}
+.logo>div{font-size:12px!important;color:var(--mut)!important;white-space:normal}
+.brand{order:1;text-align:right;padding:0 4px}
+.brand h1{font-size:17px;font-weight:700;color:var(--navy);margin:0;line-height:1.6}
+.brand .sub{font-size:12px;color:var(--mut);margin-top:2px}
+.lft{order:2;display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.lft .ctrl{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;box-shadow:none}
+.lft .ctrl select{border:0;background:var(--hov);border-radius:8px;min-height:36px;font-weight:600;font-size:14px;width:100%;color:var(--navy)}
+.lft>.gear{order:9;margin-top:auto;align-self:stretch;width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--mut);display:flex;align-items:center;justify-content:center;gap:8px}
+.lft>.gear:hover{background:var(--hov);color:var(--pri)}
+nav{display:flex;flex-direction:column;gap:4px;margin:0;order:3}
+nav button{height:44px;width:100%;border-radius:12px;border:1px solid transparent;background:transparent;color:var(--navy);font-size:14px;font-weight:500;padding:0 14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:none}
+nav button:hover{background:var(--hov);color:var(--pri)}
+nav button.on{background:var(--pri);color:#fff;border-color:var(--pri);font-weight:600}
+nav button:focus-visible{outline:2px solid var(--pri2);outline-offset:2px}
+main{grid-column:2;grid-row:1;max-width:none;margin:0;padding:28px 32px;min-width:0}
+#guide{grid-column:1/-1}
+.card,.box,.drill{border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh);background:#fff}
+.card{border-top:1px solid var(--line)}
+.card.hl,.stat-row .card.hl{border:1px solid var(--pri)}
+.btn{border-radius:12px;min-height:44px}
+.btn:not(.sec){background:var(--pri)}
+.btn.sec{border-radius:12px}
+.seg button{border-radius:10px}
+.pg-head{border-bottom:0;margin-bottom:20px;padding-bottom:0}
+.pg-head h1{font-size:28px;font-weight:700;color:var(--navy)}
+.pg-head .crumb{color:var(--mut)}
+.pg-head p{color:var(--mut)}
+
+nav button{position:relative;padding-right:34px}
+nav button::before{content:"";position:absolute;right:14px;top:50%;transform:translateY(-50%);width:8px;height:8px;border-radius:50%;border:1.5px solid #B8C4D6;background:#fff}
+nav button.on::before{border-color:#fff;background:#fff}
+nav button.on{box-shadow:0 6px 16px rgba(23,101,245,.25)}
+.logo{flex-direction:column}
+}
+@media(min-width:901px) and (prefers-reduced-motion:no-preference){
+.card,.box,.drill{transition:box-shadow .18s ease,border-color .18s ease}
+nav button{transition:background .15s ease,color .15s ease}
+}
 </style>
 </head>
 <body>
