@@ -658,6 +658,53 @@ main{max-width:760px!important;margin:0 auto!important;padding-top:70px!importan
 @media(max-width:1180px){.grid:has(>.card.tap.g){grid-template-columns:1fr!important}}
 .wrap table{border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .wrap td,.wrap th{border-bottom:1px solid var(--line)}
+
+/* ===== سیستم طراحی یکپارچه (لایهٔ نهایی) =====
+   مقیاس روان بر پایهٔ عرض صفحه: گوشی ← تبلت ← لپ‌تاپ */
+:root{
+--pri:#1f6feb;--pri-d:#1857c2;--pri-l:#e8f1fe;--navy:#14213d;--ink:#18202f;--mut:#66708a;
+--ok:#12a150;--warn:#f0a020;--bad:#d93a3a;--line:#e4e8f1;--bg:#f4f6fb;--surf:#fff;
+--r:clamp(12px,1.2vw,18px);--r-s:10px;
+--sh:0 1px 2px #14213d0f,0 4px 14px #14213d0a;--sh-h:0 2px 4px #14213d14,0 8px 22px #14213d14;
+--fs:clamp(12px,.55vw + 9.6px,15px);--fs-s:clamp(10.5px,.35vw + 9px,12.5px);--fs-l:var(--fs);
+--h1:clamp(15px,1vw + 11px,24px);--vbig:clamp(20px,1.4vw + 14px,34px);--vmid:clamp(17px,1vw + 12px,28px);
+--gap:clamp(8px,.9vw + 4px,18px);--pad:clamp(10px,.9vw + 6px,22px)}
+body{background:var(--bg);color:var(--ink);font-size:var(--fs);line-height:1.6;-webkit-font-smoothing:antialiased}
+header{background:linear-gradient(135deg,#eaf3ff,#cfe2fb)!important;box-shadow:0 1px 0 var(--line),0 4px 16px #14213d12!important}
+.card,.box,.drill{background:var(--surf);border:1px solid var(--line);border-radius:var(--r)!important;box-shadow:var(--sh)!important}
+.card{border-top:1px solid var(--line)}
+.card.g{border-top-color:var(--ok)}.card.w{border-top-color:var(--warn)}.card.b{border-top-color:var(--bad)}
+.drill{border-top:3px solid var(--pri)}
+.tap{transition:transform .12s,box-shadow .2s,border-color .2s}
+.tap:hover{box-shadow:var(--sh-h)!important;border-color:#c8d6ee}
+.tap.on{box-shadow:0 0 0 2px var(--pri)!important}
+.tap .more,.gh,.drill .dx{color:var(--pri)}
+.btn{background:var(--pri);color:#fff;border-radius:var(--r-s);padding:.5em 1em;font-size:var(--fs-s);transition:background .15s}
+.btn:hover{background:var(--pri-d)}
+.btn.sec{background:var(--pri-l);color:var(--pri-d)}
+nav button{background:#fff;color:var(--navy);border:1px solid var(--line);border-radius:var(--r-s);transition:background .15s,color .15s}
+nav button:hover{background:var(--pri-l)}
+nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.seg button{border-radius:var(--r-s);border-color:var(--line)}
+.seg button.on{background:var(--pri);border-color:var(--pri)}
+.bar{background:#e9eef7;border-radius:99px}.bar>i{border-radius:99px;background:linear-gradient(90deg,var(--pri),#4c93f5)}
+table{border-collapse:collapse}
+th{background:#f3f6fc;color:var(--mut);font-weight:600;position:sticky;top:0}
+td,th{padding:.55em .7em;border-bottom:1px solid var(--line)}
+tbody tr:hover td{background:#f7faff}
+input,select{border:1px solid var(--line);border-radius:8px;font-family:inherit}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--pri);outline-offset:1px}
+h2,h3{color:var(--navy)}
+main{max-width:min(1500px,100%)}
+@media(min-width:1181px){.ovx-r1{grid-template-columns:repeat(3,1fr)!important}}
+
+/* ===== قانون واحد چیدمان: تعداد ستون از عرض واقعی تعیین می‌شود، نه از نوع دستگاه ===== */
+.ovx-r1,.ov-r1{grid-template-columns:repeat(auto-fit,minmax(clamp(150px,22vw,260px),1fr))!important;gap:var(--gap)!important}
+.ovx-r2,.ov-r2,.stat-row{grid-template-columns:repeat(auto-fit,minmax(clamp(130px,18vw,220px),1fr))!important;gap:var(--gap)!important}
+.ov-st .grid,.grid{grid-template-columns:repeat(auto-fit,minmax(clamp(130px,16vw,200px),1fr))!important;gap:var(--gap)!important}
+.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,clamp(280px,40vw,520px)),1fr))!important;gap:var(--gap)!important}
+.grid:has(>.card.tap.g){grid-template-columns:repeat(auto-fit,minmax(min(100%,clamp(260px,34vw,420px)),1fr))!important}
+main{max-width:min(1500px,100%)!important}
 </style>
 </head>
 <body>
