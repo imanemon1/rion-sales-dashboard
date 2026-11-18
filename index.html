@@ -910,7 +910,7 @@ function viewOver(){
   </div>
   ${drillPanel('top')}
   ${statBlock()}
-  ${M?'':`<div class="box pb-click" role="button" tabindex="0"><div class="pb-head"><h2>هدف سالانه: ${fa(target)} متر</h2><b>${fa(sold)} متر فروخته شده • ${fa(left)} متر مانده</b></div>
+  <div class="box pb-click" role="button" tabindex="0"><div class="pb-head"><h2>هدف سالانه: ${fa(target)} متر</h2><b>${fa(sold)} متر فروخته شده • ${fa(left)} متر مانده</b></div>
   <div class="pb-tube"><div class="pb-fill" style="--w:${Math.max(Math.min(sold/target*100,100),0)}%"><i class="pb-w"></i><i class="pb-w p2"></i></div><div class="pb-pct">${fa(sold/target*100)}٪</div></div>
   <div class="gh">روی نوار بزنید: راهنمای مسیر و پیشنهادها</div>
   <div class="pb-ticks"><span>۰</span><span>۲۵٪</span><span>۵۰٪</span><span>۷۵٪</span><span>${fa(target)}</span></div></div>
@@ -925,7 +925,7 @@ function viewOver(){
    ${o.mon.slice(1).map((v,i)=>`<div class="mc ${i+1>c?'f':''} ${i+1===c?'cur':''}"><span>${v?fa(v):''}</span><b style="height:${v/maxM*100}%"></b></div>`).join('')}</div>
    <div class="mlab">${MONTHS.map(m=>`<div><span>${m}</span></div>`).join('')}</div></div>
   <div class="two"><div class="box"><h2>۲۰ مغازه برتر</h2><div class="wrap"><table>${[...D.shops].sort(byTot).slice(0,20).map((s,i)=>`<tr><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td class="n">${fa(s.total)}</td></tr>`).join('')}</table></div></div>
-  <div class="box"><h2>سهم بوک‌ها از فروش مغازه‌ها</h2>${yearTable()}</div></div>`}`;
+  <div class="box"><h2>سهم بوک‌ها از فروش مغازه‌ها</h2>${yearTable()}</div></div>`;
 }
 function yearTable(){
   const y={};D.shops.forEach(s=>{const o=y[s.year]??={n:0,t:0,h:0};o.n++;o.t+=s.total;if(s.hanger)o.h++});
