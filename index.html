@@ -894,7 +894,6 @@ function viewOver(){
       ${yk.map(y=>{const q=yrs[y],sh=q.t/yT*100;return `<div class="mp-bk"><div class="mp-row"><b class="mp-pc2">${pct(sh)}</b><h3>بوک ${yl(+y)}</h3></div>${vbar(sh,100,'bk')}<div class="mp-meta"><span>میانگین: ${R(q.t/q.n)} متر</span><span>${fa(q.n)} مغازه · ${R(q.t)} متر</span></div></div>`}).join('')}
     </div>`;
   }
-  if(M) return mob;
   return `<div class="ovx-top"><div class="ovx-pills"><div class="ovx-pill">ماه: <b>${MONTHS[c-1]}</b></div><div class="ovx-pill">${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${fa(jy)}</div></div>
   <div class="ovx-title"><small>داشبورد / نمای کلی</small><h1>فروش کاتینگ ریون</h1><p>پیگیری فروش متراژ حریر و توری</p></div></div>
   <div class="ovx-sec"><span class="ovx-yr">سال ${fa(jy)}</span><div><h2>عملکرد فروش</h2><p>نمایی روشن از مسیر رسیدن به هدف</p></div></div>
@@ -911,7 +910,7 @@ function viewOver(){
   </div>
   ${drillPanel('top')}
   ${statBlock()}
-  <div class="box pb-click" role="button" tabindex="0"><div class="pb-head"><h2>هدف سالانه: ${fa(target)} متر</h2><b>${fa(sold)} متر فروخته شده • ${fa(left)} متر مانده</b></div>
+  ${M?'':`<div class="box pb-click" role="button" tabindex="0"><div class="pb-head"><h2>هدف سالانه: ${fa(target)} متر</h2><b>${fa(sold)} متر فروخته شده • ${fa(left)} متر مانده</b></div>
   <div class="pb-tube"><div class="pb-fill" style="--w:${Math.max(Math.min(sold/target*100,100),0)}%"><i class="pb-w"></i><i class="pb-w p2"></i></div><div class="pb-pct">${fa(sold/target*100)}٪</div></div>
   <div class="gh">روی نوار بزنید: راهنمای مسیر و پیشنهادها</div>
   <div class="pb-ticks"><span>۰</span><span>۲۵٪</span><span>۵۰٪</span><span>۷۵٪</span><span>${fa(target)}</span></div></div>
@@ -926,7 +925,7 @@ function viewOver(){
    ${o.mon.slice(1).map((v,i)=>`<div class="mc ${i+1>c?'f':''} ${i+1===c?'cur':''}"><span>${v?fa(v):''}</span><b style="height:${v/maxM*100}%"></b></div>`).join('')}</div>
    <div class="mlab">${MONTHS.map(m=>`<div><span>${m}</span></div>`).join('')}</div></div>
   <div class="two"><div class="box"><h2>۲۰ مغازه برتر</h2><div class="wrap"><table>${[...D.shops].sort(byTot).slice(0,20).map((s,i)=>`<tr><td>${fa(i+1)}</td>${shopCell(s)}<td><small>${esc(s.sheet)}</small></td><td class="n">${fa(s.total)}</td></tr>`).join('')}</table></div></div>
-  <div class="box"><h2>سهم بوک‌ها از فروش مغازه‌ها</h2>${yearTable()}</div></div>`;
+  <div class="box"><h2>سهم بوک‌ها از فروش مغازه‌ها</h2>${yearTable()}</div></div>`}`;
 }
 function yearTable(){
   const y={};D.shops.forEach(s=>{const o=y[s.year]??={n:0,t:0,h:0};o.n++;o.t+=s.total;if(s.hanger)o.h++});
