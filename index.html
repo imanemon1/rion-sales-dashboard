@@ -314,7 +314,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .ov-st .card:nth-child(1){background:#e8f0ff}.ov-st .card:nth-child(2){background:#eef4fc}.ov-st .card:nth-child(3),.ov-st .card:nth-child(4){background:#f1f3f8}.ov-st .card:nth-child(5){background:#e6f7f2}
 .ov-st .card .v{font-size:26px;margin-top:6px}
 /* ===== هدر و منوی بالا طبق مرجع (فقط CSS) ===== */
-@media(min-width:901px){
+@media(min-width:0){
 body{background:#F4F6FA}
 header{background:#fff;padding:16px 24px 14px;border-bottom:1px solid #E5E9F0;box-shadow:none}
 header .top{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:16px}
@@ -344,9 +344,9 @@ main{padding:24px}
 @media(max-width:760px){.ov-r1,.ov-r2,.ov-st .grid{grid-template-columns:1fr 1fr}.ov-r1 .card .v{font-size:28px}.ov-r2 .card .v{font-size:24px}}
 
 /* ===== دسکتاپ: سایدبار راست + محتوای اصلی (فقط CSS) ===== */
-@media(min-width:901px){
+@media(min-width:0){
 :root{--bg:#F3F8FF;--pri:#1765F5;--pri2:#55B9FF;--hov:#EDF5FF;--line:#E3EDFA;--ink:#35516D;--navy:#35516D;--mut:#71869D;--sh:0 8px 28px rgba(42,102,170,.07)}
-body{display:grid;grid-template-columns:272px minmax(0,1fr);min-height:100vh;background:var(--bg);color:var(--ink)}
+body{display:grid;grid-template-columns:clamp(170px,24vw,272px) minmax(0,1fr);min-height:100vh;background:var(--bg);color:var(--ink)}
 header{grid-column:1;grid-row:1;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:18px;padding:24px 16px;background:#fff;border:0;border-left:1px solid var(--line);box-shadow:none;z-index:10}
 header .top{display:flex;flex-direction:column;align-items:stretch;gap:16px}
 .logo{order:0;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px;box-shadow:none;flex-direction:column;align-items:center;gap:6px;text-align:center}
@@ -361,7 +361,7 @@ header .top{display:flex;flex-direction:column;align-items:stretch;gap:16px}
 .lft>.gear{order:9;margin-top:auto;align-self:stretch;width:100%;height:44px;border-radius:12px;border:1px solid var(--line);background:#fff;color:var(--mut);display:flex;align-items:center;justify-content:center;gap:8px}
 .lft>.gear:hover{background:var(--hov);color:var(--pri)}
 nav{display:flex;flex-direction:column;gap:4px;margin:0;order:3}
-nav button{height:44px;width:100%;border-radius:12px;border:1px solid transparent;background:transparent;color:var(--navy);font-size:14px;font-weight:500;padding:0 14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:none}
+nav button{height:44px;width:100%;font-size:13px;border-radius:12px;border:1px solid transparent;background:transparent;color:var(--navy);font-size:14px;font-weight:500;padding:0 14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:none}
 nav button:hover{background:var(--hov);color:var(--pri)}
 nav button.on{background:var(--pri);color:#fff;border-color:var(--pri);font-weight:600}
 nav button:focus-visible{outline:2px solid var(--pri2);outline-offset:2px}
@@ -385,24 +385,22 @@ nav button.on::before{border-color:#fff;background:#fff}
 nav button.on{box-shadow:0 6px 16px rgba(23,101,245,.25)}
 .logo{flex-direction:column}
 }
-@media(min-width:901px) and (prefers-reduced-motion:no-preference){
+@media(min-width:0) and (prefers-reduced-motion:no-preference){
 .card,.box,.drill{transition:box-shadow .18s ease,border-color .18s ease}
 nav button{transition:background .15s ease,color .15s ease}
 }
 
-/* ===== موبایل/عرض کم: لوگو و تب‌ها سمت راست، تب‌ها عمودی ===== */
-@media(max-width:900px){
-header .top{display:flex;flex-direction:column;align-items:stretch;gap:10px}
-.logo{order:0;align-self:flex-start;flex-direction:column;align-items:center;gap:4px;padding:8px 14px;border-radius:14px}
-.logo img{height:52px}
-.brand{order:1;text-align:right}
-.lft{order:2;display:flex;flex-direction:row;align-items:center;gap:8px}
-.lft .ctrl{flex:1}
-nav#nav{display:flex!important;flex-direction:column;gap:4px;margin-top:8px}
-nav#nav button{position:relative;width:100%;height:44px;text-align:right;padding:0 38px 0 12px;border-radius:12px;border:1px solid transparent;background:transparent;box-shadow:none;font-size:15px;white-space:nowrap}
-nav#nav button::before{content:"";position:absolute;right:14px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;border:1.5px solid #B8C4D6;background:#fff}
-nav#nav button.on{background:#1765F5;color:#fff;font-weight:600}
-nav#nav button.on::before{border-color:#fff;background:#fff}
+/* سایدبار باریک در موبایل */
+@media(max-width:700px){
+body{grid-template-columns:116px minmax(0,1fr)!important}
+header{padding:12px 6px!important;gap:10px!important}
+.logo{padding:6px!important}.logo img{height:36px!important}
+.logo>div,.brand,.lft .ctrl label{font-size:10px!important}
+.brand h1{font-size:12px!important}.brand .sub{display:none}
+nav button{height:38px!important;font-size:11px!important;padding:0 22px 0 4px!important;white-space:normal!important;line-height:1.2}
+nav button::before{right:6px!important;width:7px!important;height:7px!important}
+.lft .ctrl select{font-size:11px!important;min-height:30px!important}
+main{padding:12px 10px!important}
 }
 </style>
 </head>
