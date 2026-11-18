@@ -260,7 +260,7 @@ html,body{max-width:100%;overflow-x:hidden}
 .shl{cursor:pointer;color:inherit;text-decoration:underline dotted;text-underline-offset:3px}.shl:hover{color:#1d4ed8}.clk{cursor:pointer}.clk:hover td{background:#f4f7ff}.spk{display:inline-flex;align-items:flex-end;gap:2px;height:22px}.spk i{display:block;width:5px;background:#2f5bea;border-radius:1px}
 .cl_in.bad{border:2px solid #c0392b!important;background:#fdecea}
 .bkS{background:#ffe3c2!important}
-.cl_t{width:auto}.cl_t td,.cl_t th{padding:4px 6px;vertical-align:middle}.cl_t td.nm{min-width:260px;white-space:normal;line-height:1.6}.cl_t .cl_in{width:120px;box-sizing:border-box}.cl_t td.nm .cl_in{width:260px}.cl_t td.n{white-space:nowrap}
+.cl_t{width:auto}.cl_t td,.cl_t th{padding:4px 6px;vertical-align:middle}.cl_t td.nm{min-width:0;max-width:340px;white-space:normal;line-height:1.6}.cl_t .cl_in{width:120px;box-sizing:border-box}.cl_t td.nm .cl_in{width:200px}.cl_grip{display:none;vertical-align:middle;width:16px;margin-left:6px;cursor:grab}.cl_grip i{display:block;height:2px;background:#6b7a8c;border-radius:2px;margin:3px 0}.cl_rdy .cl_grip{display:inline-block}.cl_rdy,.cl_rdy td{touch-action:none;user-select:none}.cl_drag,.cl_drag td{background:#fff7dc!important;box-shadow:0 4px 12px rgba(0,0,0,.18)}.cl_t td.n{white-space:nowrap}
 /* ---- overview v2 (matches Rion-Dashboard-4K) ---- */
 .ovx-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
 .ovx-pills{display:flex;gap:10px}
@@ -1469,7 +1469,7 @@ function viewCList(){
         return `<td class="${cls.trim()}"><input class="cl_in${isBk?' '+bkCls(r[c]):''}${BAD.has(sn+'|'+i+'|'+c)?' bad':''}" ${h[c]==='شهر'?'list="cl_cities"':''} data-s="${esc(sn)}" data-r="${i}" data-c="${c}" value="${esc(r[c]??'')}"></td>`+(c===nc?vt:'')}).join('');
       const tail=edit?`<td>${MULTI?'':`<select class="cl_mv" data-s="${esc(sn)}" data-r="${i}"><option value="">جابجایی به…</option>${TG.map(n=>`<option>${esc(n)}</option>`).join('')}</select>`}</td><td><button class="btn sec cl_del" data-s="${esc(sn)}" data-r="${i}">🗑 حذف</button></td>`:'';
       const sh=edit?null:CAL.find(x=>x.sheet===sn&&nz(x.name)===nz(r[nc]));
-      body.push(`<tr${sh?` class="clk" data-shop="${sh.id}"`:''}><td class="n">${fa(k)}</td>${cells}${tail}</tr>`)}
+      body.push(`<tr${sh?` class="clk" data-shop="${sh.id}"`:''}><td class="n">${edit?'<span class="cl_grip" title="نگه دارید و بکشید"><i></i><i></i><i></i></span>':''}${fa(k)}</td>${cells}${tail}</tr>`)}
     const hd=cols.map(c=>`<th>${esc(h[c])}</th>`+(c===nc?'<th style="text-align:center">ویترین</th>':'')).join('');
     return `<div class="box cl_sec" style="width:100%;margin:0;padding:0;overflow:hidden;direction:rtl">
      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:#faf6ec;border-bottom:1px solid #eadfc4">
@@ -1565,6 +1565,33 @@ async function clSave(){
   catch(e){return '⚠ ذخیره محلی شد ولی در گیت‌هاب ثبت نشد ('+e.message+'). توکن و دسترسی را بررسی کنید.'}}
 function bindCList(){
   const app=$('app'),msg=t=>{const m=$('cl_msg');if(m)m.textContent=t};
+  let HT=null,DR=null,PS=null;
+  const cancelHold=()=>{clearTimeout(HT);HT=null;PS=null};
+  const endDrag=()=>{cancelHold();if(!DR)return;const d=DR;DR=null;
+    d.tr.classList.remove('cl_rdy','cl_drag');
+    const sn=d.tr.querySelector('[data-s]').dataset.s,rows=CLW[sn],hi=hdrIdx(rows),nc=hdrOf(rows[hi]).indexOf('نام مغازه');
+    const P=[];rows.forEach((r,i)=>{if(i>hi&&isDataRow(r,nc))P.push(i)});
+    const order=[...d.tbody.querySelectorAll('tr')].map(t=>+t.querySelector('[data-r]').dataset.r);
+    if(order.length!==P.length||order.every((v,j)=>v===P[j]))return;
+    const nr=rows.slice();P.forEach((pos,j)=>{nr[pos]=rows[order[j]]});CLW[sn]=nr;
+    draw();setTimeout(()=>{const m=$('cl_msg');if(m)m.textContent='ترتیب تغییر کرد؛ برای ثبت، دکمه «💾 ذخیره و اعمال» را بزنید'},0)};
+  app.onpointerdown=e=>{
+    if(S.clm!=='edit'||e.button>0||e.target.closest('input,select,button,textarea,a'))return;
+    const tr=e.target.closest('.cl_t tbody tr');if(!tr)return;
+    cancelHold();PS={x:e.clientX,y:e.clientY,id:e.pointerId};
+    HT=setTimeout(()=>{HT=null;DR={tr,tbody:tr.parentNode,pid:e.pointerId};tr.classList.add('cl_rdy','cl_drag');
+      try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}},400);
+  };
+  app.onpointermove=e=>{
+    if(!DR){if(PS&&PS.id===e.pointerId&&Math.hypot(e.clientX-PS.x,e.clientY-PS.y)>10)cancelHold();return}
+    if(e.pointerId!==DR.pid)return;e.preventDefault();
+    const y=e.clientY,cur=DR.tr,trs=[...DR.tbody.querySelectorAll('tr')];let ref=null;
+    for(const t of trs){if(t===cur)continue;const b=t.getBoundingClientRect();if(y<b.top+b.height/2){ref=t;break}}
+    if(ref){if(cur.nextElementSibling!==ref)DR.tbody.insertBefore(cur,ref)}
+    else if(DR.tbody.lastElementChild!==cur)DR.tbody.appendChild(cur);
+  };
+  app.onpointerup=endDrag;app.onpointercancel=endDrag;
+  app.oncontextmenu=e=>{if(DR||HT)e.preventDefault()};
   app.oninput=e=>{const i=e.target.closest('.cl_in');if(!i)return;
     const rows=CLW[i.dataset.s],h=hdrOf(rows[hdrIdx(rows)]),c=+i.dataset.c;let v=i.value;
     if(h[c].startsWith('بوک-')||/^\d+$/.test(h[c])||(h[c]==='هنگر'&&h.filter(x=>x.startsWith('بوک')).length>1))v=v===''?null:num(v);
