@@ -487,8 +487,8 @@ body{display:block!important;background:#f3f8ff}
 body.locked #mbar button{display:none}
 #mbar{display:flex;position:fixed;top:0;left:0;right:0;height:53px;z-index:50;background:#fff;border-bottom:1px solid #e3edfa;align-items:center;justify-content:space-between;padding:0 16px;direction:rtl}
 #mbar button{width:40px;height:40px;border-radius:10px;border:1px solid #e3edfa;background:#fff;color:#1f2f45;display:flex;align-items:center;justify-content:center;padding:0}
-#mbar b{font-size:15px;color:#1f2f45;margin-right:auto;margin-left:auto;position:absolute;right:68px}
-#mbar img{height:34px;width:auto;margin-left:auto}
+#mbar b{flex:1;min-width:0;font-size:16px;font-weight:700;color:#1f2f45;text-align:right;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mbar img{height:30px;width:auto;max-width:90px;object-fit:contain;flex:0 0 auto}
 #mbk{display:block;position:fixed;inset:0;background:#0f1b3a66;z-index:55;opacity:0;pointer-events:none;transition:opacity .2s}
 body.menu #mbk{opacity:1;pointer-events:auto}
 header{position:fixed!important;top:0!important;right:0!important;left:auto!important;height:100vh!important;width:min(290px,82vw)!important;transform:translateX(105%);transition:transform .25s;z-index:60!important;padding:18px 14px!important;gap:14px!important;border-left:1px solid #e3edfa;box-shadow:-8px 0 30px #0f1b3a30!important}
@@ -510,7 +510,10 @@ main{padding:65px 14px 24px!important}
 .mv-sec h2{margin:0;font-size:15px;font-weight:700;color:#1f2f45}
 .mv-sec span{font-size:11px;color:#71869d;direction:ltr;letter-spacing:.3px}
 .mv-c{background:#fff;border:1px solid #e3edfa;border-radius:14px;padding:13px 14px;min-width:0;text-align:right}
-.mv-c.on{border-color:#1765F5}
+.mv-c{box-shadow:0 2px 10px #1765f50d}.mv-c.on{border-color:#9ec0fb;box-shadow:0 0 0 3px #1765f51a}
+.mv-big{background:linear-gradient(135deg,#fff,#eef4ff)}.mv-big .v b{color:#0d3fa6}
+.mv-grid .mv-c{position:relative;padding-top:14px}.mv-grid .mv-c.blue::before{content:'';position:absolute;top:14px;bottom:14px;right:0;width:3px;border-radius:3px;background:#1765F5}
+.mv-c:active{transform:scale(.98)}
 .mv-c .t{font-size:12px;color:#35516d}
 .mv-c .v{margin-top:6px;font-size:12px;color:#1f2f45}
 .mv-c .v b{font-size:21px;font-weight:800;color:#1f2f45;white-space:nowrap}
@@ -741,7 +744,7 @@ function viewOver(){
   const mT=target/12, maxM=Math.max(...o.mon.slice(1),mT)*1.1||1, tot=sold||1;
   const jd=new Date(Date.now()+NOWOFF),[jy,jm,jdd]=g2j(jd.getFullYear(),jd.getMonth()+1,jd.getDate());
   const WDN=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
-  const pct=v=>fa(v.toFixed(1).replace('.','٫'))+'٪';
+  const pct=v=>fa(Math.round((+v||0)*10)/10)+'٪';
   const ic={bar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 20V12M12 20V5M18 20v-7"/></svg>',clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>'};
   const ovc=(k,title,icon,val,unit,body,extra='')=>`<div class="card tap ovx ${S.drill===k?'on':''}" data-d="${k}" role="button" tabindex="0" aria-expanded="${S.drill===k}"><div class="ovx-t"><span class="ovx-i">${icon}</span><span>${title}</span></div><div class="ovx-v"><b>${val}</b>${unit?`<span>${unit}</span>`:''}</div>${body}${extra}</div>`;
   const bar=p=>`<div class="ovx-bar"><i style="width:${Math.max(Math.min(p,100),0)}%"></i></div>`;
@@ -754,7 +757,7 @@ function viewOver(){
     const sT=(nA+nS+nI+nD)||1, pc=Math.max(Math.min(sold/target*100,100),0);
     const mc=(k,t,v,u,s,cls='')=>`<div class="mv-c tap ${cls} ${S.drill===k?'on':''}" data-d="${k}" role="button" tabindex="0"><div class="t">${t}</div><div class="v"><b>${v}</b>${u?` <span>${u}</span>`:''}</div><div class="s">${s}</div></div>`;
     const sr=(k,l,n,col)=>`<div class="mv-sr tap" data-d="${k}" role="button" tabindex="0"><span class="l"><i style="background:${col}"></i>${l}</span><b>${fa(n)}</b></div>`;
-    mob=`<div class="mv-top"><div class="mv-hd"><h1>فروش کاتینگ ریون</h1><p>${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${fa(jy)}</p></div><label class="mv-pill">ماه: ${MONTHS[c-1]}<select id="mvcur">${MONTHS.map((m,i)=>`<option value="${i+1}" ${i+1===c?'selected':''}>${m}</option>`).join('')}</select></label></div>
+    mob=`<div class="mv-top"><div class="mv-hd"><h1>فروش کاتینگ ریون</h1><p>${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${String(jy).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d])}</p></div><label class="mv-pill">ماه: ${MONTHS[c-1]}<select id="mvcur">${MONTHS.map((m,i)=>`<option value="${i+1}" ${i+1===c?'selected':''}>${m}</option>`).join('')}</select></label></div>
     <div class="mv-sec"><h2>عملکرد فروش</h2><span>01 &nbsp;/&nbsp; PERFORMANCE</span></div>
     <div class="mv-c mv-big tap ${S.drill==='sold'?'on':''}" data-d="sold" role="button" tabindex="0"><div class="mv-info"><div class="t">فروش تا امروز</div><div class="v"><b>${fa(sold)} متر</b></div><div class="s">از هدف سالانهٔ ${fa(target)} متر</div></div><div class="mv-ring" style="--p:${pc}"><span>${pct(sold/target*100)}</span></div></div>
     <div class="mv-grid">
