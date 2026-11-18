@@ -637,6 +637,27 @@ main{max-width:760px!important;margin:0 auto!important;padding-top:70px!importan
 .mp-card,.mp-hd{max-width:100%}
 .mp-hd h1{font-size:28px}
 }
+
+/* ---- overview like reference screenshots ---- */
+.ovx-hero{display:flex;flex-direction:row;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-bottom:10px}
+.ovx-hero .ovx-sold{flex:1;border:0!important;box-shadow:none!important;padding:0!important;background:none}
+.ovx-donut{flex:0 0 auto;width:132px;height:132px;border-radius:50%;background:conic-gradient(#176FC1 calc(var(--p)*1%),#E2E8F0 0);display:flex;align-items:center;justify-content:center;-webkit-mask:radial-gradient(circle,transparent 0 0)}
+.ovx-donut{-webkit-mask:none;position:relative}
+.ovx-donut::before{content:"";position:absolute;inset:11px;border-radius:50%;background:#fff}
+.ovx-donut span{position:relative;font-weight:bold;font-size:15px;color:#176FC1;direction:ltr}
+.ovx-blue{color:#176FC1}
+.ovx-i{display:none!important}
+.ovx-r1{grid-template-columns:1fr 1fr!important;gap:10px!important}
+.ovx-r2{display:none!important}
+.ovx-r1 .ovx-v b{font-size:24px!important}
+.ovx-r1 .card.ovx{border-top:1px solid var(--line)!important;border-radius:16px;padding:14px!important}
+.ovx-hero .ovx-v b{font-size:30px!important}
+@media(max-width:560px){.ovx-donut{width:96px;height:96px}.ovx-donut::before{inset:9px}.ovx-donut span{font-size:12px}.ovx-hero .ovx-v b{font-size:26px!important}}
+.grid>.card.tap.g{border:1.5px solid var(--ok)!important;border-radius:16px}
+.grid>.card.tap.b{border:1.5px solid var(--bad)!important;border-radius:16px}
+@media(max-width:1180px){.grid:has(>.card.tap.g){grid-template-columns:1fr!important}}
+.wrap table{border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.wrap td,.wrap th{border-bottom:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -897,16 +918,15 @@ function viewOver(){
   return `<div class="ovx-top"><div class="ovx-pills"><div class="ovx-pill">ماه: <b>${MONTHS[c-1]}</b></div><div class="ovx-pill">${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${fa(jy)}</div></div>
   <div class="ovx-title"><small>داشبورد / نمای کلی</small><h1>فروش کاتینگ ریون</h1><p>پیگیری فروش متراژ حریر و توری</p></div></div>
   <div class="ovx-sec"><span class="ovx-yr">سال ${fa(jy)}</span><div><h2>عملکرد فروش</h2><p>نمایی روشن از مسیر رسیدن به هدف</p></div></div>
+  <div class="ovx-hero"><div class="ovx-donut" style="--p:${Math.max(Math.min(sold/target*100,100),0)}"><span>${pct(sold/target*100)}</span></div>
+   <div class="card tap ovx ovx-sold ${S.drill==='sold'?'on':''}" data-d="sold" role="button" tabindex="0"><div class="ovx-t"><span>فروش تا امروز</span></div><div class="ovx-v"><b>${fa(sold)}</b><span>متر</span></div><div class="ovx-sub">از هدف سالانهٔ ${fa(target)} متر</div></div></div>
   <div class="ovx-r1">
-   ${ovc('sold','فروش تا امروز',ic.bar,fa(sold),'متر',`<div class="ovx-sub">${pct(sold/target*100)} از هدف سالانه</div>${bar(sold/target*100)}<div class="ovx-note">هدف: ${fa(target)} متر</div>`)}
-   ${ovc('left','باقی‌مانده تا هدف',ic.clock,fa(left),'متر',`<div class="ovx-sub">فاصله تا تکمیل هدف فروش سال</div>${bar(left/target*100)}`,`<span class="ovx-tag">${fa(rem)} ماه مانده</span>`)}
-   ${ovc('need','لازم در هر ماه',ic.cal,fa(need),'متر',`<div class="ovx-foot"><span>میانگین فعلی</span><b>${fa(pace)} متر</b></div>`)}
-  </div>
-  <div class="ovx-r2">
-   ${ovc('proj','پیش‌بینی پایان سال',ic.bar,fa(proj),'',`<div class="ovx-note">با همین روند فروش</div>`)}
-   ${ovc('inact','مغازه‌های بی‌خرید',ic.clock,fa(inact),'',`<div class="ovx-note">یک ماه ${fa(cnt('g1'))} • دو ماه ${fa(cnt('g2'))} • بیشتر ${fa(cnt('g3'))}</div>`)}
-   ${gN?ovc('added','مغازه جدید اضافه‌شده',ic.cal,fa(added)+' <small>از '+fa(gN)+'</small>','',`<div class="ovx-note">هدف: ${fa(Math.min(added/gN*100,100))}٪</div>`):''}
-   ${ovc('coll','بوک برای جمع‌آوری',ic.clock,fa(coll),'',`<div class="ovx-note">بوک ۱۴۰۵ و ۱۴۰۴ • این ماه کار نکرده</div>`)}
+   ${ovc('left','باقی‌مانده تا هدف','',`<span class="ovx-blue">${fa(left)}</span>`,'متر',`<div class="ovx-sub">${fa(rem)} ماه تا پایان سال</div>`)}
+   ${ovc('need','لازم در هر ماه','',`<span class="ovx-blue">${fa(need)}</span>`,'متر',`<div class="ovx-sub">میانگین فعلی: ${fa(pace)} متر</div>`)}
+   ${ovc('proj','پیش‌بینی پایان سال','',fa(proj),'متر',`<div class="ovx-sub">با همین روند فروش</div>`)}
+   ${ovc('inact','مغازه‌های بی‌خرید','',fa(inact),'مغازه',`<div class="ovx-sub">۱ ماه: ${fa(cnt('g1'))} ۲ ماه: ${fa(cnt('g2'))} بیشتر: ${fa(cnt('g3'))}</div>`)}
+   ${gN?ovc('added','مغازهٔ جدید اضافه‌شده','',fa(added)+' از '+fa(gN),'',`<div class="ovx-sub">${pct(added/gN*100)} از هدف</div>`):''}
+   ${ovc('coll','بوک برای جمع‌آوری','',fa(coll),'بوک',`<div class="ovx-sub">بدون کارکرد در این ماه</div>`)}
   </div>
   ${drillPanel('top')}
   ${statBlock()}
@@ -930,7 +950,7 @@ function viewOver(){
 function yearTable(){
   const y={};D.shops.forEach(s=>{const o=y[s.year]??={n:0,t:0,h:0};o.n++;o.t+=s.total;if(s.hanger)o.h++});
   const tot=D.shops.reduce((a,s)=>a+s.total,0)||1;
-  return `<div class="wrap"><table><tr><th>طرح</th><th class="n">مغازه</th><th class="n">متر</th><th>سهم از فروش</th><th class="n">میانگین هر مغازه</th><th class="n">هنگر</th></tr>${Object.keys(y).sort((a,b)=>b-a).map(k=>{const o=y[k];return `<tr><td>${ytag(+k)}</td><td class="n">${fa(o.n)}</td><td class="n">${fa(o.t)}</td><td>${shareBar(o.t/tot*100)}</td><td class="n">${fa(o.t/o.n)}</td><td class="n">${fa(o.h)}</td></tr>`}).join('')}</table></div>`;
+  return `<div class="wrap"><table><tr><th>طرح</th><th class="n">مغازه</th><th class="n">متر</th><th>سهم از فروش</th><th class="n">میانگین</th></tr>${Object.keys(y).sort((a,b)=>b-a).map(k=>{const o=y[k];return `<tr><td>${ytag(+k)}</td><td class="n">${fa(o.n)}</td><td class="n">${fa(o.t)}</td><td>${shareBar(o.t/tot*100)}</td><td class="n">${fa(o.t/o.n)}</td></tr>`}).join('')}</table></div>`;
 }
 
 /* ---- all shops ---- */
