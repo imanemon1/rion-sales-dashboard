@@ -390,17 +390,58 @@ nav button.on{box-shadow:0 6px 16px rgba(23,101,245,.25)}
 nav button{transition:background .15s ease,color .15s ease}
 }
 
-/* سایدبار باریک در موبایل */
+/* ===== سیستم واکنش‌گرای سه‌اندازه‌ای: موبایل / تبلت / لپ‌تاپ ===== */
+:root{--sbw:112px;--gap:12px;--pad:12px;--fs:13px;--fs-s:11px;--fs-l:12px;--h1:18px;--vbig:24px;--vmid:20px;--r:14px}
+html{font-size:16px}
+body{font-size:var(--fs)}
+body{grid-template-columns:var(--sbw) minmax(0,1fr)!important}
+main{padding:var(--pad)!important;min-width:0;overflow-x:hidden}
+.card,.box,.drill{min-width:0;border-radius:var(--r)!important;overflow-wrap:break-word;word-break:normal}
+.box,.drill{overflow-x:auto;padding:var(--pad)}
+.grid,.ov-r1,.ov-r2,.ov-st .grid,.stat-row,.two{gap:var(--gap)!important}
+.card{padding:var(--pad)}
+.card .l,.ov-r1 .card .l,.ov-r2 .card .l{font-size:var(--fs-l)!important;white-space:normal}
+.card .s,.ov-r1 .card .s,.ov-r2 .card .s,.card .more{font-size:var(--fs-s)!important;white-space:normal;line-height:1.7}
+.ov-r1 .card .v,.stat-row .card .v{font-size:var(--vbig)!important;overflow-wrap:normal;white-space:nowrap}
+.ov-r2 .card .v,.ov-st .card .v,.card .v{font-size:var(--vmid)!important;overflow-wrap:normal}
+.pg-head h1,.brand h1{font-size:var(--h1)!important}
+.pg-head p,.pg-head .crumb{font-size:var(--fs-s)!important}
+table{font-size:var(--fs-s)}
+h2,h3{font-size:calc(var(--fs) + 2px);line-height:1.6}
+
+/* موبایل (آیفون و گوشی‌ها) */
 @media(max-width:700px){
-body{grid-template-columns:116px minmax(0,1fr)!important}
-header{padding:12px 6px!important;gap:10px!important}
-.logo{padding:6px!important}.logo img{height:36px!important}
-.logo>div,.brand,.lft .ctrl label{font-size:10px!important}
-.brand h1{font-size:12px!important}.brand .sub{display:none}
-nav button{height:38px!important;font-size:11px!important;padding:0 22px 0 4px!important;white-space:normal!important;line-height:1.2}
+:root{--sbw:100px;--gap:10px;--pad:10px;--fs:12px;--fs-s:10px;--fs-l:11px;--h1:15px;--vbig:22px;--vmid:18px}
+header{padding:10px 6px!important;gap:8px!important}
+.logo{padding:5px!important}.logo img{height:32px!important}
+.logo>div,.lft .ctrl label{font-size:9px!important;white-space:normal!important}
+.brand h1{font-size:11px!important;line-height:1.5}.brand .sub{display:none}
+.lft .ctrl{padding:4px 6px!important}
+.lft .ctrl select{font-size:11px!important;min-height:28px!important;padding:0 2px}
+.lft>.gear{height:34px!important}
+nav button{height:auto!important;min-height:34px;font-size:10.5px!important;line-height:1.35;padding:6px 20px 6px 4px!important;white-space:normal!important;text-align:right}
 nav button::before{right:6px!important;width:7px!important;height:7px!important}
-.lft .ctrl select{font-size:11px!important;min-height:30px!important}
-main{padding:12px 10px!important}
+.ov-r1,.ov-r2,.ov-st .grid,.stat-row,.grid,.two{grid-template-columns:1fr!important}
+.ov-st .grid{grid-template-columns:1fr 1fr!important}
+.pg-head h1{font-size:15px!important}
+}
+/* تبلت ۱۰ تا ۱۲ اینچ */
+@media(min-width:701px) and (max-width:1180px){
+:root{--sbw:200px;--gap:14px;--pad:16px;--fs:13px;--fs-s:11.5px;--fs-l:12.5px;--h1:20px;--vbig:28px;--vmid:22px}
+header{padding:18px 12px!important}
+nav button{font-size:13px!important;height:42px!important;white-space:normal!important}
+.ov-r1{grid-template-columns:repeat(3,1fr)!important}
+.ov-r2,.stat-row{grid-template-columns:repeat(2,1fr)!important}
+.ov-st .grid{grid-template-columns:repeat(3,1fr)!important}
+.two{grid-template-columns:1fr!important}
+}
+/* لپ‌تاپ ۱۳ تا ۱۵ اینچ و بالاتر */
+@media(min-width:1181px){
+:root{--sbw:250px;--gap:16px;--pad:20px;--fs:14px;--fs-s:12px;--fs-l:13px;--h1:24px;--vbig:34px;--vmid:28px}
+main{padding:28px 32px!important}
+.ov-r1{grid-template-columns:repeat(3,1fr)!important}
+.ov-r2,.stat-row{grid-template-columns:repeat(4,1fr)!important}
+.ov-st .grid{grid-template-columns:repeat(5,1fr)!important}
 }
 </style>
 </head>
