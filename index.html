@@ -443,6 +443,41 @@ main{padding:28px 32px!important}
 .ov-r2,.stat-row{grid-template-columns:repeat(4,1fr)!important}
 .ov-st .grid{grid-template-columns:repeat(5,1fr)!important}
 }
+/* ===== اصلاح کارت‌های نمای کلی (ovx) برای موبایل ===== */
+@media(max-width:700px){
+main{padding:10px 8px!important}
+.ovx-top{gap:8px;margin-bottom:10px}
+.ovx-pills{gap:6px;width:100%}
+.ovx-pill{flex:1;min-width:0;font-size:11px;padding:7px 8px;white-space:normal}
+.ovx-title{margin-right:0;width:100%}
+.ovx-title small{font-size:10px}
+.ovx-title h1{font-size:18px;margin:2px 0}
+.ovx-title p{font-size:11px}
+.ovx-sec{padding:10px 0 12px;margin-bottom:10px;gap:8px}
+.ovx-sec h2{font-size:14px}
+.ovx-sec p{font-size:10px}
+.ovx-yr{font-size:10px;white-space:nowrap}
+.ovx-r1,.ovx-r2{grid-template-columns:1fr 1fr!important;gap:8px!important;margin-bottom:8px!important}
+.card.ovx,.ovx-r2 .card.ovx{padding:12px 10px!important;min-width:0;overflow:hidden}
+.ovx-t{font-size:11px;gap:4px;align-items:flex-start;min-width:0}
+.ovx-t>span:last-child{line-height:1.5;min-width:0;overflow-wrap:anywhere}
+.ovx-i{width:24px;height:24px;flex:0 0 24px;border-radius:6px}
+.ovx-i svg{width:13px;height:13px}
+.ovx-v{margin-top:8px;flex-wrap:wrap;justify-content:flex-start;gap:2px 4px;min-width:0}
+.ovx-v b,.ovx-r2 .ovx-v b{font-size:20px!important;line-height:1.2;white-space:nowrap;direction:ltr;unicode-bidi:isolate}
+.ovx-v span{font-size:10px}
+.ovx-sub{font-size:10px;margin-top:6px;line-height:1.6}
+.ovx-note{font-size:10px;margin-top:6px;line-height:1.6}
+.ovx-tag{position:static;display:inline-block;margin-bottom:6px;font-size:10px;padding:2px 6px}
+.ovx-bar{margin-top:6px;height:5px}
+.ovx-foot{font-size:10px;padding-top:8px;margin-top:8px;flex-wrap:wrap;gap:4px}
+.ovx-foot b{font-size:11px}
+.ov-st .grid{grid-template-columns:1fr 1fr!important;gap:8px!important}
+.ov-st .card{padding:10px!important}
+.ov-st .card .v{font-size:20px!important}
+.ov-st .card .l,.ov-st .card .s{font-size:10px!important}
+.ov-hd h2,.ov-st h2{font-size:13px!important;line-height:1.7}
+}
 </style>
 </head>
 <body>
