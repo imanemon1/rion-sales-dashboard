@@ -894,7 +894,8 @@ function viewOver(){
       ${yk.map(y=>{const q=yrs[y],sh=q.t/yT*100;return `<div class="mp-bk"><div class="mp-row"><b class="mp-pc2">${pct(sh)}</b><h3>بوک ${yl(+y)}</h3></div>${vbar(sh,100,'bk')}<div class="mp-meta"><span>میانگین: ${R(q.t/q.n)} متر</span><span>${fa(q.n)} مغازه · ${R(q.t)} متر</span></div></div>`}).join('')}
     </div>`;
   }
-  return `${M?mob:`<div class="ovx-top"><div class="ovx-pills"><div class="ovx-pill">ماه: <b>${MONTHS[c-1]}</b></div><div class="ovx-pill">${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${fa(jy)}</div></div>
+  if(M) return mob;
+  return `<div class="ovx-top"><div class="ovx-pills"><div class="ovx-pill">ماه: <b>${MONTHS[c-1]}</b></div><div class="ovx-pill">${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${fa(jy)}</div></div>
   <div class="ovx-title"><small>داشبورد / نمای کلی</small><h1>فروش کاتینگ ریون</h1><p>پیگیری فروش متراژ حریر و توری</p></div></div>
   <div class="ovx-sec"><span class="ovx-yr">سال ${fa(jy)}</span><div><h2>عملکرد فروش</h2><p>نمایی روشن از مسیر رسیدن به هدف</p></div></div>
   <div class="ovx-r1">
@@ -909,7 +910,7 @@ function viewOver(){
    ${ovc('coll','بوک برای جمع‌آوری',ic.clock,fa(coll),'',`<div class="ovx-note">بوک ۱۴۰۵ و ۱۴۰۴ • این ماه کار نکرده</div>`)}
   </div>
   ${drillPanel('top')}
-  ${statBlock()}`}
+  ${statBlock()}
   <div class="box pb-click" role="button" tabindex="0"><div class="pb-head"><h2>هدف سالانه: ${fa(target)} متر</h2><b>${fa(sold)} متر فروخته شده • ${fa(left)} متر مانده</b></div>
   <div class="pb-tube"><div class="pb-fill" style="--w:${Math.max(Math.min(sold/target*100,100),0)}%"><i class="pb-w"></i><i class="pb-w p2"></i></div><div class="pb-pct">${fa(sold/target*100)}٪</div></div>
   <div class="gh">روی نوار بزنید: راهنمای مسیر و پیشنهادها</div>
