@@ -705,6 +705,20 @@ main{max-width:min(1500px,100%)}
 .two{grid-template-columns:repeat(auto-fit,minmax(min(100%,clamp(280px,40vw,520px)),1fr))!important;gap:var(--gap)!important}
 .grid:has(>.card.tap.g){grid-template-columns:repeat(auto-fit,minmax(min(100%,clamp(260px,34vw,420px)),1fr))!important}
 main{max-width:min(1500px,100%)!important}
+
+/* ===== بلوک وضعیت مغازه‌ها (فشرده، همه دستگاه‌ها) ===== */
+.sx{padding:var(--pad)}
+.sx-t{font-size:var(--h1);font-weight:700;margin:0}
+.sx-sub{color:var(--mut);font-size:var(--fs-s);margin-top:2px}
+.sx-bar{display:flex;gap:3px;height:8px;margin:12px 0 4px;direction:rtl}
+.sx-bar i{display:block;border-radius:4px;min-width:3px}
+.sx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));column-gap:clamp(16px,3vw,48px)}
+.sx-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:clamp(10px,1vw,14px) 2px;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;border-top:0;background:transparent;cursor:pointer;direction:rtl}
+.sx-row:hover{background:#f7faff;box-shadow:none}
+.sx-row.on{background:var(--pri-l);box-shadow:none}
+.sx-l{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:var(--fs-s)}
+.sx-l i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.sx-n{font-size:var(--vmid);color:var(--navy);font-weight:700}
 </style>
 </head>
 <body>
@@ -835,18 +849,20 @@ function NEWSH(){
 function statBlock(){
   const c=S.cur, by=k=>D.shops.filter(s=>s.status===k);
   const upd=D.shops.filter(s=>s.year===4&&['ok','g1','g2'].includes(s.status));
-  const g={
-    active:{l:'فعال',a:by('ok'),cl:'g',d:'در ماه جاری خرید داشته‌اند'},
-    semi:{l:'نیمه‌فعال',a:[...by('g1'),...by('g2')],cl:'w',d:'۱ یا ۲ ماه است خرید نکرده‌اند'},
-    inact:{l:'غیرفعال',a:by('g3'),cl:'b',d:'۳ ماه یا بیشتر خرید نکرده‌اند ولی امسال خرید داشته‌اند'},
-    dead:{l:'راکد',a:by('never'),cl:'b',d:'از ابتدای سال هیچ خریدی نداشته‌اند'}
-  };
-  const card=(k,l,a,cl,d)=>drillTap(k,l,fa(a.length),d,cl);
-  const sa=[g.active.a,g.semi.a,g.inact.a,g.dead.a].map(x=>x.length),sT=sa.reduce((a,b)=>a+b,0)||1;
-  const seg=sa.map(n=>`<i style="flex:${n/sT}"></i>`).join('');
-  return `<div class="box ov-st"><div class="ov-hd"><h2>وضعیت مغازه‌ها تا ${MONTHS[c-1]} (${fa(D.shops.length)} مغازه، بدون نماینده)</h2></div>
-  <div class="segbar">${seg}</div>
-  <div class="grid">${card('st_active',g.active.l,g.active.a,g.active.cl,g.active.d)}${card('st_semi',g.semi.l,g.semi.a,g.semi.cl,g.semi.d)}${card('st_inact',g.inact.l,g.inact.a,g.inact.cl,g.inact.d)}${card('st_dead',g.dead.l,g.dead.a,g.dead.cl,g.dead.d)}${card('st_upd','قابل به‌روزرسانی به بوک ۱۴۰۵',upd,'g','بوک ۱۴۰۴ دارند و فعال یا نیمه‌فعال هستند')}</div>
+  const items=[
+    {k:'st_active',l:'فعال',a:by('ok'),col:'#2f5bea'},
+    {k:'st_semi',l:'نیمه‌فعال',a:[...by('g1'),...by('g2')],col:'#7cc4f5'},
+    {k:'st_inact',l:'غیرفعال',a:by('g3'),col:'#9ba3c6'},
+    {k:'st_dead',l:'راکد',a:by('never'),col:'#c3c8d8'},
+    {k:'st_upd',l:'قابل به‌روزرسانی به بوک ۱۴۰۵',a:upd,col:'#2a8a80'}
+  ];
+  const sa=items.slice(0,4).map(x=>x.a.length),sT=sa.reduce((a,b)=>a+b,0)||1;
+  const seg=sa.map((n,i)=>`<i style="flex:${n/sT};background:${items[i].col}"></i>`).join('');
+  const row=it=>`<div class="sx-row tap ${S.drill===it.k?'on':''}" data-d="${it.k}" role="button" tabindex="0" aria-expanded="${S.drill===it.k}"><span class="sx-l"><i style="background:${it.col}"></i>${it.l}</span><b class="sx-n">${fa(it.a.length)}</b></div>`;
+  return `<div class="box sx"><h2 class="sx-t">وضعیت مغازه‌ها تا ${MONTHS[c-1]}</h2>
+  <div class="sx-sub">${fa(D.shops.length)} مغازه · بدون نماینده</div>
+  <div class="segbar sx-bar">${seg}</div>
+  <div class="sx-grid">${items.map(row).join('')}</div>
   ${drillPanel('st')}</div>`;
 }
 function shopRows(a){
