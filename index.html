@@ -719,6 +719,7 @@ main{max-width:min(1500px,100%)!important}
 .sx-l{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:var(--fs-s)}
 .sx-l i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
 .sx-n{font-size:var(--vmid);color:var(--navy);font-weight:700}
+.ovx-v b .ovx-blue{color:#2f5bea!important;font-size:inherit!important}
 </style>
 </head>
 <body>
@@ -759,6 +760,7 @@ const TABS=[['over','نمای کلی'],['shops','همه مغازه‌ها'],['in
 const STL={ok:'فعال',g1:'یک ماه بی‌خرید',g2:'دو ماه بی‌خرید',g3:'سه ماه+ بی‌خرید',never:'بدون خرید'};
 const mcell=(v,cls='',attr='')=>`<td class="n ${cls}" ${attr}>${v==null?'':fa(v)}</td>`;
 const fa=n=>Number(n).toLocaleString('fa-IR',{maximumFractionDigits:1});
+const fy=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const num=v=>typeof v==='number'?v:(parseFloat(v)||0);
 const $=id=>document.getElementById(id);
@@ -978,16 +980,16 @@ function viewOver(){
       ${yk.map(y=>{const q=yrs[y],sh=q.t/yT*100;return `<div class="mp-bk"><div class="mp-row"><b class="mp-pc2">${pct(sh)}</b><h3>بوک ${yl(+y)}</h3></div>${vbar(sh,100,'bk')}<div class="mp-meta"><span>میانگین: ${R(q.t/q.n)} متر</span><span>${fa(q.n)} مغازه · ${R(q.t)} متر</span></div></div>`}).join('')}
     </div>`;
   }
-  return `<div class="ovx-top"><div class="ovx-pills"><div class="ovx-pill">ماه: <b>${MONTHS[c-1]}</b></div><div class="ovx-pill">${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${fa(jy)}</div></div>
+  return `<div class="ovx-top"><div class="ovx-pills"><div class="ovx-pill">ماه: <b>${MONTHS[c-1]}</b></div><div class="ovx-pill">${WDN[jd.getDay()]}، ${fa(jdd)} ${MONTHS[jm-1]} ${fy(jy)}</div></div>
   <div class="ovx-title"><small>داشبورد / نمای کلی</small><h1>فروش کاتینگ ریون</h1><p>پیگیری فروش متراژ حریر و توری</p></div></div>
-  <div class="ovx-sec"><span class="ovx-yr">سال ${fa(jy)}</span><div><h2>عملکرد فروش</h2><p>نمایی روشن از مسیر رسیدن به هدف</p></div></div>
+  <div class="ovx-sec"><span class="ovx-yr">سال ${fy(jy)}</span><div><h2>عملکرد فروش</h2><p>نمایی روشن از مسیر رسیدن به هدف</p></div></div>
   <div class="ovx-hero"><div class="ovx-donut" style="--p:${Math.max(Math.min(sold/target*100,100),0)}"><span>${pct(sold/target*100)}</span></div>
    <div class="card tap ovx ovx-sold ${S.drill==='sold'?'on':''}" data-d="sold" role="button" tabindex="0"><div class="ovx-t"><span>فروش تا امروز</span></div><div class="ovx-v"><b>${fa(sold)}</b><span>متر</span></div><div class="ovx-sub">از هدف سالانهٔ ${fa(target)} متر</div></div></div>
   <div class="ovx-r1">
    ${ovc('left','باقی‌مانده تا هدف','',`<span class="ovx-blue">${fa(left)}</span>`,'متر',`<div class="ovx-sub">${fa(rem)} ماه تا پایان سال</div>`)}
    ${ovc('need','لازم در هر ماه','',`<span class="ovx-blue">${fa(need)}</span>`,'متر',`<div class="ovx-sub">میانگین فعلی: ${fa(pace)} متر</div>`)}
    ${ovc('proj','پیش‌بینی پایان سال','',fa(proj),'متر',`<div class="ovx-sub">با همین روند فروش</div>`)}
-   ${ovc('inact','مغازه‌های بی‌خرید','',fa(inact),'مغازه',`<div class="ovx-sub">۱ ماه: ${fa(cnt('g1'))} ۲ ماه: ${fa(cnt('g2'))} بیشتر: ${fa(cnt('g3'))}</div>`)}
+   ${ovc('inact','مغازه‌های بی‌خرید','',fa(inact),'مغازه',`<div class="ovx-sub">۱ ماه: ${fa(cnt('g1'))} · ۲ ماه: ${fa(cnt('g2'))} · ۳+ ماه: ${fa(cnt('g3'))}</div>`)}
    ${gN?ovc('added','مغازهٔ جدید اضافه‌شده','',fa(added)+' از '+fa(gN),'',`<div class="ovx-sub">${pct(added/gN*100)} از هدف</div>`):''}
    ${ovc('coll','بوک برای جمع‌آوری','',fa(coll),'بوک',`<div class="ovx-sub">بدون کارکرد در این ماه</div>`)}
   </div>
