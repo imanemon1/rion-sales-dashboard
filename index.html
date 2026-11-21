@@ -2180,7 +2180,7 @@ function whOver(){
   if(!WH)return '';const sm=a=>a.reduce((x,y)=>x+y,0);
   const bx=(l,v)=>`<div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">${l}</div><b>${v}</b></div>`;
   return `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:-2px 0 10px">${bx('ضایعات (خروج انبار، متر)',fm(sm(WH.waste)))}${bx('اضافه طاقه (رسید، متر)',fm(sm(WH.extra)))}</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${SFAC.slice(0,2).map(f=>`<div>${`<div style="font-weight:700;margin-bottom:4px">${f[1]}</div>`}${whFac(f[0])}</div>`).join('')}</div>`}
+  <div style="display:block">${SFAC.slice(0,2).map(f=>`<div>${`<div style="font-weight:700;margin-bottom:4px">${f[1]}</div>`}${whFac(f[0])}</div>`).join('')}</div>`}
 function overView(){
   const O=getOrd(),FN={paya:'پایا',delvan:'دلوان',other:'سایر'};
   const by={};SFAC.forEach(f=>by[f[0]]=stkRows(f[0]));
@@ -2189,6 +2189,9 @@ function overView(){
   const sum=a=>({n:a.length,s:a.reduce((t,x)=>t+x.s,0),v:a.reduce((t,x)=>t+x.s*x.p,0),r:a.reduce((t,x)=>t+(x.r||0),0),av:a.reduce((t,x)=>t+x.avg,0),nd:a.filter(x=>x.sug>0).length});
   const T=sum(ALL);
   const kp=(l,v)=>`<div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">${l}</div><b>${v}</b></div>`;
+  const facCharts=(()=>{const cl=['#2563eb','#0a8f5b','#9ca3af'];const A=SFAC.map(f=>({n:f[1],a:sum(by[f[0]]),o:f[0]==='other',tr:O.tr.filter(x=>x.g===f[0]&&trLvl(x)<5).length}));
+   const grp=(t,fn,unit)=>{const mx=Math.max(1,...A.map(x=>fn(x)));return `<div style="padding:10px;border:1px solid #dfe7f5;border-radius:14px;margin-bottom:8px;background:#fff"><div style="font-weight:700;margin-bottom:6px;font-size:13px">${t}</div>${A.map((x,i)=>`<div style="display:flex;align-items:center;gap:6px;margin:5px 0;font-size:12px"><span style="width:44px">${x.n}</span><div style="flex:1;background:#eef2fa;border-radius:6px;height:18px;direction:ltr"><div style="width:${fn(x)/mx*100}%;background:${cl[i]};height:100%;border-radius:6px"></div></div><b style="min-width:64px;text-align:left">${fm(Math.round(fn(x)))}${unit}</b></div>`).join('')}</div>`};
+   return grp('تعداد کد',x=>x.a.n,'')+grp('موجودی (متر)',x=>x.a.s,'')+grp('ارزش موجودی (میلیون تومان)',x=>x.a.v/10/1e6,'')+grp('فروش ماهانه (متر)',x=>x.a.av,'')+grp('نیازمند سفارش (کد)',x=>x.o?0:x.a.nd,'')+grp('سفارش در جریان',x=>x.o?0:x.tr,'')})();
   const facRows=SFAC.map(f=>{const a=sum(by[f[0]]),tr=O.tr.filter(x=>x.g===f[0]&&trLvl(x)<5).length;return `<tr><td><b>${f[1]}</b></td><td class="n">${fa(a.n)}</td><td class="n">${fm(a.s)}</td><td class="n">${mt(a.v)}</td><td class="n">${fm(Math.round(a.av))}</td><td class="n">${f[0]==='other'?'-':fa(a.nd)}</td><td class="n">${f[0]==='other'?'-':fa(tr)}</td></tr>`}).join('');
   const act=O.tr.filter(x=>trLvl(x)<5);
   const stg=TSH.slice(0,4).map((t,k)=>{const a=O.tr.filter(x=>trLvl(x)===k+1);return `<tr><td>${t}</td><td class="n">${fa(a.length)}</td><td class="n">${fm(a.reduce((u,x)=>u+(+x.ord||0),0))}</td></tr>`}).join('');
@@ -2218,7 +2221,7 @@ function overView(){
   ${whOver()}
   ${allCard}
   ${sec('به تفکیک کارخانه','فروش ماهانه = جمع میانگین فروش کدها بر مبنای تنظیم «مبنای فروش»؛ سفارش در جریان = هنوز به انبار کارخانه نرسیده')}
-  ${tbl(['','کد','موجودی (م)','ارزش (م.ت)','فروش ماهانه','نیازمند سفارش','در جریان'],facRows)}
+  ${facCharts}
   ${sec('وضعیت سفارش‌های در جریان',act.length?`${fa(act.length)} سفارش در جریان · ${fa(inFac.length)} سفارش در انبار کارخانه`:'')}
   ${tbl(['مرحله','تعداد','متراژ سفارش'],stg)}
   ${sec('فهرست همهٔ سفارش‌های پیگیری‌شده')}
