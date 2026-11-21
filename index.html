@@ -2174,7 +2174,7 @@ function overView(){
   const ordered=new Set(act.map(x=>x.c));
   const FS=ALL.filter(x=>x.fac!=='other');
   const short=FS.filter(x=>x.cover!=null&&x.cover<=2&&!ordered.has(x.c)).slice(0,10);
-  const top=ALL.filter(x=>x.avg>0).sort((a,b)=>b.avg-a.avg).slice(0,10);
+  const top=FS.filter(x=>x.avg>0).sort((a,b)=>b.avg-a.avg).slice(0,10);
   const low=ALL.filter(x=>x.s>0&&(x.avg===0||x.cover>12)).sort((a,b)=>b.s*b.p-a.s*a.p).slice(0,10);
   const lowAll=ALL.filter(x=>x.s>0&&(x.avg===0||x.cover>12));
   const cv=x=>x.cover==null?'-':fa(Math.round(x.cover*10)/10);
@@ -2191,7 +2191,7 @@ function overView(){
   ${O.tr.length?tbl(['کد','کارخانه','متراژ سفارش','مرحله'],ordList):'<p class="note">هنوز سفارشی در تب پیگیری ثبت نشده.</p>'}
   ${sec('⚠ کسری بدون سفارش','کدهای پایا/دلوان با پوشش ۲ ماه یا کمتر که سفارش در جریان ندارند')}
   ${short.length?tbl(['کد','موجودی','پوشش (ماه)','کارخانه'],short.map(x=>`<tr>${cd(x)}<td class="n">${fm(x.s)}</td><td class="n" style="color:#c0392b"><b>${cv(x)}</b></td><td>${FN[x.fac]}</td>`+'</tr>').join('')):'<p class="note">مورد خاصی نیست ✓</p>'}
-  ${sec('★ پرفروش‌ترین کدها','این کدها را همیشه موجود نگه دارید')}
+  ${sec('★ پرفروش‌ترین کدها','فقط کدهای پایا و دلوان؛ این‌ها را همیشه موجود نگه دارید')}
   ${tbl(['کد','فروش ماهانه','موجودی','پوشش (ماه)'],top.map(x=>`<tr>${cd(x)}<td class="n"><b>${fm(Math.round(x.avg))}</b></td><td class="n">${fm(x.s)}</td><td class="n" style="color:${x.cover<=2?'#c0392b':x.cover<=O.t?'#b9770e':'#1e8449'}"><b>${cv(x)}</b></td></tr>`).join(''))}
   ${sec('کم‌فروش / کاندید خروج',`${fa(lowAll.length)} کد با پوشش بیش از ۱۲ ماه یا بدون فروش · ارزش راکد ${mt(lowAll.reduce((t,x)=>t+x.s*x.p,0))} م.ت · ۱۰ مورد با بیشترین ارزش:`)}
   ${tbl(['کد','موجودی','فروش ماهانه','ارزش (م.ت)'],low.map(x=>`<tr>${cd(x)}<td class="n">${fm(x.s)}</td><td class="n">${fm(Math.round(x.avg))}</td><td class="n"><b>${mt(x.s*x.p)}</b></td></tr>`).join(''))}
@@ -2226,25 +2226,27 @@ function viewStock(){
   if(q)R=R.filter(x=>x.c.toLowerCase().includes(q));
   const stat=x=>x.cover==null?(x.s>0?'<span style="color:#c0392b">بدون فروش</span>':'-'):x.cover<=2?'<span style="color:#c0392b"><b>کسری</b></span>':x.cover<=O.t?'<span style="color:#b9770e"><b>نزدیک کسری</b></span>':x.cover>12?'<span style="color:#7f8c8d">مازاد</span>':'<span style="color:#1e8449">کافی</span>';
   const sel=(k,v,l)=>`<option value="${v}" ${O[k]===v?'selected':''}>${l}</option>`;
-  return `<div class="box"><h2>انبار و سفارش</h2>${fseg}
-  ${isOther?'<p class="note">این کدها (امید جیناک، خارج‌شده از بوک و بدون گروه) به کارخانهٔ دلوان یا پایا سفارش داده نمی‌شوند؛ فقط موجودی و آمار فروش نمایش داده می‌شود.</p>':''}
-  <div style="border:1px solid #dfe7f5;border-radius:14px;padding:12px;margin:10px 0;background:#fff;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;box-sizing:border-box;width:100%">
+  const filt=`  <div style="border:1px solid #dfe7f5;border-radius:14px;padding:12px;margin:10px 0;background:#fff;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;box-sizing:border-box;width:100%">
    <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">مبنای فروش<select id="o_b" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px;color:#111">${sel('b','max','بیشترین (میانگین کل / ۳ ماه اخیر)')}${sel('b','a8','میانگین '+fa(NM)+' ماه')}${sel('b','a3','۳ ماه اخیر')}${sel('b','a6','۶ ماه اخیر')}</select></label>
    <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">هدف پوشش فروش (ماه)<input id="o_t" type="number" min="0.5" step="0.5" value="${O.t}" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px"></label>
    
    <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">جستجو<input id="o_q" placeholder="جستجوی کد…" value="${esc(S.stq||'')}" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px"></label>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0">
+`;
+  const kpi=`  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0">
    <div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">موجودی کل</div><b>${fm(tot.s)} متر</b></div>
    <div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">ارزش موجودی</div><b>${fm(Math.round(tot.sv/10/1e6))} م.ت</b></div>
   </div>
+`;
+  return `<div class="box"><h2>انبار و سفارش</h2>${fseg}
+  ${isOther?'<p class="note">این کدها (امید جیناک، خارج‌شده از بوک و بدون گروه) به کارخانهٔ دلوان یا پایا سفارش داده نمی‌شوند؛ فقط موجودی و آمار فروش نمایش داده می‌شود.</p>':''}
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center">
    ${tabsHtml(O)}
      <span class="note">${esc(ORDMSG)}</span>
   </div>
   <div class="wrap"><table class="bt"><tr><th>#</th><th>کد</th><th>گروه</th><th class="n">موجودی (متر)</th><th class="n">طاقه</th>${SMON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">جمع ${fa(NM)} ماه</th><th class="n">مردودی</th><th class="n">فروش ماهانه</th><th class="n">پوشش (ماه)</th><th>وضعیت</th><th class="n">پیشنهاد</th><th class="n">سفارش (متر)</th></tr>
   ${R.map((x,i)=>`<tr><td>${fa(i+1)}</td><td dir="ltr" style="text-align:right">${esc(x.c)}</td><td>${esc(x.g)}</td><td class="n"><b>${fm(x.s)}</b></td><td class="n">${fa(x.r)}</td>${x.m.map(v=>`<td class="n">${v?fm(v):'-'}</td>`).join('')}<td class="n"><b>${fm(x.m.reduce((a,b)=>a+b,0))}</b></td><td class="n">${(x.rt||[]).some(v=>v)?fm(x.rt.reduce((a,b)=>a+b,0)):'-'}</td><td class="n">${fm(x.avg)}</td><td class="n">${x.cover==null?'-':fm(x.cover)}</td><td>${stat(x)}</td><td class="n">${x.sug?fm(x.sug):'-'}</td><td class="n"><input class="o_in" data-c="${esc(x.c)}" type="number" min="0" step="10" value="${x.ord||''}" style="width:90px"></td></tr>`).join('')||'<tr><td colspan="20" class="note">موردی نیست.</td></tr>'}
-  </table></div>${fsum}</div>`;
+  </table></div>${filt}${kpi}${fsum}</div>`;
 }
 const TSTG=[['ord','ثبت سفارش'],['bafat','بافت'],['rang','رنگ‌ریزی'],['taq','تاق‌پیچی'],['anbar','در انبار کارخانه']];
 let TROPEN=new Set();
@@ -2252,7 +2254,7 @@ function tabsHtml(O){
   const R=stkRows(),need=R.filter(x=>x.sug>0).length,trc=O.tr.filter(x=>x.g===(S.sf||'paya')).length;
   const isT=O.f==='track',isN=O.f==='need',isA=!isT&&!isN;
   const b=(id,on,l)=>`<button class="btn ${on?'':'sec'}" id="${id}" style="padding:10px 4px;font-size:12px;min-width:0">${l}</button>`;
-  return `<div style="display:grid;grid-template-columns:repeat(${isT?3:4},minmax(0,1fr));gap:8px;width:100%;margin:8px 0">${b('o_all',isA,`کل کالاها (${fa(R.length)})`)}${b('o_need',isN,`کدهای نیازمند سفارش (${fa(need)})`)}${b('o_track',isT,`پیگیری سفارشات (${fa(trc)})`)}${isT?'':b('o_csv',false,'خروجی اکسل (CSV)')}</div>`;
+  return `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;margin:8px 0">${b('o_all',isA,`کل کالاها (${fa(R.length)})`)}${b('o_need',isN,`کدهای نیازمند سفارش (${fa(need)})`)}${b('o_track',isT,`پیگیری سفارشات (${fa(trc)})`)}</div>${isT?'':`<div style="margin:8px 0">${b('o_csv',false,'خروجی اکسل (CSV)')}</div>`}`;
 }
 function bindTabs(){
   const O=getOrd();
@@ -2278,7 +2280,7 @@ function trackHtml(O){
     const t=k===0?(x.ord?fm(x.ord):'✓'):k===4&&ok?(x.fm?fm(x.fm):'✓'):'✓';
     return `<td style="text-align:center;${cur?'background:#eaf6ee;font-weight:700':''};color:${ok?'#1e8449':'#cbd5e1'}">${ok?t:'·'}</td>`};
   const rows=items.map(({x})=>`<tr><td dir="ltr" style="text-align:right;font-size:11px;white-space:nowrap"><b>${esc(x.c)}</b></td>${[0,1,2,3,4].map(k=>cell(x,k)).join('')}${TREDIT?`<td style="text-align:center"><button class="tr_del" data-i="${O.tr.indexOf(x)}" style="border:0;background:#fdecea;color:#c0392b;border-radius:8px;padding:4px 8px;font-size:14px">🗑</button></td>`:''}</tr>`).join('');
-  return `${bar}${add}${items.length?`<div class="wrap"><table class="bt" style="font-size:11px"><tr><th>کد</th>${TSH.map(t=>`<th style="text-align:center;font-size:10px">${t}</th>`).join('')}${TREDIT?'<th></th>':''}</tr>${rows}</table></div><p class="note" style="margin-top:6px">${TREDIT?'برای هر مرحله‌ای که کالا از آن گذشته تیک بزنید؛ با تیک «انبار کارخانه» متراژ موجود در کارخانه پرسیده می‌شود.':'ستون سبز مرحلهٔ فعلی هر کد است. برای جابه‌جایی مرحله یا حذف، «ویرایش» را بزنید.'}</p>`:'<p class="note">هنوز کدی برای پیگیری اضافه نشده.</p>'}
+  return `${bar}${add}${items.length?`<div class="wrap"><table class="bt" style="font-size:10px;table-layout:fixed;width:100%"><tr><th style="width:28%">کد</th>${TSH.map(t=>`<th style="text-align:center;font-size:9px;padding:4px 2px">${t}</th>`).join('')}${TREDIT?'<th></th>':''}</tr>${rows}</table></div><p class="note" style="margin-top:6px">${TREDIT?'برای هر مرحله‌ای که کالا از آن گذشته تیک بزنید؛ با تیک «انبار کارخانه» متراژ موجود در کارخانه پرسیده می‌شود.':'ستون سبز مرحلهٔ فعلی هر کد است. برای جابه‌جایی مرحله یا حذف، «ویرایش» را بزنید.'}</p>`:'<p class="note">هنوز کدی برای پیگیری اضافه نشده.</p>'}
   <div class="note" style="margin-top:6px">${esc(ORDMSG)}</div>`;
 }
 function bindTrack(){
