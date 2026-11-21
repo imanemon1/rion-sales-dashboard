@@ -2208,13 +2208,12 @@ function bindStock(){
   const O=getOrd();
   $('app').querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{S.sf=b.dataset.sf;draw()});
   $('o_b').onchange=e=>{O.b=e.target.value;ordSave();draw()};
-  $('o_f').onchange=e=>{O.f=e.target.value;ordSave();draw()};
   $('o_t').onchange=e=>{O.t=Math.max(.5,+e.target.value||4);ordSave();draw()};
   $('o_q').oninput=e=>{S.stq=e.target.value;const p=e.target.selectionStart;draw();const n=$('o_q');n.focus();n.setSelectionRange(p,p)};
   $('o_all').onclick=()=>{O.f='all';ordSave();draw()};
   $('o_need').onclick=()=>{O.f='need';ordSave();draw()};
-  $('o_csv').onclick=()=>{const R=stkRows().filter(x=>x.ord>0);if(!R.length){alert('سفارشی ثبت نشده');return}
-    const L=[['کد','گروه','موجودی','فروش ماهانه','پوشش ماه','سفارش متر','قیمت هر متر','ارزش سفارش']].concat(R.map(x=>[x.c,x.g,x.s,x.avg.toFixed(1),x.cover==null?'':x.cover.toFixed(1),x.ord,x.p,x.val]));
+  $('o_csv').onclick=()=>{const R=stkRows().filter(x=>x.sug>0||x.ord>0);if(!R.length){alert('کدی نیازمند سفارش نیست');return}
+    const L=[['کد کالا','متراژ سفارش']].concat(R.map(x=>[x.c,x.ord>0?x.ord:x.sug]));
     const b=new Blob(['\ufeff'+L.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n')],{type:'text/csv'});
     const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='سفارش-'+(S.sf||'paya')+'-'+new Date().toISOString().slice(0,10)+'.csv';a.click()};
   $('app').querySelectorAll('.o_in').forEach(i=>i.onchange=e=>{const v=+e.target.value;if(v>0)O.o[e.target.dataset.c]=v;else delete O.o[e.target.dataset.c];ordSave();draw()});
