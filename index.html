@@ -2144,11 +2144,11 @@ async function ordSave(){const O=getOrd();localStorage.setItem('rionOrd',JSON.st
   try{ORDMSG=await ghPush(O,GH.ordPath,'orders')==='ok'?'✔ ذخیره شد':'ذخیره شد (فقط روی این مرورگر)'}catch(e){ORDMSG='⚠ در گیت‌هاب ثبت نشد ('+e.message+')'}}
 async function fetchOrd(){try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.ordPath}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch(e){return null}}
 const SFAC=[['paya','پایا',g=>/PAYA/i.test(g)],['delvan','دلوان',g=>/DELVAN/i.test(g)],['other','سایر (امید جیناک و خارج‌شده)',g=>!/PAYA|DELVAN/i.test(g)]];
-const SMON=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان'];
+const NM=(STK[0]&&STK[0].m.length)||8,SMON=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'].slice(0,NM),LASTM=SMON[NM-1];
 function stkRows(){
   const O=getOrd(),F=SFAC.find(f=>f[0]===(S.sf||'paya'));
   return STK.filter(x=>F[2](x.g||'')).map(x=>{
-    const a8=x.m.reduce((s,v)=>s+v,0)/8,a3=x.m.slice(5).reduce((s,v)=>s+v,0)/3;
+    const a8=x.m.reduce((s,v)=>s+v,0)/NM,a3=x.m.slice(-3).reduce((s,v)=>s+v,0)/3;
     const avg=O.b==='a8'?a8:O.b==='a3'?a3:Math.max(a8,a3);
     const cover=avg>0?x.s/avg:null;
     const sug=Math.max(0,Math.ceil((avg*O.t-x.s)/10)*10);
@@ -2161,26 +2161,30 @@ function viewStock(){
   let R=stkRows();
   const tot={s:R.reduce((a,x)=>a+x.s,0),sv:R.reduce((a,x)=>a+x.s*x.p,0),on:R.filter(x=>x.sug>0).length,om:R.reduce((a,x)=>a+x.ord,0),ov:R.reduce((a,x)=>a+x.val,0),oc:R.filter(x=>x.ord>0).length};
   const fseg=`<div class="seg">${SFAC.map(f=>`<button class="${(S.sf||'paya')===f[0]?'on':''}" data-sf="${f[0]}">${f[1]} (${fa(STK.filter(x=>f[2](x.g||'')).length)})</button>`).join('')}</div>`;
-  const AL=stkRows(),sold=AL.reduce((a,x)=>a+x.m.reduce((u,v)=>u+v,0),0),ret=AL.reduce((a,x)=>a+(x.rt||[]).reduce((u,v)=>u+v,0),0),mon8=SMON.map((_,i)=>AL.reduce((a,x)=>a+x.m[i],0));
-  const fsum=`<div style="display:flex;gap:14px;flex-wrap:wrap;margin:8px 0;padding:10px;background:#f4f7fc;border-radius:10px">
-   <div><div class="note">کد</div><b>${fa(AL.length)}</b></div>
-   <div><div class="note">کد دارای موجودی</div><b>${fa(AL.filter(x=>x.s>0).length)}</b></div>
-   <div><div class="note">کد دارای فروش</div><b>${fa(AL.filter(x=>x.m.some(v=>v>0)).length)}</b></div>
-   <div><div class="note">فروش خالص ۸ ماه</div><b>${fm(sold)} متر</b></div>
-   <div><div class="note">مردودی ۸ ماه</div><b>${fm(ret)} متر</b></div>
-   <div><div class="note">میانگین ماهانه</div><b>${fm(sold/8)} متر</b></div>
-   <div><div class="note">موجودی</div><b>${fm(AL.reduce((a,x)=>a+x.s,0))} متر</b></div>
-   <div style="flex-basis:100%"><div class="note">فروش ماهانه: ${SMON.map((m,i)=>m+' '+fm(mon8[i])).join(' | ')}</div></div></div>`;
+  const F0=SFAC.find(f=>f[0]===(S.sf||'paya')),AL=stkRows(),sold=AL.reduce((a,x)=>a+x.m.reduce((u,v)=>u+v,0),0),ret=AL.reduce((a,x)=>a+(x.rt||[]).reduce((u,v)=>u+v,0),0),mon8=SMON.map((_,i)=>AL.reduce((a,x)=>a+x.m[i],0));
+  const avgM=sold/NM,mx=Math.max(...mon8,1);
+  const fsum=`<div style="margin-top:14px;padding:16px;background:linear-gradient(180deg,#f8fafe,#eef3fb);border:1px solid #dfe7f5;border-radius:16px">
+   <div style="font-weight:700;margin-bottom:2px">آمار فروش ${esc(F0[1])} · فروردین تا ${LASTM}</div>
+   <div class="note" style="margin-bottom:12px">${fa(AL.length)} کد · به‌روز تا پایان ${LASTM}</div>
+   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+    ${[['فروش خالص '+fa(NM)+' ماه',fm(sold),'#1f6feb'],['میانگین ماهانه',fm(avgM),'#0a8f5b'],['مردودی',fm(ret),'#d9480f'],['موجودی فعلی',fm(AL.reduce((a,x)=>a+x.s,0)),'#6741d9']].map(k=>`<div style="background:#fff;border-radius:12px;padding:10px 12px;border-right:4px solid ${k[2]};box-shadow:0 1px 3px #0001"><div class="note">${k[0]}</div><b style="font-size:17px">${k[1]}</b> <span class="note">متر</span></div>`).join('')}
+   </div>
+   <div style="position:relative;display:flex;align-items:flex-end;gap:6px;height:170px;padding:0 4px;border-bottom:1px solid #c9d4e8" dir="rtl">
+    <div style="position:absolute;left:0;right:0;bottom:${avgM/mx*140+22}px;border-top:2px dashed #0a8f5b;opacity:.7"></div>
+    ${mon8.map((v,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%"><div style="font-size:10px;color:#556">${fm(v)}</div><div style="width:100%;max-width:34px;height:${Math.max(2,v/mx*140)}px;background:${v>=avgM?'#1f6feb':'#8fb4f5'};border-radius:6px 6px 0 0"></div></div>`).join('')}
+   </div>
+   <div style="display:flex;gap:6px;padding:4px" dir="rtl">${SMON.map(m=>`<div style="flex:1;text-align:center;font-size:10px;color:#556">${m}</div>`).join('')}</div>
+   <div class="note" style="margin-top:6px">خط سبز چین‌دار: میانگین ماهانه</div></div>`;
   const isOther=(S.sf||'paya')==='other';
   if(O.f==='need')R=R.filter(x=>x.sug>0||x.ord>0);else if(O.f==='ord')R=R.filter(x=>x.ord>0);else if(O.f==='slow')R=R.filter(x=>x.s>0&&(x.cover==null||x.cover>12));
   if(q)R=R.filter(x=>x.c.toLowerCase().includes(q));
   const stat=x=>x.cover==null?(x.s>0?'<span style="color:#c0392b">بدون فروش</span>':'-'):x.cover<=2?'<span style="color:#c0392b"><b>کمبود</b></span>':x.cover<=O.t?'<span style="color:#b9770e">نزدیک اتمام</span>':x.cover>12?'<span style="color:#7f8c8d">مازاد</span>':'<span style="color:#1e8449">کافی</span>';
   const sel=(k,v,l)=>`<option value="${v}" ${O[k]===v?'selected':''}>${l}</option>`;
-  return `<div class="box"><h2>انبار و سفارش</h2>${fseg}${fsum}
+  return `<div class="box"><h2>انبار و سفارش</h2>${fseg}
   ${isOther?'<p class="note">این کدها (امید جیناک، خارج‌شده از بوک و بدون گروه) به کارخانهٔ دلوان یا پایا سفارش داده نمی‌شوند؛ فقط موجودی و آمار فروش نمایش داده می‌شود.</p>':''}
   <p class="note">موجودی هر کد با فروش ماهانه‌اش سنجیده می‌شود. پیشنهاد سفارش = (فروش ماهانه × ماه هدف) − موجودی فعلی. عدد سفارش را خودتان هم می‌توانید تغییر دهید.</p>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0">
-   <label>مبنای فروش <select id="o_b">${sel('b','max','بیشترین (۸ ماه / ۳ ماه اخیر)')}${sel('b','a8','میانگین ۸ ماه')}${sel('b','a3','میانگین ۳ ماه اخیر')}</select></label>
+   <label>مبنای فروش <select id="o_b">${sel('b','max','بیشترین ('+fa(NM)+' ماه / ۳ ماه اخیر)')}${sel('b','a8','میانگین '+fa(NM)+' ماه')}${sel('b','a3','میانگین ۳ ماه اخیر')}</select></label>
    <label>پوشش هدف (ماه) <input id="o_t" type="number" min="0.5" step="0.5" value="${O.t}" style="width:70px"></label>
    <label>نمایش <select id="o_f">${sel('f','need','نیازمند سفارش')}${sel('f','ord','سفارش‌های ثبت‌شده')}${sel('f','slow','مازاد (بیش از ۱۲ ماه)')}${sel('f','all','همه')}</select></label>
    <input id="o_q" placeholder="جستجوی کد…" value="${esc(S.stq||'')}" style="padding:6px 10px;border:1px solid #cfd6e4;border-radius:8px;font:inherit">
@@ -2198,9 +2202,9 @@ function viewStock(){
    <button class="btn sec" id="o_csv">خروجی اکسل (CSV) سفارش‌ها</button>
    <span class="note">${esc(ORDMSG)}</span>
   </div>
-  <div class="wrap"><table><tr><th>#</th><th>کد</th><th>گروه</th><th class="n">موجودی (متر)</th><th class="n">طاقه</th>${SMON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">جمع ۸ ماه</th><th class="n">مردودی</th><th class="n">فروش ماهانه</th><th class="n">پوشش (ماه)</th><th>وضعیت</th><th class="n">پیشنهاد</th><th class="n">سفارش (متر)</th><th class="n">ارزش سفارش (میلیون ریال)</th></tr>
+  <div class="wrap"><table><tr><th>#</th><th>کد</th><th>گروه</th><th class="n">موجودی (متر)</th><th class="n">طاقه</th>${SMON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">جمع ${fa(NM)} ماه</th><th class="n">مردودی</th><th class="n">فروش ماهانه</th><th class="n">پوشش (ماه)</th><th>وضعیت</th><th class="n">پیشنهاد</th><th class="n">سفارش (متر)</th><th class="n">ارزش سفارش (میلیون ریال)</th></tr>
   ${R.map((x,i)=>`<tr><td>${fa(i+1)}</td><td dir="ltr" style="text-align:right">${esc(x.c)}</td><td>${esc(x.g)}</td><td class="n"><b>${fm(x.s)}</b></td><td class="n">${fa(x.r)}</td>${x.m.map(v=>`<td class="n">${v?fm(v):'-'}</td>`).join('')}<td class="n"><b>${fm(x.m.reduce((a,b)=>a+b,0))}</b></td><td class="n">${(x.rt||[]).some(v=>v)?fm(x.rt.reduce((a,b)=>a+b,0)):'-'}</td><td class="n">${fm(x.avg)}</td><td class="n">${x.cover==null?'-':fm(x.cover)}</td><td>${stat(x)}</td><td class="n">${x.sug?fm(x.sug):'-'}</td><td class="n"><input class="o_in" data-c="${esc(x.c)}" type="number" min="0" step="10" value="${x.ord||''}" style="width:90px"></td><td class="n">${x.ord&&x.p?fa(Math.round(x.val/1e6)):(x.ord?'بدون قیمت':'')}</td></tr>`).join('')||'<tr><td colspan="21" class="note">موردی نیست.</td></tr>'}
-  </table></div></div>`;
+  </table></div>${fsum}</div>`;
 }
 function bindStock(){
   const O=getOrd();
