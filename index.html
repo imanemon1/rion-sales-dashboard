@@ -2184,21 +2184,20 @@ function viewStock(){
   const sel=(k,v,l)=>`<option value="${v}" ${O[k]===v?'selected':''}>${l}</option>`;
   return `<div class="box"><h2>انبار و سفارش</h2>${fseg}
   ${isOther?'<p class="note">این کدها (امید جیناک، خارج‌شده از بوک و بدون گروه) به کارخانهٔ دلوان یا پایا سفارش داده نمی‌شوند؛ فقط موجودی و آمار فروش نمایش داده می‌شود.</p>':''}
-  <div style="border:1px solid #dfe7f5;border-radius:14px;padding:12px;margin:10px 0;background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b">مبنای فروش<select id="o_b" style="padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px;color:#111">${sel('b','max','بیشترین (میانگین کل / ۳ ماه اخیر)')}${sel('b','a8','میانگین '+fa(NM)+' ماه')}${sel('b','a3','۳ ماه اخیر')}${sel('b','a6','۶ ماه اخیر')}</select></label>
-   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b">هدف پوشش فروش (ماه)<input id="o_t" type="number" min="0.5" step="0.5" value="${O.t}" style="padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px"></label>
-   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b">نمایش<select id="o_f" style="padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px;color:#111">${sel('f','need','نیازمند سفارش')}${sel('f','slow','موجودی زیاد (پوشش بیش از ۱۲ ماه)')}${sel('f','all','همه')}</select></label>
-   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b">جستجو<input id="o_q" placeholder="جستجوی کد…" value="${esc(S.stq||'')}" style="padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px"></label>
+  <div style="border:1px solid #dfe7f5;border-radius:14px;padding:12px;margin:10px 0;background:#fff;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;box-sizing:border-box;width:100%">
+   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">مبنای فروش<select id="o_b" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px;color:#111">${sel('b','max','بیشترین (میانگین کل / ۳ ماه اخیر)')}${sel('b','a8','میانگین '+fa(NM)+' ماه')}${sel('b','a3','۳ ماه اخیر')}${sel('b','a6','۶ ماه اخیر')}</select></label>
+   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">هدف پوشش فروش (ماه)<input id="o_t" type="number" min="0.5" step="0.5" value="${O.t}" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px"></label>
+   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">نمایش<select id="o_f" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px;color:#111">${sel('f','need','نیازمند سفارش')}${sel('f','slow','موجودی زیاد (پوشش بیش از ۱۲ ماه)')}${sel('f','all','همه')}</select></label>
+   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">جستجو<input id="o_q" placeholder="جستجوی کد…" value="${esc(S.stq||'')}" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px"></label>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0">
    <div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">موجودی کل</div><b>${fm(tot.s)} متر</b></div>
-   <div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">ارزش موجودی</div><b>${fa(Math.round(tot.sv/10/1e6).toLocaleString('en-US'))} م.ت</b></div>
+   <div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">ارزش موجودی</div><b>${fm(Math.round(tot.sv/10/1e6))} م.ت</b></div>
    <div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">کد نیازمند سفارش</div><b>${fa(tot.on)}</b></div>
   </div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center">
    <button class="btn" id="o_apply">ثبت پیشنهادها به‌عنوان سفارش</button>
-   <button class="btn sec" id="o_clear">پاک کردن سفارش‌های این گروه</button>
-   <button class="btn sec" id="o_csv">خروجی اکسل (CSV) سفارش‌ها</button>
+   <button class="btn sec" id="o_csv">خروجی اکسل (CSV)</button>
    <span class="note">${esc(ORDMSG)}</span>
   </div>
   <div class="wrap"><table class="bt"><tr><th>#</th><th>کد</th><th>گروه</th><th class="n">موجودی (متر)</th><th class="n">طاقه</th>${SMON.map(m=>`<th class="n">${m}</th>`).join('')}<th class="n">جمع ${fa(NM)} ماه</th><th class="n">مردودی</th><th class="n">فروش ماهانه</th><th class="n">پوشش (ماه)</th><th>وضعیت</th><th class="n">پیشنهاد</th><th class="n">سفارش (متر)</th></tr>
@@ -2213,7 +2212,6 @@ function bindStock(){
   $('o_t').onchange=e=>{O.t=Math.max(.5,+e.target.value||4);ordSave();draw()};
   $('o_q').oninput=e=>{S.stq=e.target.value;const p=e.target.selectionStart;draw();const n=$('o_q');n.focus();n.setSelectionRange(p,p)};
   $('o_apply').onclick=()=>{const R=stkRows();if(!confirm('پیشنهاد '+R.filter(x=>x.sug>0).length+' کد جایگزین سفارش‌های فعلی شود؟'))return;R.forEach(x=>delete O.o[x.c]);R.forEach(x=>{if(x.sug>0)O.o[x.c]=x.sug});ordSave();draw()};
-  $('o_clear').onclick=()=>{if(!confirm('سفارش‌های این گروه پاک شود؟'))return;stkRows().forEach(x=>delete O.o[x.c]);ordSave();draw()};
   $('o_csv').onclick=()=>{const R=stkRows().filter(x=>x.ord>0);if(!R.length){alert('سفارشی ثبت نشده');return}
     const L=[['کد','گروه','موجودی','فروش ماهانه','پوشش ماه','سفارش متر','قیمت هر متر','ارزش سفارش']].concat(R.map(x=>[x.c,x.g,x.s,x.avg.toFixed(1),x.cover==null?'':x.cover.toFixed(1),x.ord,x.p,x.val]));
     const b=new Blob(['\ufeff'+L.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n')],{type:'text/csv'});
