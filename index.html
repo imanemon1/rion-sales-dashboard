@@ -2146,8 +2146,8 @@ async function ordSave(){const O=getOrd();localStorage.setItem('rionOrd',JSON.st
 async function fetchOrd(){try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.ordPath}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch(e){return null}}
 const SFAC=[['paya','پایا',g=>/PAYA/i.test(g)],['delvan','دلوان',g=>/DELVAN/i.test(g)],['other','سایر',g=>!/PAYA|DELVAN/i.test(g)]];
 const NM=(STK[0]&&STK[0].m.length)||8,SMON=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'].slice(0,NM),LASTM=SMON[NM-1];
-function stkRows(){
-  const O=getOrd(),F=SFAC.find(f=>f[0]===(S.sf||'paya'));
+function stkRows(sf){
+  const O=getOrd(),F=SFAC.find(f=>f[0]===(sf||S.sf||'paya'));
   return STK.filter(x=>F[2](x.g||'')).map(x=>{
     const a8=x.m.reduce((s,v)=>s+v,0)/NM,a3=x.m.slice(-3).reduce((s,v)=>s+v,0)/3;
     const a6=x.m.slice(-6).reduce((s,v)=>s+v,0)/Math.min(6,NM);
@@ -2158,12 +2158,55 @@ function stkRows(){
     return {...x,avg,cover,sug,ord,val:ord*x.p};
   }).sort((a,b)=>(a.cover==null)-(b.cover==null)||(a.cover??0)-(b.cover??0));
 }
+function overView(){
+  const O=getOrd(),FN={paya:'پایا',delvan:'دلوان',other:'سایر'};
+  const by={};SFAC.forEach(f=>by[f[0]]=stkRows(f[0]));
+  const ALL=[].concat(by.paya,by.delvan,by.other).map(x=>({...x,fac:SFAC.find(f=>f[2](x.g||''))[0]}));
+  const mt=v=>fm(Math.round(v/10/1e6)),tc='style="text-align:center"';
+  const sum=a=>({n:a.length,s:a.reduce((t,x)=>t+x.s,0),v:a.reduce((t,x)=>t+x.s*x.p,0),r:a.reduce((t,x)=>t+(x.r||0),0),av:a.reduce((t,x)=>t+x.avg,0),nd:a.filter(x=>x.sug>0).length});
+  const T=sum(ALL);
+  const kp=(l,v)=>`<div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">${l}</div><b>${v}</b></div>`;
+  const facRows=SFAC.map(f=>{const a=sum(by[f[0]]),tr=O.tr.filter(x=>x.g===f[0]&&trLvl(x)<5).length;return `<tr><td><b>${f[1]}</b></td><td class="n">${fa(a.n)}</td><td class="n">${fm(a.s)}</td><td class="n">${mt(a.v)}</td><td class="n">${fm(Math.round(a.av))}</td><td class="n">${f[0]==='other'?'-':fa(a.nd)}</td><td class="n">${f[0]==='other'?'-':fa(tr)}</td></tr>`}).join('');
+  const act=O.tr.filter(x=>trLvl(x)<5);
+  const stg=TSH.slice(0,4).map((t,k)=>{const a=O.tr.filter(x=>trLvl(x)===k+1);return `<tr><td>${t}</td><td class="n">${fa(a.length)}</td><td class="n">${fm(a.reduce((u,x)=>u+(+x.ord||0),0))}</td></tr>`}).join('');
+  const inFac=O.tr.filter(x=>trLvl(x)===5);
+  const ordList=O.tr.slice().sort((a,b)=>trLvl(a)-trLvl(b)).map(x=>{const l=trLvl(x);return `<tr><td dir="ltr" style="text-align:right;font-size:11px"><b>${esc(x.c)}</b></td><td>${FN[x.g]||''}</td><td class="n">${fm(x.ord||0)}</td><td style="color:${l===5?'#1e8449':'#b9770e'}">${l?TSH[l-1]:'ثبت نشده'}${l===5&&x.fm?' ('+fm(x.fm)+' م)':''}</td></tr>`}).join('');
+  const ordered=new Set(act.map(x=>x.c));
+  const FS=ALL.filter(x=>x.fac!=='other');
+  const short=FS.filter(x=>x.cover!=null&&x.cover<=2&&!ordered.has(x.c)).slice(0,10);
+  const top=ALL.filter(x=>x.avg>0).sort((a,b)=>b.avg-a.avg).slice(0,10);
+  const low=ALL.filter(x=>x.s>0&&(x.avg===0||x.cover>12)).sort((a,b)=>b.s*b.p-a.s*a.p).slice(0,10);
+  const lowAll=ALL.filter(x=>x.s>0&&(x.avg===0||x.cover>12));
+  const cv=x=>x.cover==null?'-':fa(Math.round(x.cover*10)/10);
+  const tbl=(h,r)=>`<div class="wrap"><table class="bt" style="font-size:12px"><tr>${h.map(t=>`<th>${t}</th>`).join('')}</tr>${r}</table></div>`;
+  const sec=(t,n)=>`<h3 style="margin:18px 0 6px;font-size:15px">${t}</h3>${n?`<p class="note" style="margin:0 0 6px">${n}</p>`:''}`;
+  const cd=x=>`<td dir="ltr" style="text-align:right;font-size:11px"><b>${esc(x.c)}</b></td>`;
+  return `<div class="box"><h2>انبار و سفارش</h2><div class="seg">${sfBtns()}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">${kp('موجودی کل',fm(T.s)+' متر')}${kp('ارزش موجودی',mt(T.v)+' م.ت')}${kp('تعداد کد',fa(T.n))}${kp('طاقه (≥۱ متر)',fa(T.r))}</div>
+  ${sec('به تفکیک کارخانه','فروش ماهانه = جمع میانگین فروش کدها بر مبنای تنظیم «مبنای فروش»؛ سفارش در جریان = هنوز به انبار کارخانه نرسیده')}
+  ${tbl(['','کد','موجودی (م)','ارزش (م.ت)','فروش ماهانه','نیازمند سفارش','در جریان'],facRows)}
+  ${sec('وضعیت سفارش‌های در جریان',act.length?`${fa(act.length)} سفارش در جریان · ${fa(inFac.length)} سفارش در انبار کارخانه`:'')}
+  ${tbl(['مرحله','تعداد','متراژ سفارش'],stg)}
+  ${sec('فهرست همهٔ سفارش‌های پیگیری‌شده')}
+  ${O.tr.length?tbl(['کد','کارخانه','متراژ سفارش','مرحله'],ordList):'<p class="note">هنوز سفارشی در تب پیگیری ثبت نشده.</p>'}
+  ${sec('⚠ کسری بدون سفارش','کدهای پایا/دلوان با پوشش ۲ ماه یا کمتر که سفارش در جریان ندارند')}
+  ${short.length?tbl(['کد','موجودی','پوشش (ماه)','کارخانه'],short.map(x=>`<tr>${cd(x)}<td class="n">${fm(x.s)}</td><td class="n" style="color:#c0392b"><b>${cv(x)}</b></td><td>${FN[x.fac]}</td>`+'</tr>').join('')):'<p class="note">مورد خاصی نیست ✓</p>'}
+  ${sec('★ پرفروش‌ترین کدها','این کدها را همیشه موجود نگه دارید')}
+  ${tbl(['کد','فروش ماهانه','موجودی','پوشش (ماه)'],top.map(x=>`<tr>${cd(x)}<td class="n"><b>${fm(Math.round(x.avg))}</b></td><td class="n">${fm(x.s)}</td><td class="n" style="color:${x.cover<=2?'#c0392b':x.cover<=O.t?'#b9770e':'#1e8449'}"><b>${cv(x)}</b></td></tr>`).join(''))}
+  ${sec('کم‌فروش / کاندید خروج',`${fa(lowAll.length)} کد با پوشش بیش از ۱۲ ماه یا بدون فروش · ارزش راکد ${mt(lowAll.reduce((t,x)=>t+x.s*x.p,0))} م.ت · ۱۰ مورد با بیشترین ارزش:`)}
+  ${tbl(['کد','موجودی','فروش ماهانه','ارزش (م.ت)'],low.map(x=>`<tr>${cd(x)}<td class="n">${fm(x.s)}</td><td class="n">${fm(Math.round(x.avg))}</td><td class="n"><b>${mt(x.s*x.p)}</b></td></tr>`).join(''))}
+  </div>`;
+}
+function trackView(O){return `<div class="box"><h2>انبار و سفارش</h2><div class="seg">${sfBtns()}</div>${tabsHtml(O)}${trackHtml(O)}</div>`}
+function sfBtns(){return `<button class="${S.sf==='over'?'on':''}" data-sf="over">نمای کلی</button>`+SFAC.map(f=>`<button class="${S.sf===f[0]?'on':''}" data-sf="${f[0]}">${f[1]} (${fa(STK.filter(x=>f[2](x.g||'')).length)})</button>`).join('')}
 function viewStock(){
+  if(S.sf===undefined)S.sf='over';
+  if(S.sf==='over')return overView();
   const O=getOrd();if(!Array.isArray(O.tr))O.tr=[];const q=(S.stq||'').trim().toLowerCase();
   if(O.f==='track')return trackView(O);
   let R=stkRows();
   const tot={s:R.reduce((a,x)=>a+x.s,0),sv:R.reduce((a,x)=>a+x.s*x.p,0),on:R.filter(x=>x.sug>0).length,om:R.reduce((a,x)=>a+x.ord,0),ov:R.reduce((a,x)=>a+x.val,0),oc:R.filter(x=>x.ord>0).length};
-  const fseg=`<div class="seg">${SFAC.map(f=>`<button class="${(S.sf||'paya')===f[0]?'on':''}" data-sf="${f[0]}">${f[1]} (${fa(STK.filter(x=>f[2](x.g||'')).length)})</button>`).join('')}</div>`;
+  const fseg=`<div class="seg">${sfBtns()}</div>`;
   const F0=SFAC.find(f=>f[0]===(S.sf||'paya')),AL=stkRows(),sold=AL.reduce((a,x)=>a+x.m.reduce((u,v)=>u+v,0),0),ret=AL.reduce((a,x)=>a+(x.rt||[]).reduce((u,v)=>u+v,0),0),mon8=SMON.map((_,i)=>AL.reduce((a,x)=>a+x.m[i],0));
   const avgM=sold/NM,mx=Math.max(...mon8,1);
   const fsum=`<div style="margin-top:14px;padding:16px;background:linear-gradient(180deg,#f8fafe,#eef3fb);border:1px solid #dfe7f5;border-radius:16px">
@@ -2217,13 +2260,9 @@ function bindTabs(){
   $('o_need').onclick=()=>{O.f='need';ordSave();draw()};
   $('o_track').onclick=()=>{O.f='track';ordSave();draw()};
 }
-function trStat(x){
-  let last=null;TSTG.forEach(([k,l])=>{if(+x[k]>0)last=l});
-  return last?`<span style="color:#1e8449">${last}</span>`:'<span style="color:#b9770e">ثبت نشده</span>';
-}
-function trackView(O){
-  return `<div class="box"><h2>انبار و سفارش</h2><div class="seg">${SFAC.map(f=>`<button class="${(S.sf||'paya')===f[0]?'on':''}" data-sf="${f[0]}">${f[1]} (${fa(STK.filter(x=>f[2](x.g||'')).length)})</button>`).join('')}</div>${tabsHtml(O)}${trackHtml(O)}</div>`;
-}
+let TREDIT=false,TRADD=false;
+const TSH=['ثبت سفارش','بافت','رنگ‌ریزی','تاق‌پیچی','انبار کارخانه'];
+function trLvl(x){if(x.s==null){let l=0;TSTG.forEach(([k],i)=>{if(+x[k]>0)l=i+1});x.s=l;if(l===5)x.fm=x.fm||+x.anbar||0;if(!x.ord&&l>0)x.ord=+x.ord||0}return x.s}
 function trackHtml(O){
   const F=S.sf||'paya';
   if(F==='other')return '<p class="note">پیگیری سفارش فقط برای پایا و دلوان است.</p>';
@@ -2231,27 +2270,32 @@ function trackHtml(O){
   const items=O.tr.map((x,i)=>({x,i})).filter(o=>o.x.g===F);
   const used=new Set(O.tr.map(x=>x.c));
   const codes=STK.filter(x=>fn(x.g||'')&&!used.has(x.c)).map(x=>x.c);
-  return `<p class="note" style="margin-top:6px">کد را انتخاب و اضافه کنید، سپس روی آن بزنید تا باز شود. متراژ هر مرحله را وارد کنید (مثلاً متراژی که بافت شده یا وارد انبار شده).</p>
-  <div style="display:flex;gap:8px;align-items:center;margin:8px 0">
-   <select id="tr_add" style="flex:1;min-width:0;box-sizing:border-box;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:16px;direction:ltr"><option value="">انتخاب کد…</option>${codes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select>
-   <button class="btn" id="tr_addb" style="white-space:nowrap">+ افزودن</button></div>
-  ${items.map(({x,i})=>`<div style="border:1px solid #dfe7f5;border-radius:12px;margin:8px 0;background:#fff;overflow:hidden">
-   <div class="tr_tog" data-i="${i}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;cursor:pointer"><b dir="ltr">${esc(x.c)}</b><span class="note">${trStat(x)} ${TROPEN.has(x.c)?'▲':'▼'}</span></div>
-   ${TROPEN.has(x.c)?`<div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;padding:0 10px 8px">${TSTG.map(([k,l])=>`<label style="display:flex;flex-direction:column;gap:4px;font-size:11px;color:#64748b;min-width:0">${l}<input type="number" min="0" step="1" class="tr_in" data-i="${i}" data-k="${k}" value="${x[k]||''}" style="box-sizing:border-box;width:100%;min-width:0;padding:6px 4px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:16px"></label>`).join('')}</div>
-   <div style="padding:0 10px 10px"><button class="btn sec tr_del" data-i="${i}" style="padding:6px 10px;font-size:12px">حذف کد</button></div>`:''}
-  </div>`).join('')||'<p class="note">هنوز کدی برای پیگیری اضافه نشده.</p>'}
+  const inp='box-sizing:border-box;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:16px;min-width:0';
+  const bar=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0"><button class="btn ${TRADD?'':'sec'}" id="tr_addt" style="padding:10px 4px">+ افزودن</button><button class="btn ${TREDIT?'':'sec'}" id="tr_edt" style="padding:10px 4px">${TREDIT?'پایان ویرایش':'ویرایش'}</button></div>`;
+  const add=TRADD?`<div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin:8px 0;align-items:center"><select id="tr_add" style="${inp};direction:ltr"><option value="">انتخاب کد…</option>${codes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select><input id="tr_m" type="number" min="0" placeholder="متراژ سفارش" style="${inp};width:100%"><button class="btn" id="tr_addb" style="padding:9px 12px">ثبت</button></div>`:'';
+  const cell=(x,k)=>{const l=trLvl(x),ok=l>k,cur=l===k+1;
+    if(TREDIT)return `<td style="text-align:center;${cur?'background:#eaf6ee':''}"><input type="checkbox" class="tr_ck" data-i="${O.tr.indexOf(x)}" data-k="${k}" ${ok?'checked':''} style="width:20px;height:20px"></td>`;
+    const t=k===0?(x.ord?fm(x.ord):'✓'):k===4&&ok?(x.fm?fm(x.fm):'✓'):'✓';
+    return `<td style="text-align:center;${cur?'background:#eaf6ee;font-weight:700':''};color:${ok?'#1e8449':'#cbd5e1'}">${ok?t:'·'}</td>`};
+  const rows=items.map(({x})=>`<tr><td dir="ltr" style="text-align:right;font-size:11px;white-space:nowrap"><b>${esc(x.c)}</b></td>${[0,1,2,3,4].map(k=>cell(x,k)).join('')}${TREDIT?`<td style="text-align:center"><button class="tr_del" data-i="${O.tr.indexOf(x)}" style="border:0;background:#fdecea;color:#c0392b;border-radius:8px;padding:4px 8px;font-size:14px">🗑</button></td>`:''}</tr>`).join('');
+  return `${bar}${add}${items.length?`<div class="wrap"><table class="bt" style="font-size:11px"><tr><th>کد</th>${TSH.map(t=>`<th style="text-align:center;font-size:10px">${t}</th>`).join('')}${TREDIT?'<th></th>':''}</tr>${rows}</table></div><p class="note" style="margin-top:6px">${TREDIT?'برای هر مرحله‌ای که کالا از آن گذشته تیک بزنید؛ با تیک «انبار کارخانه» متراژ موجود در کارخانه پرسیده می‌شود.':'ستون سبز مرحلهٔ فعلی هر کد است. برای جابه‌جایی مرحله یا حذف، «ویرایش» را بزنید.'}</p>`:'<p class="note">هنوز کدی برای پیگیری اضافه نشده.</p>'}
   <div class="note" style="margin-top:6px">${esc(ORDMSG)}</div>`;
 }
 function bindTrack(){
   const O=getOrd(),F=S.sf||'paya';
-  const ad=$('tr_addb');if(ad)ad.onclick=()=>{const c=$('tr_add').value;if(!c)return;const row=STK.find(x=>x.c===c);O.tr.push({g:F,c,ord:0});TROPEN.add(c);ordSave();draw()};
-  document.querySelectorAll('.tr_tog').forEach(d=>d.onclick=()=>{const c=O.tr[+d.dataset.i].c;TROPEN.has(c)?TROPEN.delete(c):TROPEN.add(c);draw()});
-  document.querySelectorAll('.tr_in').forEach(i=>i.onchange=e=>{const v=+e.target.value;const r=O.tr[+e.target.dataset.i];if(v>0)r[e.target.dataset.k]=v;else delete r[e.target.dataset.k];ordSave();draw()});
-  document.querySelectorAll('.tr_del').forEach(b=>b.onclick=()=>{const r=O.tr[+b.dataset.i];TROPEN.delete(r.c);O.tr.splice(+b.dataset.i,1);ordSave();draw()});
+  $('tr_addt').onclick=()=>{TRADD=!TRADD;draw()};
+  $('tr_edt').onclick=()=>{TREDIT=!TREDIT;draw()};
+  const ad=$('tr_addb');if(ad)ad.onclick=()=>{const c=$('tr_add').value;if(!c){alert('کد را انتخاب کنید');return}const m=+$('tr_m').value||0;O.tr.push({g:F,c,ord:m,s:1});TRADD=false;ordSave();draw()};
+  document.querySelectorAll('.tr_ck').forEach(i=>i.onchange=e=>{const r=O.tr[+i.dataset.i],k=+i.dataset.k;
+    if(i.checked){r.s=k+1;if(r.s===5){const v=prompt('چند متر در انبار کارخانه موجود شده؟',r.ord||'');const n=+String(v||'').replace(/[^\d.]/g,'');if(n>0)r.fm=n;else{r.s=4;delete r.fm}}else delete r.fm}
+    else{r.s=k;if(k<5)delete r.fm}
+    ordSave();draw()});
+  document.querySelectorAll('.tr_del').forEach(b=>b.onclick=()=>{const r=O.tr[+b.dataset.i];if(!confirm('حذف '+r.c+'؟'))return;O.tr.splice(+b.dataset.i,1);ordSave();draw()});
 }
 function bindStock(){
   const O=getOrd();
   $('app').querySelectorAll('[data-sf]').forEach(b=>b.onclick=()=>{S.sf=b.dataset.sf;draw()});
+  if(S.sf==='over')return;
   bindTabs();
   if(O.f==='track'){bindTrack();return}
   $('o_b').onchange=e=>{O.b=e.target.value;ordSave();draw()};
