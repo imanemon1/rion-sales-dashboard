@@ -1252,7 +1252,9 @@ let _SHN=null;
 function shopOfDesc(d){const x=nz(d);if(!x)return null;if(!_SHN||_SHN.n!==CAL.length)_SHN={n:CAL.length,l:CAL.map(s=>[nz(s.name),s.name]).filter(a=>a[0].length>2).sort((a,b)=>b[0].length-a[0].length)};
   const h=_SHN.l.find(a=>x.includes(a[0]));return h?h[1]:null}
 const isVitRow=r=>/\u0648\u06CC\u062A\u0631\u06CC\u0646/.test(String(r[7]==null?'':r[7]).replace(/\u064A/g,'\u06CC').replace(/\u0643/g,'\u06A9'));
-function vitMap(){if(!ACC||!ACC.rows)return {};if(window._vmSrc===ACC)return window._vm;const m={};ACC.rows.forEach(r=>{if(!isVitRow(r))return;let n=null;const u=ACC.cust[r[0]];if(u&&u.shop)n=u.shop.name;if(!n)n=shopOfDesc(r[7]);if(!n)return;(m[nz(n)]=m[nz(n)]||[]).push(r)});window._vmSrc=ACC;window._vm=m;return m}
+let _ALB=null;
+function albSet(){if(!_ALB)_ALB=new Set(STK.filter(x=>/PAYA|DELVAN/i.test(String(x.g))).map(x=>String(x.c).trim()));return _ALB}
+function vitMap(){if(!ACC||!ACC.rows)return {};if(window._vmSrc===ACC)return window._vm;const m={};const AL=albSet();ACC.rows.forEach(r=>{if(!isVitRow(r))return;if(!AL.has(String(r[2]).trim()))return;let n=null;const u=ACC.cust[r[0]];if(u&&u.shop)n=u.shop.name;if(!n)n=shopOfDesc(r[7]);if(!n)return;(m[nz(n)]=m[nz(n)]||[]).push(r)});window._vmSrc=ACC;window._vm=m;return m}
 function vitSet(){return new Set(Object.keys(vitMap()))}
 function vitTick(name){const k=nz(name);return vitMap()[k]?`<span data-vit="${esc(k)}" title="کد ویترین را ببینید" style="color:#16a34a;font-weight:700;font-size:16px;cursor:pointer">✔</span>`:''}
 function vitRowsModal(title,L){modal(`<h3>ویترین: ${esc(title)}</h3><p class="note">${fa(L.length)} ردیف با کد ویترین</p><div class="wrap"><table><tr><th>تاریخ</th><th>کد ویترین</th><th class="n">متر</th><th>مشتری حسابداری</th></tr>${L.slice().sort((a,b)=>String(b[1]).localeCompare(String(a[1]))).map(r=>`<tr><td>${esc(r[1])}</td><td dir="ltr" style="text-align:right">${esc(r[2])}</td><td class="n">${fm(r[4])}</td><td>${esc(r[0])}</td></tr>`).join('')||'<tr><td colspan="4" class="note">ردیفی نیست</td></tr>'}</table></div>`)}
