@@ -2159,7 +2159,7 @@ function stkRows(){
   }).sort((a,b)=>(a.cover==null)-(b.cover==null)||(a.cover??0)-(b.cover??0));
 }
 function viewStock(){
-  const O=getOrd(),q=(S.stq||'').trim().toLowerCase();
+  const O=getOrd();if(!Array.isArray(O.tr))O.tr=[];const q=(S.stq||'').trim().toLowerCase();
   if(O.f==='track')return trackView(O);
   let R=stkRows();
   const tot={s:R.reduce((a,x)=>a+x.s,0),sv:R.reduce((a,x)=>a+x.s*x.p,0),on:R.filter(x=>x.sug>0).length,om:R.reduce((a,x)=>a+x.ord,0),ov:R.reduce((a,x)=>a+x.val,0),oc:R.filter(x=>x.ord>0).length};
@@ -2391,7 +2391,7 @@ $('guide').addEventListener('click',e=>{
 
 const SAVED=(()=>{try{return JSON.parse(localStorage.getItem('rionData')||'null')}catch(e){return null}})();
 (async()=>{const ra=await fetchRemoteAcc();if(ra&&ra.length){ACCR=ra;localStorage.setItem('rionAcc',JSON.stringify(ra))}
-{const ro=await fetchOrd();if(ro&&ro.o){ORD=ro;localStorage.setItem('rionOrd',JSON.stringify(ro))}}
+{const ro=await fetchOrd();if(ro&&ro.o){ORD=ro;ORD.tr=ORD.tr||[];if(ORD.v!==3){ORD.v=3;ORD.t=3;ORD.f='all'}ORD.t=ORD.t||3;ORD.b=ORD.b||'max';ORD.f=ORD.f||'all';localStorage.setItem('rionOrd',JSON.stringify(ro))}}
 {const rd=await fetchDisc();if(rd&&typeof rd==='object'&&!Array.isArray(rd)&&rd.g){DSC=rd;localStorage.setItem('rionDisc',JSON.stringify(rd))}}
 {const fr=await fetchFU();if(fr&&typeof fr==='object'&&!Array.isArray(fr)){FU=fr;localStorage.setItem('rionFU',JSON.stringify(fr))}}
 const rl=await fetchAlias();if(rl&&typeof rl==='object'&&!Array.isArray(rl)){ALIAS=rl;localStorage.setItem('rionAlias',JSON.stringify(rl))}
