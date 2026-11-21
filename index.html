@@ -2140,9 +2140,12 @@ const STK=[{"c": "R-4566/D-1307/203F", "g": "PAYA(RION)", "s": 441.4, "r": 17, "
 let ORD=null;
 function getOrd(){if(!ORD){try{ORD=JSON.parse(localStorage.getItem('rionOrd')||'null')}catch(e){}if(!ORD||typeof ORD!=='object'||Array.isArray(ORD))ORD={};ORD.o=ORD.o||{};if(ORD.v!==3){ORD.v=3;ORD.t=3;ORD.f='all'}ORD.t=ORD.t||3;ORD.b=ORD.b||'max';ORD.tr=ORD.tr||[];ORD.f=ORD.f||'need'}return ORD}
 let ORDMSG='';
-async function ordSave(){const O=getOrd();localStorage.setItem('rionOrd',JSON.stringify(O));
+let ORDQ=Promise.resolve();
+function ordSave(){ORDQ=ORDQ.then(_ordSave,_ordSave);return ORDQ}
+async function _ordSave(){const O=getOrd();localStorage.setItem('rionOrd',JSON.stringify(O));
   if(!localStorage.getItem(GHK)){ORDMSG='ذخیره شد (فقط روی این مرورگر؛ برای همگام‌سازی توکن گیت‌هاب را در تنظیمات ثبت کنید)';return}
-  try{ORDMSG=await ghPush(O,GH.ordPath,'orders')==='ok'?'✔ ذخیره شد':'ذخیره شد (فقط روی این مرورگر)'}catch(e){ORDMSG='⚠ در گیت‌هاب ثبت نشد ('+e.message+')'}}
+  let ok=false,err='';for(let i=0;i<3&&!ok;i++){try{ok=await ghPush(O,GH.ordPath,'orders')==='ok'}catch(e){err=e.message;if(!err.includes('409'))break;await new Promise(r=>setTimeout(r,400))}}
+  ORDMSG=ok?'✔ ذخیره شد':(err?'⚠ در گیت‌هاب ثبت نشد ('+err+')':'ذخیره شد (فقط روی این مرورگر)')}
 async function fetchOrd(){try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.ordPath}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch(e){return null}}
 const SFAC=[['paya','پایا',g=>/PAYA/i.test(g)],['delvan','دلوان',g=>/DELVAN/i.test(g)],['other','سایر',g=>!/PAYA|DELVAN/i.test(g)]];
 const NM=(STK[0]&&STK[0].m.length)||8,SMON=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'].slice(0,NM),LASTM=SMON[NM-1];
@@ -2175,8 +2178,12 @@ function overView(){
   const FS=ALL.filter(x=>x.fac!=='other');
   const short=FS.filter(x=>x.cover!=null&&x.cover<=2&&!ordered.has(x.c)).slice(0,10);
   const top=FS.filter(x=>x.avg>0).sort((a,b)=>b.avg-a.avg).slice(0,10);
-  const low=ALL.filter(x=>x.s>0&&(x.avg===0||x.cover>12)).sort((a,b)=>b.s*b.p-a.s*a.p).slice(0,10);
-  const lowAll=ALL.filter(x=>x.s>0&&(x.avg===0||x.cover>12));
+  const AK=ACC?ACC.code:null;
+  const accOf=x=>(AK&&AK[x.c])||{q:0,nc:0};
+  const pool=AK?FS.map(accOf).filter(a=>a.q>0).map(a=>a.q).sort((a,b)=>a-b):[];
+  const medA=pool.length?pool[Math.floor(pool.length/2)]:0;
+  const lowAll=AK?FS.filter(x=>x.s>0).map(x=>({x,a:accOf(x)})).filter(o=>o.a.q<medA*0.5||o.a.nc<=5):[];
+  const low=lowAll.slice().sort((p,q)=>q.x.s*q.x.p-p.x.s*p.x.p).slice(0,10);
   const cv=x=>x.cover==null?'-':fa(Math.round(x.cover*10)/10);
   const tbl=(h,r)=>`<div class="wrap"><table class="bt" style="font-size:12px"><tr>${h.map(t=>`<th>${t}</th>`).join('')}</tr>${r}</table></div>`;
   const sec=(t,n)=>`<h3 style="margin:18px 0 6px;font-size:15px">${t}</h3>${n?`<p class="note" style="margin:0 0 6px">${n}</p>`:''}`;
@@ -2193,8 +2200,8 @@ function overView(){
   ${short.length?tbl(['کد','موجودی','پوشش (ماه)','کارخانه'],short.map(x=>`<tr>${cd(x)}<td class="n">${fm(x.s)}</td><td class="n" style="color:#c0392b"><b>${cv(x)}</b></td><td>${FN[x.fac]}</td>`+'</tr>').join('')):'<p class="note">مورد خاصی نیست ✓</p>'}
   ${sec('★ پرفروش‌ترین کدها','فقط کدهای پایا و دلوان؛ این‌ها را همیشه موجود نگه دارید')}
   ${tbl(['کد','فروش ماهانه','موجودی','پوشش (ماه)'],top.map(x=>`<tr>${cd(x)}<td class="n"><b>${fm(Math.round(x.avg))}</b></td><td class="n">${fm(x.s)}</td><td class="n" style="color:${x.cover<=2?'#c0392b':x.cover<=O.t?'#b9770e':'#1e8449'}"><b>${cv(x)}</b></td></tr>`).join(''))}
-  ${sec('کم‌فروش / کاندید خروج',`${fa(lowAll.length)} کد با پوشش بیش از ۱۲ ماه یا بدون فروش · ارزش راکد ${mt(lowAll.reduce((t,x)=>t+x.s*x.p,0))} م.ت · ۱۰ مورد با بیشترین ارزش:`)}
-  ${tbl(['کد','موجودی','فروش ماهانه','ارزش (م.ت)'],low.map(x=>`<tr>${cd(x)}<td class="n">${fm(x.s)}</td><td class="n">${fm(Math.round(x.avg))}</td><td class="n"><b>${mt(x.s*x.p)}</b></td></tr>`).join(''))}
+  ${sec('کاندید خروج (کدهای آلبوم)',AK?`${fa(lowAll.length)} کد پایا/دلوان با موجودی که فروش کل‌شان کمتر از نصف میانهٔ کدهای آلبوم (${fm(medA)} متر) یا ۵ مشتری یا کمتر دارد · ارزش ${mt(lowAll.reduce((t,o)=>t+o.x.s*o.x.p,0))} م.ت · ۱۰ مورد با بیشترین ارزش:`:'برای این فهرست، ابتدا اکسل حسابداری را از ⚙ تنظیمات بارگذاری کنید.')}
+  ${tbl(['کد','موجودی','فروش کل (متر)','مشتری','ارزش (م.ت)'],low.map(o=>`<tr>${cd(o.x)}<td class="n">${fm(o.x.s)}</td><td class="n">${fm(o.a.q)}</td><td class="n">${fa(o.a.nc)}</td><td class="n"><b>${mt(o.x.s*o.x.p)}</b></td></tr>`).join(''))}
   </div>`;
 }
 function trackView(O){return `<div class="box"><h2>انبار و سفارش</h2><div class="seg">${sfBtns()}</div>${tabsHtml(O)}${trackHtml(O)}</div>`}
@@ -2226,16 +2233,17 @@ function viewStock(){
   if(q)R=R.filter(x=>x.c.toLowerCase().includes(q));
   const stat=x=>x.cover==null?(x.s>0?'<span style="color:#c0392b">بدون فروش</span>':'-'):x.cover<=2?'<span style="color:#c0392b"><b>کسری</b></span>':x.cover<=O.t?'<span style="color:#b9770e"><b>نزدیک کسری</b></span>':x.cover>12?'<span style="color:#7f8c8d">مازاد</span>':'<span style="color:#1e8449">کافی</span>';
   const sel=(k,v,l)=>`<option value="${v}" ${O[k]===v?'selected':''}>${l}</option>`;
-  const filt=`  <div style="border:1px solid #dfe7f5;border-radius:14px;padding:12px;margin:10px 0;background:#fff;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;box-sizing:border-box;width:100%">
-   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">مبنای فروش<select id="o_b" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px;color:#111">${sel('b','max','بیشترین (میانگین کل / ۳ ماه اخیر)')}${sel('b','a8','میانگین '+fa(NM)+' ماه')}${sel('b','a3','۳ ماه اخیر')}${sel('b','a6','۶ ماه اخیر')}</select></label>
-   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">هدف پوشش فروش (ماه)<input id="o_t" type="number" min="0.5" step="0.5" value="${O.t}" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px"></label>
-   
-   <label style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;min-width:0">جستجو<input id="o_q" placeholder="جستجوی کد…" value="${esc(S.stq||'')}" style="box-sizing:border-box;width:100%;min-width:0;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:14px"></label>
+  const INP='box-sizing:border-box;width:100%;min-width:0;height:42px;padding:0 10px;border:1px solid #cfd6e4;border-radius:10px;font:inherit;font-size:14px;color:#111;background:#fff';
+  const LBL='display:flex;flex-direction:column;gap:6px;font-size:12px;color:#64748b;min-width:0';
+  const BOX='border:1px solid #dfe7f5;border-radius:12px;padding:12px;background:#fff;box-sizing:border-box;width:100%';
+  const filt=`  <div style="${BOX};margin:10px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+   <label style="${LBL}">مبنای فروش<select id="o_b" style="${INP}">${sel('b','max','بیشترین (میانگین کل / ۳ ماه اخیر)')}${sel('b','a8','میانگین '+fa(NM)+' ماه')}${sel('b','a3','۳ ماه اخیر')}${sel('b','a6','۶ ماه اخیر')}</select></label>
+   <label style="${LBL}">هدف پوشش فروش (ماه)<input id="o_t" type="number" min="0.5" step="0.5" value="${O.t}" style="${INP}"></label>
   </div>
 `;
-  const kpi=`  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0">
-   <div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">موجودی کل</div><b>${fm(tot.s)} متر</b></div>
-   <div style="border:1px solid #dfe7f5;border-radius:12px;padding:10px;text-align:center"><div class="note">ارزش موجودی</div><b>${fm(Math.round(tot.sv/10/1e6))} م.ت</b></div>
+  const kpi=`  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0">
+   <div style="${BOX};text-align:center"><div class="note">موجودی کل</div><b>${fm(tot.s)} متر</b></div>
+   <div style="${BOX};text-align:center"><div class="note">ارزش موجودی</div><b>${fm(Math.round(tot.sv/10/1e6))} م.ت</b></div>
   </div>
 `;
   return `<div class="box"><h2>انبار و سفارش</h2>${fseg}
@@ -2253,8 +2261,8 @@ let TROPEN=new Set();
 function tabsHtml(O){
   const R=stkRows(),need=R.filter(x=>x.sug>0).length,trc=O.tr.filter(x=>x.g===(S.sf||'paya')).length;
   const isT=O.f==='track',isN=O.f==='need',isA=!isT&&!isN;
-  const b=(id,on,l)=>`<button class="btn ${on?'':'sec'}" id="${id}" style="padding:10px 4px;font-size:12px;min-width:0">${l}</button>`;
-  return `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;margin:8px 0">${b('o_all',isA,`کل کالاها (${fa(R.length)})`)}${b('o_need',isN,`کدهای نیازمند سفارش (${fa(need)})`)}${b('o_track',isT,`پیگیری سفارشات (${fa(trc)})`)}</div>${isT?'':`<div style="margin:8px 0">${b('o_csv',false,'خروجی اکسل (CSV)')}</div>`}`;
+  const b=(id,on,l)=>`<button class="btn ${on?'':'sec'}" id="${id}" style="height:42px;padding:0 4px;font-size:12px;min-width:0;border-radius:10px">${l}</button>`;
+  return `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;margin:8px 0">${b('o_all',isA,`کل کالاها (${fa(R.length)})`)}${b('o_need',isN,`کدهای نیازمند سفارش (${fa(need)})`)}${b('o_track',isT,`پیگیری سفارشات (${fa(trc)})`)}</div>${isT?'':`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;align-items:stretch">${b('o_csv',false,'خروجی اکسل (CSV)')}<input id="o_q" placeholder="جستجوی کد…" value="${esc(S.stq||'')}" style="box-sizing:border-box;width:100%;min-width:0;height:42px;padding:0 10px;border:1px solid #cfd6e4;border-radius:10px;font:inherit;font-size:14px;color:#111;background:#fff"></div>`}`;;
 }
 function bindTabs(){
   const O=getOrd();
@@ -2273,25 +2281,28 @@ function trackHtml(O){
   const used=new Set(O.tr.map(x=>x.c));
   const codes=STK.filter(x=>fn(x.g||'')&&!used.has(x.c)).map(x=>x.c);
   const inp='box-sizing:border-box;padding:8px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;font-size:16px;min-width:0';
-  const bar=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0"><button class="btn ${TRADD?'':'sec'}" id="tr_addt" style="padding:10px 4px">+ افزودن</button><button class="btn ${TREDIT?'':'sec'}" id="tr_edt" style="padding:10px 4px">${TREDIT?'پایان ویرایش':'ویرایش'}</button></div>`;
-  const add=TRADD?`<div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin:8px 0;align-items:center"><select id="tr_add" style="${inp};direction:ltr"><option value="">انتخاب کد…</option>${codes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select><input id="tr_m" type="number" min="0" placeholder="متراژ سفارش" style="${inp};width:100%"><button class="btn" id="tr_addb" style="padding:9px 12px">ثبت</button></div>`:'';
+  const bar=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0"><button class="btn ${TRADD?'':'sec'}" id="tr_addt" style="padding:10px 4px">+ افزودن</button><button class="btn ${TREDIT?'':'sec'}" id="tr_edt" style="padding:10px 4px">${TREDIT?'ذخیره و بستن':'ویرایش'}</button></div>`;
+  const add=TRADD?`<div style="margin:8px 0"><div class="note" style="margin:0 0 4px">تاریخ ثبت سفارش (شمسی)</div><input id="tr_dt" value="${jtoday()}" dir="ltr" placeholder="yyyy/mm/dd" style="${inp};width:100%;direction:ltr"></div><div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin:8px 0;align-items:center"><select id="tr_add" style="${inp};direction:ltr"><option value="">انتخاب کد…</option>${codes.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select><input id="tr_m" type="number" min="0" placeholder="متراژ سفارش" style="${inp};width:100%"><button class="btn" id="tr_addb" style="padding:9px 12px">ثبت</button></div>`:'';
   const cell=(x,k)=>{const l=trLvl(x),ok=l>k,cur=l===k+1;
     if(TREDIT)return `<td style="text-align:center;${cur?'background:#eaf6ee':''}"><input type="checkbox" class="tr_ck" data-i="${O.tr.indexOf(x)}" data-k="${k}" ${ok?'checked':''} style="width:20px;height:20px"></td>`;
     const t=k===0?(x.ord?fm(x.ord):'✓'):k===4&&ok?(x.fm?fm(x.fm):'✓'):'✓';
     return `<td style="text-align:center;${cur?'background:#eaf6ee;font-weight:700':''};color:${ok?'#1e8449':'#cbd5e1'}">${ok?t:'·'}</td>`};
-  const rows=items.map(({x})=>`<tr><td dir="ltr" style="text-align:right;font-size:11px;white-space:nowrap"><b>${esc(x.c)}</b></td>${[0,1,2,3,4].map(k=>cell(x,k)).join('')}${TREDIT?`<td style="text-align:center"><button class="tr_del" data-i="${O.tr.indexOf(x)}" style="border:0;background:#fdecea;color:#c0392b;border-radius:8px;padding:4px 8px;font-size:14px">🗑</button></td>`:''}</tr>`).join('');
+  const rows=items.map(({x})=>`<tr><td dir="ltr" style="text-align:right;font-size:11px;white-space:nowrap"><b>${esc(x.c)}</b>${TREDIT?`<br><input class="tr_dte" data-i="${O.tr.indexOf(x)}" value="${esc(x.dt||'')}" placeholder="yyyy/mm/dd" dir="ltr" style="width:92px;font-size:11px;padding:2px 4px;border:1px solid #cfd6e4;border-radius:6px;font-family:inherit">`:`<div style="font-size:9px;color:#64748b">${esc(x.dt||'—')}</div>`}</td>${[0,1,2,3,4].map(k=>cell(x,k)).join('')}${TREDIT?`<td style="text-align:center"><button class="tr_del" data-i="${O.tr.indexOf(x)}" style="border:0;background:#fdecea;color:#c0392b;border-radius:8px;padding:4px 8px;font-size:14px">🗑</button></td>`:''}</tr>`).join('');
   return `${bar}${add}${items.length?`<div class="wrap"><table class="bt" style="font-size:10px;table-layout:fixed;width:100%"><tr><th style="width:28%">کد</th>${TSH.map(t=>`<th style="text-align:center;font-size:9px;padding:4px 2px">${t}</th>`).join('')}${TREDIT?'<th></th>':''}</tr>${rows}</table></div><p class="note" style="margin-top:6px">${TREDIT?'برای هر مرحله‌ای که کالا از آن گذشته تیک بزنید؛ با تیک «انبار کارخانه» متراژ موجود در کارخانه پرسیده می‌شود.':'ستون سبز مرحلهٔ فعلی هر کد است. برای جابه‌جایی مرحله یا حذف، «ویرایش» را بزنید.'}</p>`:'<p class="note">هنوز کدی برای پیگیری اضافه نشده.</p>'}
   <div class="note" style="margin-top:6px">${esc(ORDMSG)}</div>`;
 }
 function bindTrack(){
   const O=getOrd(),F=S.sf||'paya';
   $('tr_addt').onclick=()=>{TRADD=!TRADD;draw()};
-  $('tr_edt').onclick=()=>{TREDIT=!TREDIT;draw()};
-  const ad=$('tr_addb');if(ad)ad.onclick=()=>{const c=$('tr_add').value;if(!c){alert('کد را انتخاب کنید');return}const m=+$('tr_m').value||0;O.tr.push({g:F,c,ord:m,s:1});TRADD=false;ordSave();draw()};
+  $('tr_edt').onclick=async()=>{if(!TREDIT){TREDIT=true;draw();return}
+    ORDMSG='در حال ذخیره…';draw();await ordSave();
+    if(ORDMSG.startsWith('✔')){TREDIT=false}draw()};
+  const ad=$('tr_addb');if(ad)ad.onclick=()=>{const c=$('tr_add').value;if(!c){alert('کد را انتخاب کنید');return}const m=+$('tr_m').value||0;const dv=($('tr_dt')&&$('tr_dt').value.trim())||jtoday();if(!/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(dv)){alert('تاریخ را به صورت yyyy/mm/dd (شمسی) وارد کنید');return}O.tr.push({g:F,c,ord:m,s:1,dt:dv});TRADD=false;ordSave();draw()};
   document.querySelectorAll('.tr_ck').forEach(i=>i.onchange=e=>{const r=O.tr[+i.dataset.i],k=+i.dataset.k;
     if(i.checked){r.s=k+1;if(r.s===5){const v=prompt('چند متر در انبار کارخانه موجود شده؟',r.ord||'');const n=+String(v||'').replace(/[^\d.]/g,'');if(n>0)r.fm=n;else{r.s=4;delete r.fm}}else delete r.fm}
     else{r.s=k;if(k<5)delete r.fm}
     ordSave();draw()});
+  document.querySelectorAll('.tr_dte').forEach(i=>i.onchange=()=>{const r=O.tr[+i.dataset.i],v=i.value.trim();if(!/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(v)){alert('تاریخ را به صورت yyyy/mm/dd (شمسی) وارد کنید');draw();return}r.dt=v;ordSave();draw()});
   document.querySelectorAll('.tr_del').forEach(b=>b.onclick=()=>{const r=O.tr[+b.dataset.i];if(!confirm('حذف '+r.c+'؟'))return;O.tr.splice(+b.dataset.i,1);ordSave();draw()});
 }
 function bindStock(){
