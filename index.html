@@ -1294,8 +1294,8 @@ function viewSettings(){
   const c=getCfg(),n=D?D.shops.length:0;
   return `<div class="box"><h2>توکن گیت‌هاب</h2><p class="note">برای ذخیره‌ی لیست پخش کالیته در گیت‌هاب لازم است. فقط روی همین مرورگر ذخیره می‌شود.</p>
   <div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="s_tok" type="password" placeholder="توکن گیت‌هاب" autocomplete="off" style="padding:8px 10px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;flex:1;min-width:240px;direction:ltr"><button class="btn sec" id="s_tokbtn">ثبت توکن</button><span class="note">${localStorage.getItem(GHK)?'توکن ثبت است':'توکن ثبت نشده'}</span></div></div>
-  <div class="box"><h2>بارگذاری اکسل حسابداری</h2><p class="note">فایل فروش حسابداری (xls). فقط در همین مرورگر خوانده می‌شود.</p>
-  <div class="upl"><button class="btn" onclick="$('afile').click()">بارگذاری اکسل حسابداری</button>${ACC?`<span class="ok">✔ ${fa(ACC.rows.length)} ردیف، ${fa(Math.round(ACC.total))} متر</span>`:''}</div>${accPrevHTML()}</div>
+  <div class="box"><h2>بارگذاری اکسل فروش</h2><p class="note">فایل فروش (xls). فقط در همین مرورگر خوانده می‌شود.</p>
+  <div class="upl"><button class="btn" onclick="$('afile').click()">بارگذاری اکسل فروش</button>${ACC?`<span class="ok">✔ ${fa(ACC.rows.length)} ردیف، ${fa(Math.round(ACC.total))} متر</span>`:''}</div>${accPrevHTML()}</div>
   <div class="box"><h2>تنظیمات</h2><p class="note">این مقادیر فقط در همین مرورگر ذخیره می‌شوند.</p>
   <div class="setf">
    <label>هدف فروش سالانه (متر)<input id="s_t" type="number" min="0" value="${c.target}"></label>
