@@ -840,6 +840,7 @@ function parse(sheets){
 
 const todayM=()=>g2j(...new Date().toISOString().slice(0,10).split('-').map(Number))[1];
 function lastMonth(){let l=0;[...D.shops,...D.reps].forEach(s=>{for(let k=1;k<=12;k++)if(s.m[k]>0&&k>l)l=k});return l||1}
+function daysSince(s){if(!s.ld)return null;const[y,m,d]=s.ld.split('-').map(Number);if(!y)return null;const n=new Date(Date.now()+(typeof NOWOFF!=='undefined'?NOWOFF:0));const k=Math.round((Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate())-Date.UTC(y,m-1,d))/864e5);return k<0?0:k}
 function enrich(){
   const c=S.cur;
   D.shops.forEach(s=>{
@@ -848,6 +849,8 @@ function enrich(){
     s.upto=upto;
     s.gap=gap;
     s.status=upto===0?'never':gap===0?'ok':gap===1?'g1':gap===2?'g2':'g3';
+    const dd=daysSince(s);s.days=dd;
+    if(dd!=null&&upto>0){const g=Math.floor(dd/30);s.gap=g;s.status=g<=0?'ok':g===1?'g1':g===2?'g2':'g3'}
     // last purchase month
     s.lastBuy=0;for(let k=c;k>=1;k--)if(s.m[k]>0){s.lastBuy=k;break}
   });
@@ -861,6 +864,8 @@ function applyYC(){const c=getYC();let st=document.getElementById('ycss');if(!st
 applyYC();
 const ytag=y=>`<span class="tag ${y?'y'+y:'gray'}">بوک ${yl(y)}</span>`;
 const stag=s=>`<span class="st ${s}">${STL[s]}</span>`;
+const sDays=s=>{if(!s.ld)return '';try{const[gy,gm,gd]=s.ld.split('-').map(Number);const[jy,jm,jd]=g2j(gy,gm,gd);const n=new Date(Date.now()+NOWOFF);const k=Math.round((Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())-Date.UTC(gy,gm-1,gd))/864e5);return k>=0?`<br><small>${fa(k)} روز بدون خرید (آخرین: ${fa(jd)} ${JM[jm-1]})</small>`:''}catch(e){return ''}};
+const stagD=s=>stag(s.status)+sDays(s);
 const shopId=s=>{if(!s)return -1;const n=x=>String(x??'').replace(/\s+/g,' ').trim();if(s.id!=null&&CAL[s.id]&&n(CAL[s.id].name)===n(s.name))return s.id;const c=CAL.find(x=>x.sheet===s.sheet&&n(x.name)===n(s.name))||CAL.find(x=>n(x.name)===n(s.name));return c?c.id:-1};
 const shopA=s=>{const i=shopId(s);return i<0?esc(s.name):`<a class="shl" data-shop="${i}">${esc(s.name)}</a>`};
 const shopCell=s=>`<td>${shopA(s)}</td>`;
@@ -913,7 +918,7 @@ function statBlock(){
 }
 function shopRows(a){
   if(!a.length)return '<p class="note">موردی نیست.</p>';
-  return `<div class="wrap"><table><tr><th>مغازه</th><th>بوک</th><th class="n">آخرین خرید</th><th class="n">جمع سال</th><th>وضعیت</th></tr>${a.map(s=>`<tr><td>${shopA(s)}<br><small>${esc(s.sheet)}</small></td><td>${ytag(s.year)}</td><td class="n">${s.lastBuy?MONTHS[s.lastBuy-1]:'—'}</td><td class="n">${fa(s.total)}</td><td>${stag(s.status)}</td></tr>`).join('')}</table></div>`;
+  return `<div class="wrap"><table><tr><th>مغازه</th><th>بوک</th><th class="n">آخرین خرید</th><th class="n">جمع سال</th><th>وضعیت</th></tr>${a.map(s=>`<tr><td>${shopA(s)}<br><small>${esc(s.sheet)}</small></td><td>${ytag(s.year)}</td><td class="n">${s.lastBuy?MONTHS[s.lastBuy-1]:'—'}</td><td class="n">${fa(s.total)}</td><td>${stagD(s)}</td></tr>`).join('')}</table></div>`;
 }
 const byTot=(a,b)=>b.total-a.total;
 const byLast=(a,b)=>(a.lastBuy||99)-(b.lastBuy||99)||b.total-a.total;
@@ -1104,7 +1109,7 @@ function shopsTable(){
   const sum=a.reduce((x,s)=>x+s.total,0);
   $('stbl').innerHTML=`<table><tr><th>#</th>${th('name','مغازه')}<th>ویترین</th>${th('sheet','شیت')}<th>شهر</th>${th('book','بوک')}${th('hanger','هنگر')}${ms.join('')}${th('total','جمع','n')}${th('status','وضعیت')}</tr>
   ${a.map((s,i)=>{const cs=CAL.find(x=>x===s)||CAL.find(x=>x.sheet===s.sheet&&nz(x.name)===nz(s.name))||CAL.find(x=>nz(x.name)===nz(s.name));return `<tr${cs?` class="clk" data-shop="${cs.id}"`:''}><td>${fa(i+1)}</td>${shopCell(s)}<td>${vitTick(s.name)}</td><td><small>${esc(s.sheet)}</small></td><td>${esc(cityOf(s.name))}</td><td>${ytag(s.year)} <small>${esc(s.book)}</small></td><td>${s.hanger?'✔':''}</td>
-  ${s.m.slice(1).map((v,k)=>mcell(v,v===0?'z':'',k+1>c?'style="opacity:.4"':'')).join('')}<td class="n"><b>${fa(s.total)}</b></td><td>${stag(s.status)}</td></tr>`}).join('')}
+  ${s.m.slice(1).map((v,k)=>mcell(v,v===0?'z':'',k+1>c?'style="opacity:.4"':'')).join('')}<td class="n"><b>${fa(s.total)}</b></td><td>${stagD(s)}</td></tr>`}).join('')}
   <tr><td></td><td></td><td><b>جمع (${fa(a.length)} مغازه)</b></td><td></td><td></td><td></td><td></td>${Array.from({length:12},(_,k)=>{const has=a.some(s=>s.m[k+1]!=null);return `<td class="n"><b>${has?fa(a.reduce((x,s)=>x+(s.m[k+1]||0),0)):''}</b></td>`}).join('')}<td class="n"><b>${fa(sum)}</b></td><td></td></tr></table>`;
 }
 function bindSheets(){document.querySelectorAll('#app [data-hl]').forEach(el=>el.onclick=()=>{const v=el.dataset.hl;S.hl=S.hl===v?null:v;draw()})}
@@ -1192,7 +1197,7 @@ function viewFU(){
    const wa=ph.length>=10?`<a class="btn" target="_blank" rel="noopener" href="https://wa.me/98${ph}?text=${encodeURIComponent((FU_TPL[s.status]||'').replace('{name}',s.name))}">واتساپ</a> <a class="btn sec" href="tel:+98${ph}">تماس</a>`:'';
    return `<tr data-k="${esc(k)}" ${od?'style="background:#fff4e0"':''}>${shopCell(s)}<td><small>${names[s.status]||'فعال'}</small></td><td class="n">${fa(s.total)}</td>
    <td><input class="fu_i" data-f="phone" value="${esc(r.phone||'')}" placeholder="09…" style="width:110px;direction:ltr"> ${wa}</td>
-   <td><span class="st" style="background:${S_[1]}">${S_[0]}</span>${r.start?`<br><small>از ${jStr(r.start)}${r.cnt?' • '+fa(r.cnt)+' بار':''}</small>`:''}</td>
+   <td><span class="st" style="background:${S_[1]}">${S_[0]}</span>${sDays(s)}${r.start?`<br><small>از ${jStr(r.start)}${r.cnt?' • '+fa(r.cnt)+' بار':''}</small>`:''}</td>
    <td><select class="fu_i" data-f="reason">${FU_RS.map(v=>`<option ${r.reason===v?'selected':''}>${v}</option>`).join('')}</select></td>
    <td><input class="fu_i" data-f="note" value="${esc(r.note||'')}" style="min-width:150px"></td>
    <td>${jDateSel(r.next)}</td>
@@ -1388,6 +1393,7 @@ const ACC_COLS=['مشتری','تاریخ','کد کالا/خدمت','گروه ف�
 const ACC_RX=[/مشتر/,/تاریخ|تاريخ/,/کد|كد/,/گروه/,/مقدار/,/خالص/,/مبلغ/,/تخفیف|تخفيف/,/ماه/];
 function colMap(H){const f=(rx,ex)=>H.findIndex(x=>rx.test(x)&&!(ex&&ex.test(x)));const ix=[f(/مشتر/,/گروه/),f(/تاریخ|تاريخ/),f(/کد|كد/),f(/گروه/,/مشتر/),f(/مقدار/),f(/خالص/),f(/مبلغ/),f(/تخفیف|تخفيف/),f(/ماه/)];const di=f(/توضي|توضی/),gi=f(/گروه[\s\u200c]*مشتر/);return {ok:!ix.some(i=>i<0)&&new Set(ix).size===9,ix,di:di<0?9:di,gi}}
 function remap(c,h){if(!h||!h.length)return c;const M=colMap(h);if(!M.ok)return c;const p=i=>i>=0&&i<c.length?c[i]:'';return [...M.ix.map(p),p(M.di),p(M.gi)]}
+const dIso=v=>{const s=String(v==null?'':v).trim();let m=s.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);if(m){let[y,mo,d]=m.slice(1).map(Number);if(y>1300&&y<1500)[y,mo,d]=j2g(y,mo,d);if(y>1900&&mo>=1&&mo<=12&&d>=1&&d<=31)return y+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0');return ''}if(/^\d{5}(\.\d+)?$/.test(s)){return new Date(Date.UTC(1899,11,30)+Number(s)*864e5).toISOString().slice(0,10)}return ''};
 function parseAcc(t,S){S=S||{};S.rows=0;S.skip=0;S.hdr=null;S.bad=[];let rn=0;
   const un=s=>s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;|&#39;/g,"'").replace(/&amp;/g,'&');
   const out=[];
@@ -1427,11 +1433,11 @@ function buildAcc(rows){
   if(!rows||!rows.length||!D){ACC=null;return}
   const CMAP={'D-1023/R01':'20020/02','D-1023/R02':'20020/02'};
   rows.forEach(r=>{const t=CMAP[r[2]];if(t){r[2]=t;r[3]='DELVAN RION'}});
-  const cust={},code={};let maxM=0;CAL.forEach(s=>s.yus=0);
+  const cust={},code={};let maxM=0;CAL.forEach(s=>{s.yus=0;s.ld=''});
   rows.forEach(([c,d,k,g,q,a,m,ds,cg])=>{
     if(m>maxM)maxM=m;
     const u=cust[c]||(cust[c]={name:c,cg:'',tot:0,act:0,amt:0,mo:Array(13).fill(0),codes:{},n:0});
-    if(cg&&!u.cg)u.cg=cg;u.tot+=q;u.amt+=a;u.n++;u.mo[m]+=q;if(isAct(g))u.act+=q;
+    if(cg&&!u.cg)u.cg=cg;const di_=dIso(d);if(di_&&di_>(u.ld||''))u.ld=di_;u.tot+=q;u.amt+=a;u.n++;u.mo[m]+=q;if(isAct(g))u.act+=q;
     const uc=u.codes[k]||(u.codes[k]={q:0,g,mo:Array(13).fill(0)});uc.q+=q;uc.mo[m]+=q;
     const o=code[k]||(code[k]={code:k,g,act:isAct(g),q:0,amt:0,mo:Array(13).fill(0),cu:{}});
     o.q+=q;o.amt+=a;o.mo[m]+=q;o.cu[c]=(o.cu[c]||0)+q;(o.ev=o.ev||[]).push([c,d,q,a]);
@@ -1442,11 +1448,12 @@ function buildAcc(rows){
     let r=matchShop(u.name,CAL);
     if(!r){const rr=matchShop(u.name,D.reps);if(rr)r=rr}
     if(r){u.shop=r.s;u.how=r.how;if(r.how==='fuzzy')fz.push([u.name,r.s.name,r.r]);
-      const s=r.s;if(/^\s*یوسف/.test(nz(u.cg||'')))s.yus=1;s.acc=s.acc||{tot:0,act:0,mo:Array(13).fill(0),codes:{},cust:[]};
+      const s=r.s;if(u.ld&&u.ld>(s.ld||''))s.ld=u.ld;if(/^\s*یوسف/.test(nz(u.cg||'')))s.yus=1;s.acc=s.acc||{tot:0,act:0,mo:Array(13).fill(0),codes:{},cust:[]};
       s.acc.tot+=u.tot;s.acc.act+=u.act;u.mo.forEach((v,i)=>s.acc.mo[i]+=v);s.acc.cust.push(u.name);
       for(const k in u.codes){const t=s.acc.codes[k]||(s.acc.codes[k]={q:0,g:u.codes[k].g,mo:Array(13).fill(0)});t.q+=u.codes[k].q;u.codes[k].mo.forEach((v,i)=>t.mo[i]+=v)}
     }else unm.push(u);
   });
+  {const ys=new Set(CAL.filter(s=>s.yus).map(s=>nz(s.name)));D.shops.forEach(s=>s.yus=ys.has(nz(s.name))?1:0)}
   CAL.forEach(s=>{if(!s.acc)s.acc={tot:0,act:0,mo:Array(13).fill(0),codes:{},cust:[]}});
   Object.values(code).forEach(o=>{o.nc=Object.values(o.cu).filter(v=>v>0).length;o.last=0;for(let i=12;i>=1;i--)if(o.mo[i]>0){o.last=i;break}});
   const RET={};rows.forEach(r=>{if(r[4]<0){const x=RET[r[0]]||(RET[r[0]]={name:r[0],q:0,a:0,mo:Array(13).fill(0),L:[]});x.q+=r[4];x.a+=r[5];x.mo[r[6]]+=r[4];x.L.push(r)}});
