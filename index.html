@@ -1494,7 +1494,7 @@ async function dsPush(){
   draw();
 }
 let DSSEL=new Set();
-function dsWhere(d,g,n){return DS_SUB.filter(([k])=>k!==g&&d.g[k].shops[n]).map(([,l])=>l)}
+function dsWhere(d,g,n){return DS_SUB.filter(([k])=>k!==g&&d&&d.g&&d.g[k]&&d.g[k].shops&&d.g[k].shops[n]).map(([,l])=>l)}
 function dsTbl(d,g,mo,ed){
   const G=d.g[g];
   const rows=Object.keys(G.shops).map(k=>{const s=CAL.find(x=>x.name===k);if(!s)return{k,miss:1};const o=dsSum(s,mo);
@@ -2134,7 +2134,7 @@ function shopProfile(id){
   const s=CAL[id];if(!s)return;const a=ACC&&s.acc&&s.acc.cust.length?s.acc:null,mx=ACC?ACC.maxM:S.cur;
   const rowsM=[];for(let k=1;k<=Math.max(mx,S.cur);k++)rowsM.push(k);
   let h=`<h3>${esc(s.name)}</h3><p class="note">${esc(s.sheet)} · ${ytag(s.year)} <small>${esc(s.book)}</small> ${s.hanger?'· هنگر دارد':''} · ${stag(s.status)}</p>${(()=>{const b=getBD()[s.name.replace(/\s+/g,' ').trim()];if(!b)return '<p class="note">تاریخ ثبت بوک: هنوز تغییری ثبت نشده (از اولین ویرایش به بعد ثبت می‌شود).</p>';return `<p class="note"><b>بوک از تاریخ: ${fd(b.since||b.last)}</b></p><details><summary>تاریخچه تغییرات</summary>${b.log.slice().reverse().map(l=>`<div class="note">${fd(l.d)} — ${esc(l.t)}</div>`).join('')}</details>`})()}
-  ${(()=>{const w=dsWhere(getDS(),'',s.name);return `<p class="note"><b>گروه تخفیف:</b> ${w.length?w.map(l=>`<span style="background:#dcfce7;color:#15803d;border-radius:6px;padding:2px 8px;margin:0 2px;font-size:12px">✔ ${esc(l)}</span>`).join(''):'<span style="color:#64748b">در هیچ گروه تخفیفی نیست</span>'}</p>`})()}
+  ${(()=>{let w=[];try{w=dsWhere(getDS(),'',s.name)}catch(e){console.error(e)}return `<p class="note"><b>گروه تخفیف:</b> ${w.length?w.map(l=>`<span style="background:#dcfce7;color:#15803d;border-radius:6px;padding:2px 8px;margin:0 2px;font-size:12px">✔ ${esc(l)}</span>`).join(''):'<span style="color:#64748b">در هیچ گروه تخفیفی نیست</span>'}</p>`})()}
   <div class="cards"><div class="card"><div class="l">خرید طبق لیست ماهانه</div><div class="v">${fm(s.total)}</div><div class="s">متر</div></div>`;
   if(a)h+=`<div class="card g"><div class="l">خرید طبق حسابداری</div><div class="v">${fm(a.tot)}</div><div class="s">متر · اختلاف ${fm(a.tot-s.total)}</div></div><div class="card"><div class="l">بوک جدید (RION)</div><div class="v">${fm(a.act)}</div><div class="s">متر</div></div><div class="card w"><div class="l">قدیمی / سایر</div><div class="v">${fm(a.tot-a.act)}</div><div class="s">متر</div></div>`;
   if(a)h+=shopExtra(s,a,mx);
