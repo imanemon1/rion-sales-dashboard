@@ -851,7 +851,7 @@ function enrich(){
     s.gap=gap;
     s.status=upto===0?'never':gap===0?'ok':gap===1?'g1':gap===2?'g2':'g3';
     const dd=daysSince(s);s.days=dd;
-    if(dd!=null&&upto>0&&c===curJM()){const g=Math.floor(dd/30);s.gap=g;s.status=g<=0?'ok':g===1?'g1':g===2?'g2':'g3'}
+    if(dd!=null&&c===curJM()){const g=Math.floor(dd/30);s.gap=g;s.status=g<=0?'ok':g===1?'g1':g===2?'g2':'g3'}
     // last purchase month
     s.lastBuy=0;for(let k=c;k>=1;k--)if(s.m[k]>0){s.lastBuy=k;break}
   });
