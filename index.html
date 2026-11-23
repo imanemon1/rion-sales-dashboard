@@ -1474,7 +1474,7 @@ function codeTable(list,tot,mx){
 }
 /* ---- discount (تخفیف) ---- */
 let DSC=null;
-function getDS(){if(!DSC){try{DSC=JSON.parse(localStorage.getItem('rionDisc')||'null')}catch(e){}if(!DSC||typeof DSC!=='object'||Array.isArray(DSC))DSC={};DSC.unit='rial';DSC.g=DSC.g||{};['p','t','y'].forEach(k=>{DSC.g[k]=DSC.g[k]||{shops:{}}});DSC.g.t.tiers=DSC.g.t.tiers||''}return DSC}
+function getDS(){if(!DSC){try{DSC=JSON.parse(localStorage.getItem('rionDisc')||'null')}catch(e){}if(!DSC||typeof DSC!=='object'||Array.isArray(DSC))DSC={};DSC.unit='rial';DSC.g=DSC.g||{};['p','t','y','f'].forEach(k=>{DSC.g[k]=DSC.g[k]||{shops:{}}});DSC.g.t.tiers=DSC.g.t.tiers||''}return DSC}
 const dsSave=()=>localStorage.setItem('rionDisc',JSON.stringify(getDS()));
 const dsSum=(s,m)=>{const o={a:0,r:0,q:0,qr:0};if(!ACC||!s.acc)return o;const cs=new Set(s.acc.cust);
   ACC.rows.forEach(x=>{if(x[6]!==m||!isAct(x[3])||!cs.has(x[0]))return;if(x[4]<0){o.r+=Math.abs(x[5]);o.qr+=Math.abs(x[4])}else{o.a+=x[5];o.q+=x[4]}});
@@ -1483,8 +1483,8 @@ const DS_STAIR=[[30,60,3e5],[60,100,5e5],[100,300,7e5],[300,1/0,1e6]];
 const dsStair=x=>DS_STAIR.reduce((a,[lo,hi,p])=>a+Math.max(0,Math.min(x,hi)-lo)*p,0);
 const dsM=v=>v/1e7;
 const dsOut=v=>getDS().unit==='rial'?v:v/10;
-const DS_SUB=[['p','۵ و ۱۰ درصدی'],['t','پله‌کانی'],['y','یک پله']];
-const DS_COLS={p:['فروش به مبلغ','برگشتی (مبلغ)','فروش خالص','متراژ خالص','درصد'],t:['فروش به مبلغ','برگشتی (مبلغ)','فروش خالص','متراژ خالص','درصد'],y:['فروش به مبلغ','برگشتی (مبلغ)','فروش خالص','متراژ خالص','درصد']};
+const DS_SUB=[['p','۵ و ۱۰ درصدی'],['t','پله‌کانی'],['y','یک پله'],['f','۵ درصدی']];
+const DS_COLS={p:['فروش به مبلغ','برگشتی (مبلغ)','فروش خالص','متراژ خالص','درصد'],t:['فروش به مبلغ','برگشتی (مبلغ)','فروش خالص','متراژ خالص','درصد'],y:['فروش به مبلغ','برگشتی (مبلغ)','فروش خالص','متراژ خالص','درصد'],f:['فروش به مبلغ','برگشتی (مبلغ)','فروش خالص','متراژ خالص','درصد']};
 let DSDIRTY=false,DSMSG='';
 async function fetchDisc(){try{const r=await fetch(`https://raw.githubusercontent.com/${GH.repo}/${GH.branch}/${GH.dsPath}?t=${Date.now()}`,{cache:'no-store'});if(!r.ok)return null;return await r.json()}catch(e){return null}}
 function dsChg(){DSDIRTY=true;dsSave();DSMSG='';draw()}
@@ -1500,8 +1500,9 @@ function dsTbl(d,g,mo,ed){
   const rows=Object.keys(G.shops).map(k=>{const s=CAL.find(x=>x.name===k);if(!s)return{k,miss:1};const o=dsSum(s,mo);
     if(g==='t'){const disc=dsOut(dsStair(o.qn));return{k,sh:s.sheet,s:o,r:o.n?disc/o.n*100:0,disc}}
     if(g==='y'){const disc=dsOut(Math.max(0,o.qn-30)*3e5);return{k,sh:s.sheet,s:o,r:o.n?disc/o.n*100:0,disc}}
+    if(g==='f'){const r=dsM(o.n)>10?5:0;return{k,sh:s.sheet,s:o,r,disc:dsOut(o.n*r/100)}}
     const r=dsM(o.n)>50?10:dsM(o.n)>10?5:0;return{k,sh:s.sheet,s:o,r,disc:dsOut(o.n*r/100)}});
-  const key=x=>x.miss?-1:(g==='p'?x.s.n:x.s.qn);
+  const key=x=>x.miss?-1:(g==='t'||g==='y'?x.s.qn:x.s.n);
   rows.sort((a,b)=>key(b)-key(a));
   const tot=rows.reduce((a,x)=>a+(x.disc||0),0);
   const th='padding:8px 10px;background:#f3f6fb;color:#334;font-weight:600;border-bottom:1px solid #e2e7f0;white-space:nowrap';
@@ -1519,7 +1520,7 @@ function viewDisc(){
   const sheets=[...new Set(CAL.map(s=>s.sheet).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fa'));
   const sh=S.dsh&&sheets.includes(S.dsh)?S.dsh:(sheets[0]||'');
   const shopsOf=CAL.filter(s=>s.sheet===sh).sort((a,b)=>a.name.localeCompare(b.name,'fa'));
-  const note={p:'فروش خالص ماه بیشتر از ۱۰ میلیون تومان: ۵٪ — بیشتر از ۵۰ میلیون: ۱۰٪',t:'پله‌کانی روی متراژ خالص ماه؛ ۰–۳۰ متر بدون تخفیف، و بقیه پله‌ها طبق قانون.',y:'متراژ خالص بالای ۳۰ متر: به ازای هر متر ۳۰ هزار تومان.'}[g];
+  const note={p:'فروش خالص ماه بیشتر از ۱۰ میلیون تومان: ۵٪ — بیشتر از ۵۰ میلیون: ۱۰٪',t:'پله‌کانی روی متراژ خالص ماه؛ ۰–۳۰ متر بدون تخفیف، و بقیه پله‌ها طبق قانون.',y:'متراژ خالص بالای ۳۰ متر: به ازای هر متر ۳۰ هزار تومان.',f:'فروش خالص ماه بیشتر از ۱۰ میلیون تومان: ۵٪ (بدون سقف، بدون ۱۰٪).'}[g];
   const btn=(id,l,st)=>`<button id="${id}" style="padding:9px 18px;border:0;border-radius:8px;cursor:pointer;font:inherit;${st}">${l}</button>`;
   const tab=(k,l)=>`<button class="ds_s" data-g="${k}" style="padding:9px 16px;border:0;border-radius:8px;cursor:pointer;font:inherit;${k===g?'background:#1a6fc4;color:#fff':'background:#eef2f8;color:#334'}">${l}</button>`;
   const pick=S.dsPick?`<div id="ds_ov" style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px">
@@ -2133,6 +2134,7 @@ function shopProfile(id){
   const s=CAL[id];if(!s)return;const a=ACC&&s.acc&&s.acc.cust.length?s.acc:null,mx=ACC?ACC.maxM:S.cur;
   const rowsM=[];for(let k=1;k<=Math.max(mx,S.cur);k++)rowsM.push(k);
   let h=`<h3>${esc(s.name)}</h3><p class="note">${esc(s.sheet)} · ${ytag(s.year)} <small>${esc(s.book)}</small> ${s.hanger?'· هنگر دارد':''} · ${stag(s.status)}</p>${(()=>{const b=getBD()[s.name.replace(/\s+/g,' ').trim()];if(!b)return '<p class="note">تاریخ ثبت بوک: هنوز تغییری ثبت نشده (از اولین ویرایش به بعد ثبت می‌شود).</p>';return `<p class="note"><b>بوک از تاریخ: ${fd(b.since||b.last)}</b></p><details><summary>تاریخچه تغییرات</summary>${b.log.slice().reverse().map(l=>`<div class="note">${fd(l.d)} — ${esc(l.t)}</div>`).join('')}</details>`})()}
+  ${(()=>{const w=dsWhere(getDS(),'',s.name);return `<p class="note"><b>گروه تخفیف:</b> ${w.length?w.map(l=>`<span style="background:#dcfce7;color:#15803d;border-radius:6px;padding:2px 8px;margin:0 2px;font-size:12px">✔ ${esc(l)}</span>`).join(''):'<span style="color:#64748b">در هیچ گروه تخفیفی نیست</span>'}</p>`})()}
   <div class="cards"><div class="card"><div class="l">خرید طبق لیست ماهانه</div><div class="v">${fm(s.total)}</div><div class="s">متر</div></div>`;
   if(a)h+=`<div class="card g"><div class="l">خرید طبق حسابداری</div><div class="v">${fm(a.tot)}</div><div class="s">متر · اختلاف ${fm(a.tot-s.total)}</div></div><div class="card"><div class="l">بوک جدید (RION)</div><div class="v">${fm(a.act)}</div><div class="s">متر</div></div><div class="card w"><div class="l">قدیمی / سایر</div><div class="v">${fm(a.tot-a.act)}</div><div class="s">متر</div></div>`;
   if(a)h+=shopExtra(s,a,mx);
