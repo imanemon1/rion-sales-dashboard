@@ -1468,9 +1468,10 @@ function dsn(k){const s=String(k),n=s.match(/\d+/g)||[];let d=n[0]||'',c='';cons
 const spark=(mo,mx)=>{const M=Math.max(...mo.slice(1,mx+1),1);return `<span class="spk">${mo.slice(1,mx+1).map(v=>`<i style="height:${Math.max(v>0?10:0,Math.round(Math.max(v,0)/M*100))}%" title="${fm(v)}"></i>`).join('')}</span>`};
 const grpTag=g=>`<span class="tag ${isAct(g)?'new':'gray'}">${isAct(g)?(/DELVAN/i.test(g)?'دلوان':'پایا'):esc(g||'؟')}</span>`;
 function ordN(o){return new Set((o.ev||[]).map(e=>e[0]+"|"+e[1])).size}
+const g3Chg=(mo,mx)=>{const sum=(a,b)=>{let t=0;for(let k=Math.max(1,a);k<=b;k++)t+=(mo[k]||0);return t};const r=sum(mx-2,mx),p=sum(mx-5,mx-3);if(p<=0)return r>0?'<span class="tag new">جدید</span>':'—';const c=(r-p)/p*100;return `<b style="color:${c>=0?'#16a34a':'#dc2626'}" dir="ltr">${c>=0?'+':''}${fa(Math.round(c*10)/10)}٪</b>`};
 function codeTable(list,tot,mx){
-  return `<div class="wrap"><table class="bt"><tr><th>#</th><th>کد</th><th>گروه</th><th class="n">متر</th><th>سهم</th><th class="n">تعداد سفارش</th><th class="n">مشتری</th><th>روند ماهانه</th><th class="n">آخرین ماه</th></tr>
-  ${list.map((o,i)=>`<tr class="clk" data-code="${esc(o.code)}"><td>${fa(i+1)}</td><td dir="ltr" style="text-align:right">${esc(o.code)}</td><td>${grpTag(o.g)}</td><td class="n"><b>${fm(o.q)}</b></td><td style="min-width:90px"><div class="bar"><i style="width:${Math.min(100,tot?o.q/tot*100*4:0)}%"></i></div></td><td class="n"><b>${fa(ordN(o))}</b></td><td class="n">${fa(o.nc)}</td><td>${spark(o.mo,mx)}</td><td class="n">${o.last?MONTHS[o.last-1]:'-'}</td></tr>`).join('')}</table></div>`;
+  return `<div class="wrap"><table class="bt"><tr><th>#</th><th>کد</th><th>گروه</th><th class="n">متر</th><th>سهم</th><th class="n">تعداد سفارش</th><th class="n">مشتری</th><th>روند ماهانه</th><th class="n">آخرین ماه</th><th class="n">۳ ماه اخیر نسبت به ۳ ماه قبل</th></tr>
+  ${list.map((o,i)=>`<tr class="clk" data-code="${esc(o.code)}"><td>${fa(i+1)}</td><td dir="ltr" style="text-align:right">${esc(o.code)}</td><td>${grpTag(o.g)}</td><td class="n"><b>${fm(o.q)}</b></td><td style="min-width:90px"><div class="bar"><i style="width:${Math.min(100,tot?o.q/tot*100*4:0)}%"></i></div></td><td class="n"><b>${fa(ordN(o))}</b></td><td class="n">${fa(o.nc)}</td><td>${spark(o.mo,mx)}</td><td class="n">${o.last?MONTHS[o.last-1]:'-'}</td><td class="n">${g3Chg(o.mo,mx)}</td></tr>`).join('')}</table></div>`;
 }
 /* ---- discount (تخفیف) ---- */
 let DSC=null;
