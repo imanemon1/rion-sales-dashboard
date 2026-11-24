@@ -1193,7 +1193,7 @@ function viewFU(){
   const cnt=f=>act.filter(f).length;
   const chip=(k,l,n)=>`<button class="btn ${g===k?'':'sec'}" data-fg="${k}">${l} (${fa(n)})</button>`;
   return h+`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${chip('all','همه',act.length)}${chip('open','پیگیری نشده',cnt(s=>st(s)==='open'))}${chip('prog','در حال پیگیری',cnt(s=>st(s)==='prog'))} | ${chip('g1','۱ ماه',cnt(s=>s.status==='g1'))}${chip('g2','۲ ماه',cnt(s=>s.status==='g2'))}${chip('g3','۳+ ماه',cnt(s=>s.status==='g3'))}${chip('never','بدون خرید',cnt(s=>s.status==='never'))}${chip('m','میثم',mAll.length)}</div>
-  <div class="box"><div class="wrap"><table><tr><th>مغازه</th><th>گروه</th><th class="n">جمع سال</th><th>شماره</th><th>وضعیت</th><th>دلیل</th><th>یادداشت</th><th>پیگیری بعدی</th><th>انجام شد</th><th></th></tr>
+  <div class="box"><div class="wrap"><table><tr><th>مغازه</th><th>گروه</th><th class="n">جمع سال</th><th>شماره</th><th>وضعیت</th><th>دلیل</th><th>یادداشت</th><th>انجام شد</th><th></th></tr>
   ${a.map(s=>{const k=fuKey(s),r=rec(s),ph=fuPh(r.phone),od=isDue(s),S_=FUS[st(s)];
    const wa=ph.length>=10?`<a class="btn" target="_blank" rel="noopener" href="https://wa.me/98${ph}?text=${encodeURIComponent((FU_TPL[s.status]||'').replace('{name}',s.name))}">واتساپ</a> <a class="btn sec" href="tel:+98${ph}">تماس</a>`:'';
    return `<tr data-k="${esc(k)}" ${od?'style="background:#fff4e0"':''}>${shopCell(s)}<td><small>${names[s.status]||'فعال'}</small></td><td class="n">${fa(s.total)}</td>
@@ -1201,7 +1201,6 @@ function viewFU(){
    <td><span class="st" style="background:${S_[1]}">${S_[0]}</span>${sDays(s)}${r.start?`<br><small>از ${jStr(r.start)}${r.cnt?' • '+fa(r.cnt)+' بار':''}</small>`:''}</td>
    <td><select class="fu_i" data-f="reason">${FU_RS.map(v=>`<option ${r.reason===v?'selected':''}>${v}</option>`).join('')}</select></td>
    <td><input class="fu_i" data-f="note" value="${esc(r.note||'')}" style="min-width:150px"></td>
-   <td>${jDateSel(r.next)}</td>
    <td><input type="checkbox" class="fu_c" ${r.done?'checked':''}></td>
    <td><button class="btn sec" data-fa="close" title="بستن (مغازه تعطیل شد / دیگر کار نمی‌کند)">✖</button></td></tr>`}).join('')||'<tr><td>موردی نیست ✔</td></tr>'}</table></div></div>`}
 function bindFU(){
