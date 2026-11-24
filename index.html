@@ -1187,12 +1187,14 @@ function viewFU(){
   if(fs==='win')return h;
   const mAll=D.shops.filter(s=>s.yus&&st(s)!=='closed'&&st(s)!=='win');
   let a=fs==='due'?act.filter(isDue):act;
-  a=g==='m'?(fs==='due'?mAll.filter(isDue):mAll):a.filter(s=>g==='all'||(['open','prog'].includes(g)?st(s)===g:s.status===g));
+  a=g==='m'?(fs==='due'?mAll.filter(isDue):mAll):g==='b54'?a.filter(bothY):a.filter(s=>g==='all'||(['open','prog'].includes(g)?st(s)===g:s.status===g));
   const ord={g3:0,g2:1,g1:2,never:3};
   a.sort((x,y)=>(isDue(y)-isDue(x))||((ord[x.status]??4)-(ord[y.status]??4))||y.total-x.total);
   const cnt=f=>act.filter(f).length;
+  const yrs={};D.shops.forEach(x=>{const k=nz(x.name);(yrs[k]??=new Set()).add(x.year)});
+  const bothY=s=>{const v=yrs[nz(s.name)];return !!v&&v.has(5)&&v.has(4)};
   const chip=(k,l,n)=>`<button class="btn ${g===k?'':'sec'}" data-fg="${k}">${l} (${fa(n)})</button>`;
-  return h+`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${chip('all','همه',act.length)}${chip('open','پیگیری نشده',cnt(s=>st(s)==='open'))}${chip('prog','در حال پیگیری',cnt(s=>st(s)==='prog'))} | ${chip('g1','۱ ماه',cnt(s=>s.status==='g1'))}${chip('g2','۲ ماه',cnt(s=>s.status==='g2'))}${chip('g3','۳+ ماه',cnt(s=>s.status==='g3'))}${chip('never','بدون خرید',cnt(s=>s.status==='never'))}${chip('m','میثم',mAll.length)}</div>
+  return h+`<div style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0">${chip('all','همه',act.length)}${chip('b54','آلبوم ۱۴۰۵ و ۱۴۰۴',act.filter(bothY).length)}${chip('open','پیگیری نشده',cnt(s=>st(s)==='open'))}${chip('prog','در حال پیگیری',cnt(s=>st(s)==='prog'))} | ${chip('g1','۱ ماه',cnt(s=>s.status==='g1'))}${chip('g2','۲ ماه',cnt(s=>s.status==='g2'))}${chip('g3','۳+ ماه',cnt(s=>s.status==='g3'))}${chip('never','بدون خرید',cnt(s=>s.status==='never'))}${chip('m','میثم',mAll.length)}</div>
   <div class="box"><div class="wrap"><table><tr><th>مغازه</th><th>گروه</th><th>آلبوم</th><th class="n">جمع سال</th><th>شماره</th><th>وضعیت</th><th>دلیل</th><th>یادداشت</th><th>انجام شد</th><th></th></tr>
   ${a.map(s=>{const k=fuKey(s),r=rec(s),ph=fuPh(r.phone),od=isDue(s),S_=FUS[st(s)];
    const wa=ph.length>=10?`<a class="btn" target="_blank" rel="noopener" href="https://wa.me/98${ph}?text=${encodeURIComponent((FU_TPL[s.status]||'').replace('{name}',s.name))}">واتساپ</a> <a class="btn sec" href="tel:+98${ph}">تماس</a>`:'';
