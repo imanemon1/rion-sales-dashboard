@@ -1170,12 +1170,13 @@ function viewFU(){
   const names={g3:'۳ ماه یا بیشتر',g2:'۲ ماه',g1:'۱ ماه',never:'هرگز خرید نکرده'};
   const rec=s=>F[fuKey(s)]||{};
   const st=s=>fuState(s,rec(s));
-  const inact=D.shops.filter(s=>names[s.status]);
-  const wins=D.shops.filter(s=>st(s)==='win');
+  const SH=D.shops.filter(s=>s.year>=4);
+  const inact=SH.filter(s=>names[s.status]);
+  const wins=SH.filter(s=>st(s)==='win');
   const act=inact.filter(s=>st(s)!=='closed'&&st(s)!=='win');
-  const closed=D.shops.filter(s=>st(s)==='closed');
+  const closed=SH.filter(s=>st(s)==='closed');
   const isDue=s=>{const r=rec(s);return r.next&&r.next<=today&&!r.done&&st(s)==='prog'};
-  const revived=D.shops.flatMap(s=>(rec(s).hist||[]).map(h=>({s,h}))).sort((x,y)=>y.h.back.localeCompare(x.h.back));
+  const revived=SH.flatMap(s=>(rec(s).hist||[]).map(h=>({s,h}))).sort((x,y)=>y.h.back.localeCompare(x.h.back));
   const [jy,jm]=jNow(),thisM=revived.filter(x=>{const[a,b]=g2j(...x.h.back.split('-').map(Number));return a===jy&&b===jm});
   const card=(l,v,c,k)=>`<div class="card" data-fs="${k}" style="cursor:pointer;border-top:3px solid ${c};${fs===k?'outline:2px solid '+c:''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;
   let h=`<p class="note">مبنا: ماه <b>${MONTHS[S.cur-1]}</b>. با ثبت دلیل، یادداشت، تاریخ یا تیک، وضعیت خودکار «در حال پیگیری» می‌شود. اگر بعد از شروع پیگیری خریدی ثبت شود، سبز می‌شود تا تأیید کنید. <b id="fu_msg">${esc(FUMSG)}</b></p>
@@ -1185,7 +1186,7 @@ function viewFU(){
   if(fs==='rev')return h+`<div class="box"><h3>احیا شده‌ها</h3><div class="wrap"><table><tr><th>مغازه</th><th>شروع پیگیری</th><th>تأیید احیا</th><th class="n">خرید</th><th>دلیل</th><th>یادداشت</th></tr>${revived.map(({s,h})=>`<tr>${shopCell(s)}<td>${jStr(h.start)}</td><td>${jStr(h.back)}</td><td class="n">${fa(+(h.amt||0).toFixed(1))}</td><td>${esc(h.reason||'')}</td><td><small>${esc(h.note||'')}</small></td></tr>`).join('')||'<tr><td>هنوز موردی نیست</td></tr>'}</table></div></div>`;
   if(fs==='closed')return h+`<div class="box"><h3>بسته شده‌ها</h3><div class="wrap"><table><tr><th>مغازه</th><th>یادداشت</th><th></th></tr>${closed.map(s=>`<tr data-k="${esc(fuKey(s))}">${shopCell(s)}<td><small>${esc(rec(s).note||'')}</small></td><td><button class="btn sec" data-fa="reopen">بازگرداندن به لیست</button></td></tr>`).join('')||'<tr><td>موردی نیست</td></tr>'}</table></div></div>`;
   if(fs==='win')return h;
-  const mAll=D.shops.filter(s=>s.yus&&st(s)!=='closed'&&st(s)!=='win');
+  const mAll=SH.filter(s=>s.yus&&st(s)!=='closed'&&st(s)!=='win');
   let a=fs==='due'?act.filter(isDue):act;
   a=g==='m'?(fs==='due'?mAll.filter(isDue):mAll):g==='b54'?a.filter(bothY):a.filter(s=>g==='all'||(['open','prog'].includes(g)?st(s)===g:s.status===g));
   const ord={g3:0,g2:1,g1:2,never:3};
