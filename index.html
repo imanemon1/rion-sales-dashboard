@@ -2620,7 +2620,7 @@ $('guide').addEventListener('click',e=>{
 const SAVED=(()=>{try{return JSON.parse(localStorage.getItem('rionData')||'null')}catch(e){return null}})();
 (async()=>{const ra=await fetchRemoteAcc();if(ra&&ra.length){ACCR=ra;localStorage.setItem('rionAcc',JSON.stringify(ra))}
 {const ro=await fetchOrd();if(ro&&ro.o){ORD=ro;ORD.tr=ORD.tr||[];if(ORD.v!==3){ORD.v=3;ORD.t=3;ORD.f='all'}ORD.t=ORD.t||3;ORD.b=ORD.b||'max';ORD.f=ORD.f||'all';ORD.L=ORD.L==null?3:ORD.L;ORD.mn=ORD.mn==null?250:ORD.mn;localStorage.setItem('rionOrd',JSON.stringify(ro))}}
-{const rd=await fetchDisc();if(rd&&typeof rd==='object'&&!Array.isArray(rd)&&rd.g){DSC=rd;localStorage.setItem('rionDisc',JSON.stringify(rd))}}
+{const rd=await fetchDisc();if(rd&&typeof rd==='object'&&!Array.isArray(rd)&&rd.g){DSC=rd;rd.g=rd.g||{};['p','t','y','f'].forEach(k=>{rd.g[k]=rd.g[k]||{shops:{}};rd.g[k].shops=rd.g[k].shops||{}});rd.g.t.tiers=rd.g.t.tiers||'';rd.unit='rial';localStorage.setItem('rionDisc',JSON.stringify(rd))}}
 {const fr=await fetchFU();if(fr&&typeof fr==='object'&&!Array.isArray(fr)){FU=fr;localStorage.setItem('rionFU',JSON.stringify(fr))}}
 const rl=await fetchAlias();if(rl&&typeof rl==='object'&&!Array.isArray(rl)){ALIAS=rl;localStorage.setItem('rionAlias',JSON.stringify(rl))}
 const ri=await fetchIgn();if(Array.isArray(ri)){IGN=ri;localStorage.setItem('rionIgn',JSON.stringify(ri))}
