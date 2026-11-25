@@ -792,7 +792,7 @@ function whBuild(rows){
     F.top=Object.entries(F.n).filter(([k,v])=>v[0]>0).map(([k,v])=>[k,Math.round(v[0]*10)/10,v[1]]).sort((a,b)=>b[1]-a[1]).slice(0,8);
     delete F.n;F.m=Math.round(F.m*10)/10;F.v=Math.round(F.v);
   }
-  W.waste=W.waste.map(x=>Math.round(x*10)/10);W.extra=W.extra.map(x=>Math.round(x*10)/10);
+  W.tot=rows.length;W.waste=W.waste.map(x=>Math.round(x*10)/10);W.extra=W.extra.map(x=>Math.round(x*10)/10);
   return W;
 }
 const MONTHS=['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
@@ -1337,9 +1337,9 @@ function viewSettings(){
   return `<div class="box"><h2>توکن گیت‌هاب</h2><p class="note">برای ذخیره‌ی لیست پخش کالیته در گیت‌هاب لازم است. فقط روی همین مرورگر ذخیره می‌شود.</p>
   <div class="upl" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="s_tok" type="password" placeholder="توکن گیت‌هاب" autocomplete="off" style="padding:8px 10px;border:1px solid #cfd6e4;border-radius:8px;font:inherit;flex:1;min-width:240px;direction:ltr"><button class="btn sec" id="s_tokbtn">ثبت توکن</button><span class="note">${localStorage.getItem(GHK)?'توکن ثبت است':'توکن ثبت نشده'}</span></div></div>
   <div class="box"><h2>بارگذاری اکسل فروش</h2><p class="note">فایل فروش (xls). فقط در همین مرورگر خوانده می‌شود.</p>
-  <div class="upl"><button class="btn" onclick="$('afile').click()">بارگذاری اکسل فروش</button>${ACC?`<span class="ok">✔ ${fa(ACC.rows.length)} ردیف، ${fa(Math.round(ACC.total))} متر</span>`:''}</div>${accPrevHTML()}</div>
+  <div class="upl"><button class="btn" onclick="$('afile').click()">بارگذاری اکسل فروش</button>${ACC?`<span class="ok">✔ ${fa(ACC.rows.length)} ردیف، ${fa(Math.round(ACC.total))} متر${(()=>{try{const u=JSON.parse(localStorage.getItem('rionAccUp')||'null');return u?' · آخرین بارگذاری: '+esc(u):''}catch(e){return ''}})()}</span>`:''}</div>${accPrevHTML()}</div>
   <div class="box"><h2>بارگذاری اکسل انبار</h2><p class="note">فایل موجودی انبار (xls). ضایعات، اضافه طاقه و خرید از کارخانه از روی آن محاسبه می‌شود و در همین مرورگر ذخیره می‌شود.</p><p class="note"><b>ستون‌های لازم</b> (به همین ترتیب و موقعیت، ۱۳ ستون): ۱ ردیف، ۲ <b>عنوان تفصیلی</b> (طرف حساب؛ مثل «ضایعات»، «اضافات طاقه»، «پایاپود»)، ۳ تاریخ، ۴ <b>کد کالا</b>، ۵ <b>مقدار</b> (متر)، ۶ ردیابی، ۷ موجودی انبار، ۸ شماره، ۹ سند، ۱۰ <b>نوع</b> (مثل «خرید (داخلی)»)، ۱۱ کد تفصیلی، ۱۲ <b>ماه</b> (۱ تا ۸)، ۱۳ <b>گروه فروش</b> (مثل PAYA(RION) یا DELVAN(RION)). ستون‌های پررنگ مستقیماً استفاده می‌شوند و بقیه فقط باید در جای خود باشند. فایل باید همان خروجی XML اکسل (xls) نرم‌افزار انبار باشد.</p>
-  <div class="upl"><button class="btn" onclick="$('wfile').click()">بارگذاری اکسل انبار</button>${WH&&WH.up?`<span class="ok">✔ آخرین بارگذاری: ${WH.up}</span>`:''}</div></div>
+  <div class="upl"><button class="btn" onclick="$('wfile').click()">بارگذاری اکسل انبار</button>${WH&&WH.up?`<span class="ok">✔ ${WH.tot?fa(WH.tot)+' ردیف، '+fa(Math.round(WH.fac.paya.m+WH.fac.delvan.m))+' متر خرید · ':''}آخرین بارگذاری: ${esc(WH.up)}</span>`:''}</div></div>
   <div class="box"><h2>تنظیمات</h2><p class="note">این مقادیر فقط در همین مرورگر ذخیره می‌شوند.</p>
   <div class="setf">
    <label>هدف فروش سالانه (متر)<input id="s_t" type="number" min="0" value="${c.target}"></label>
@@ -2591,7 +2591,7 @@ function accPrevHTML(){
 let PEND=null;
 async function accSave(){
   if(!PEND||!PEND.rows.length)return;
-  const rows=PEND.rows;PEND=null;
+  const rows=PEND.rows;try{localStorage.setItem('rionAccUp',JSON.stringify(new Date().toLocaleDateString('fa-IR')+' · '+PEND.name))}catch(e){}PEND=null;
   try{localStorage.setItem('rionAcc',JSON.stringify(rows))}catch(err){}
   ACCR=rows;buildAcc(rows);saveAY(rows);applyAcc();draw();
   let st='✔ اکسل حسابداری فقط روی این مرورگر ذخیره شد';
