@@ -887,7 +887,8 @@ function ovNums(){
   const pace=c?mon.slice(1,c+1).reduce((a,b)=>a+b,0)/c:0, proj=pace*12;
   const shopM=D.shops.reduce((a,s)=>a+s.total,0), repM=D.reps.reduce((a,r)=>a+r.total,0);
   const nShops=D.shops.length, base=cfg.base??nShops, added=NEWSH().length, gN=cfg.newGoal||0;
-  return {cfg,target,c,mon,sold,left,rem,need,pace,proj,cnt,inact,coll,shopM,repM,nShops,base,added,gN};
+  const prev=mon.slice(1,c).reduce((a,b)=>a+b,0), mT=Math.max(target-prev,0)/Math.max(13-c,1);
+  return {mT,cfg,target,c,mon,sold,left,rem,need,pace,proj,cnt,inact,coll,shopM,repM,nShops,base,added,gN};
 }
 // مغازه‌هایی که در سال جاری در شیت «جدید» بوده‌اند تا آخر سال شمرده می‌شوند، حتی بعد از انتقال به شیت دیگر
 function NEWSH(){
@@ -978,7 +979,7 @@ function drillPanel(g){
 }
 function viewOver(){
   const o=ovNums(),{target,c,sold,left,rem,need,pace,proj,inact,coll,shopM,repM,gN,added,cnt,nShops}=o;
-  const mT=target/12, maxM=Math.max(...o.mon.slice(1),mT)*1.1||1, tot=sold||1;
+  const mT=o.mT, maxM=Math.max(...o.mon.slice(1),mT)*1.1||1, tot=sold||1;
   const jd=new Date(Date.now()+NOWOFF),[jy,jm,jdd]=g2j(jd.getFullYear(),jd.getMonth()+1,jd.getDate());
   const WDN=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
   const pct=v=>fa(Math.round((+v||0)*10)/10)+'٪';
