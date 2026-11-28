@@ -2359,7 +2359,7 @@ function listView(){
   const sorted=rows.slice().sort((a,b)=>(a.fac>b.fac?1:a.fac<b.fac?-1:0)||(a.l-b.l)||(a.c>b.c?1:-1));
   const body=sorted.map(x=>{const st=ST.find(q=>q[1]===x.l);const col=st?st[2]:'#6b7280';
     return `<tr><td dir="ltr" style="text-align:right;font-size:11px"><b>${esc(x.c)}</b></td><td>${FN[x.fac]}</td><td class="n">${fm(x.s)}</td><td class="n">${x.cover==null?'—':fa(Math.round(x.cover*10)/10)}</td><td class="n">${x.sug>0?fm(x.sug):'—'}</td><td class="n">${x.ord?fm(x.ord):'—'}</td><td style="color:${col};font-weight:700">${x.tr?(st?st[0]:'—'):'<span class="note">ثبت نشده</span>'}${x.l===5&&x.fm?' ('+fm(x.fm)+' م)':''}</td><td dir="ltr" style="text-align:right;font-size:11px">${esc(x.dt||'')}</td></tr>`}).join('');
-  return `<div style="padding:14px;background:#fff;border:1px solid #dfe7f5;border-radius:16px"><div style="font-weight:700;margin-bottom:10px">لیست سفارشات (پایا و دلوان)</div>
+  return `<div class="seg" style="margin-bottom:12px">${sfBtns()}</div><div style="padding:14px;background:#fff;border:1px solid #dfe7f5;border-radius:16px"><div style="font-weight:700;margin-bottom:10px">لیست سفارشات (پایا و دلوان)</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:12px">${chips}</div>
   <p class="note">مرحله هر کد از بخش «پیگیری سفارش» خوانده می‌شود. موجودی و پیشنهاد سفارش بر اساس تنظیمات انبار محاسبه شده‌اند.</p>
   <div class="wrap"><table class="bt" style="font-size:12px"><tr><th>کد</th><th>کارخانه</th><th class="n">موجودی (متر)</th><th class="n">پوشش (ماه)</th><th class="n">پیشنهاد سفارش</th><th class="n">سفارش ثبت‌شده</th><th>مرحله</th><th>تاریخ</th></tr>${body}</table></div></div>`}
