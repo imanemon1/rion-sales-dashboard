@@ -2328,7 +2328,7 @@ function overView(){
   const srt=l=>l.slice().sort((a,b)=>(a.cover==null)-(b.cover==null)||(a.cover||0)-(b.cover||0));
   const allT=l=>`<table class="bt" style="font-size:12px"><tr><th>کد</th><th>موجودی</th><th>فروش/ماه</th><th>پوشش</th><th>وضعیت</th></tr>${l.map(x=>{const st=ST(x),o=ordered.has(x.c);return `<tr>${cd(x)}<td class="n">${fm(x.s)}</td><td class="n">${fm(Math.round(x.avg))}</td><td class="n">${cv(x)}</td><td style="color:${st[1]}"><b>${st[0]}</b>${o?' · در جریان':x.sug>0?' · سفارش '+fm(x.sug)+' م':''}</td></tr>`}).join('')}</table>`;
   const allCard=`<div class="box" style="margin:10px 0"><h3>وضعیت همهٔ کدهای آلبوم (${fa(by.paya.length+by.delvan.length)} کد)</h3><p class="note">مرتب از کمترین پوشش. «سفارش» یعنی متراژ پیشنهادی تا رسیدن به هدف پوشش.</p><div class="ak-g" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start"><div><b>پایا (${fa(by.paya.length)})</b><div class="wrap">${allT(srt(by.paya))}</div></div><div><b>دلوان (${fa(by.delvan.length)})</b><div class="wrap">${allT(srt(by.delvan))}</div></div></div></div>`;
-  return `<div class="box"><h2>انبار و سفارش</h2><div class="seg">${sfBtns()}</div>
+  return `<div class="box" data-cap><h2>انبار و سفارش</h2><button class="btn sec dl_img" style="height:34px;padding:0 12px;font-size:12px;border-radius:10px;margin:0 0 10px">⬇ دانلود تصویر</button><div class="seg">${sfBtns()}</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">${kp('موجودی کل',fm(T.s)+' متر')}${kp('ارزش موجودی',mt(T.v)+' م.ت')}${kp('تعداد کد (آلبوم)',fa(by.paya.length+by.delvan.length))}${kp('طاقه (≥۱ متر)',fa(T.r))}</div>
   ${whOver()}
   ${allCard}
@@ -2346,8 +2346,27 @@ function overView(){
   ${tbl(['کد','موجودی','فروش کل (متر)','مشتری','متر به ازای مشتری','ارزش (م.ت)'],low.map(o=>`<tr>${cd(o.x)}<td class="n">${fm(o.x.s)}</td><td class="n">${fm(o.a.q)}</td><td class="n">${fa(o.a.nc)}</td><td class="n">${fm(Math.round(mpc(o)))}</td><td class="n"><b>${mt(o.x.s*o.x.p)}</b></td></tr>`).join(''))}
   </div>`;
 }
-function trackView(O){return `<div class="box"><h2>انبار و سفارش</h2><div class="seg">${sfBtns()}</div>${tabsHtml(O)}${trackHtml(O)}</div>`}
+function trackView(O){return `<div class="box" data-cap><h2>انبار و سفارش</h2><button class="btn sec dl_img" style="height:34px;padding:0 12px;font-size:12px;border-radius:10px;margin:0 0 10px">⬇ دانلود تصویر</button><div class="seg">${sfBtns()}</div>${tabsHtml(O)}${trackHtml(O)}</div>`}
 function sfBtns(){return `<button class="${S.sf==='over'?'on':''}" data-sf="over">نمای کلی</button><button class="${S.sf==='list'?'on':''}" data-sf="list">لیست سفارشات</button>`+SFAC.map(f=>`<button class="${S.sf===f[0]?'on':''}" data-sf="${f[0]}">${f[1]} (${fa(STK.filter(x=>f[2](x.g||'')).length)})</button>`).join('')}
+function capImg(el,btn){
+  const old=btn.textContent;btn.textContent='در حال ساخت…';
+  const clone=el.cloneNode(true),src=[el,...el.querySelectorAll('*')],dst=[clone,...clone.querySelectorAll('*')];
+  src.forEach((a,i)=>{const cs=getComputedStyle(a),d=dst[i];let t='';for(const k of cs)t+=k+':'+cs.getPropertyValue(k)+';';d.setAttribute('style',t)});
+  clone.querySelectorAll('.dl_img,button.btn').forEach(x=>x.remove());
+  clone.querySelectorAll('.wrap').forEach(x=>{x.style.overflow='visible';x.style.maxHeight='none'});
+  const host=document.createElement('div');host.style.cssText='position:fixed;left:-99999px;top:0;width:'+Math.max(el.scrollWidth,el.offsetWidth)+'px';
+  clone.style.width=host.style.width;clone.style.background='#fff';host.appendChild(clone);document.body.appendChild(host);
+  const w=Math.ceil(host.offsetWidth),h=Math.ceil(clone.scrollHeight)+10;
+  const xml=new XMLSerializer().serializeToString(clone);host.remove();
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="background:#fff;width:${w}px">${xml}</div></foreignObject></svg>`;
+  const img=new Image(),fail=()=>{btn.textContent=old;alert('ساخت تصویر ناموفق بود')};
+  img.onload=()=>{const sc=Math.min(2,12000/Math.max(h,1)),c=document.createElement('canvas');c.width=w*sc;c.height=h*sc;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.scale(sc,sc);x.drawImage(img,0,0);
+    c.toBlob(async b=>{btn.textContent=old;if(!b)return fail();const f=new File([b],'rion-'+new Date().toISOString().slice(0,10)+'.png',{type:'image/png'});
+      try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e&&e.name==='AbortError')return}
+      const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove()},'image/png')};
+  img.onerror=fail;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+document.addEventListener('click',e=>{const b=e.target.closest('.dl_img');if(!b)return;const el=b.closest('[data-cap]');if(el)capImg(el,b)});
 function listView(){
   const O=getOrd(),FN={paya:'پایا',delvan:'دلوان'};
   if(!Array.isArray(O.tr))O.tr=[];
@@ -2362,7 +2381,7 @@ function listView(){
   const sorted=rows.slice().sort((a,b)=>(a.fac>b.fac?1:a.fac<b.fac?-1:0)||(a.l-b.l)||(a.c>b.c?1:-1));
   const body=sorted.map(x=>{const st=ST.find(q=>q[1]===x.l);const col=st?st[2]:'#6b7280';
     return `<tr><td dir="ltr" style="text-align:right;font-size:11px"><b>${esc(x.c)}</b></td><td>${FN[x.fac]}</td><td class="n">${fm(x.s)}</td><td class="n">${x.cover==null?'—':fa(Math.round(x.cover*10)/10)}</td><td class="n">${x.sug>0?fm(x.sug):'—'}</td><td class="n">${x.ord?fm(x.ord):'—'}</td><td style="color:${col};font-weight:700">${x.tr?(st?st[0]:'—'):'<span class="note">ثبت نشده</span>'}${x.l===5&&x.fm?' ('+fm(x.fm)+' م)':''}</td><td dir="ltr" style="text-align:right;font-size:11px">${esc(x.dt||'')}</td></tr>`}).join('');
-  return `<div class="seg" style="margin-bottom:12px">${sfBtns()}</div><div style="padding:14px;background:#fff;border:1px solid #dfe7f5;border-radius:16px"><div style="font-weight:700;margin-bottom:10px">لیست سفارشات (پایا و دلوان)</div>
+  return `<div class="seg" style="margin-bottom:12px">${sfBtns()}</div><div data-cap style="padding:14px;background:#fff;border:1px solid #dfe7f5;border-radius:16px"><div style="font-weight:700;margin-bottom:10px">لیست سفارشات (پایا و دلوان)</div><button class="btn sec dl_img" style="height:34px;padding:0 12px;font-size:12px;border-radius:10px;margin:0 0 10px">⬇ دانلود تصویر</button>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:12px">${chips}</div>
   <p class="note">مرحله هر کد از بخش «پیگیری سفارش» خوانده می‌شود. موجودی و پیشنهاد سفارش بر اساس تنظیمات انبار محاسبه شده‌اند.</p>
   <div class="wrap"><table class="bt" style="font-size:12px"><tr><th>کد</th><th>کارخانه</th><th class="n">موجودی (متر)</th><th class="n">پوشش (ماه)</th><th class="n">پیشنهاد سفارش</th><th class="n">سفارش ثبت‌شده</th><th>مرحله</th><th>تاریخ</th></tr>${body}</table></div></div>`}
@@ -2409,7 +2428,7 @@ function viewStock(){
    <div style="${BOX};text-align:center"><div class="note">ارزش موجودی</div><b>${fm(Math.round(tot.sv/10/1e6))} م.ت</b></div>
   </div>
 `;
-  return `<div class="box"><h2>انبار و سفارش</h2>${fseg}
+  return `<div class="box" data-cap><h2>انبار و سفارش</h2><button class="btn sec dl_img" style="height:34px;padding:0 12px;font-size:12px;border-radius:10px;margin:0 0 10px">⬇ دانلود تصویر</button>${fseg}
   ${isOther?'<p class="note">این کدها (امید جیناک، خارج‌شده از بوک و بدون گروه) به کارخانهٔ دلوان یا پایا سفارش داده نمی‌شوند؛ فقط موجودی و آمار فروش نمایش داده می‌شود.</p>':''}
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center">
    ${tabsHtml(O)}
